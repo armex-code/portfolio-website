@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Abderrahman Elarfaoui — Creative Developer</title>
+  <meta name="description" content="Abderrahman Elarfaoui — creative developer crafting immersive, jaw-dropping web experiences with 3D, motion and clean code.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+  <div class="scrim"></div>
+  <div class="grain"></div>
+  <div class="cursor"></div>
+  <div class="cursor-ring"></div>
+
+  <nav>
+    <a class="brand" href="experience.html">AE.</a>
+    <div class="links">
+      <a href="#about">About</a>
+      <a href="#work">Work</a>
+      <a href="#contact">Contact</a>
+      <a href="index.html">↩ Basic</a>
+    </div>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow reveal-h">Abderrahman Elarfaoui — Creative Developer</div>
+      <h1 class="reveal-h">
+        Crafting <span class="serif" style="color:var(--accent)">jaw&#8209;dropping</span><br>
+        web experiences.
+      </h1>
+      <p class="lead reveal-h">
+        Student at Al Akhawayn University. I blend clean code with 3D, motion,
+        and just enough chaos to make people stop scrolling.
+      </p>
+      <div class="cta reveal-h">
+        <a class="btn" href="#work">View Work</a>
+        <a class="btn ghost" href="#contact">Get in Touch</a>
+        <button class="btn-tiny" onclick="partyTime()" title="don't press this">psst</button>
+      </div>
+    </div>
+    <div class="scroll-hint">Scroll</div>
+  </header>
+
+  <!-- ===== MARQUEE ===== -->
+  <div class="marquee">
+    <div class="marquee-track">
+      <span>Three.js</span><span class="dot">✦</span><span>WebGL</span><span class="dot">✦</span>
+      <span>Motion</span><span class="dot">✦</span><span>Creative Code</span><span class="dot">✦</span>
+      <span>UI / UX</span><span class="dot">✦</span><span>Front&#8209;End</span><span class="dot">✦</span>
+      <span>3D</span><span class="dot">✦</span><span>Interaction</span><span class="dot">✦</span>
+      <span>Three.js</span><span class="dot">✦</span><span>WebGL</span><span class="dot">✦</span>
+      <span>Motion</span><span class="dot">✦</span><span>Creative Code</span><span class="dot">✦</span>
+      <span>UI / UX</span><span class="dot">✦</span><span>Front&#8209;End</span><span class="dot">✦</span>
+      <span>3D</span><span class="dot">✦</span><span>Interaction</span><span class="dot">✦</span>
+    </div>
+  </div>
+
+  <!-- ===== ABOUT ===== -->
+  <section id="about">
+    <div class="wrap about-grid">
+      <div class="reveal">
+        <div class="eyebrow">About</div>
+        <p class="big">
+          I turn ideas into things you can <span class="serif">click, feel</span> and remember —
+          building for the web with an obsession for detail and motion.
+        </p>
+        <p class="body">
+          Based in Ifrane, Morocco. Always experimenting, always shipping. When I'm not
+          coding, I'm probably breaking something just to learn how to rebuild it better.
+        </p>
+        <div class="stat-row">
+          <div class="stat"><b>3+</b><span>Projects</span></div>
+          <div class="stat"><b>∞</b><span>Curiosity</span></div>
+          <div class="stat"><b>24/7</b><span>Learning</span></div>
+        </div>
+      </div>
+      <div class="reveal">
+        <p class="body" style="border-left:2px solid var(--accent); padding-left:20px;">
+          <b style="color:var(--text)">Currently exploring</b><br>
+          3D on the web, shaders, interaction design, and shipping fast on Vercel.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SKILLS ===== -->
+  <section id="skills">
+    <div class="wrap">
+      <div class="reveal">
+        <div class="eyebrow">Toolbox</div>
+        <h2 class="title">Skills &amp; tools</h2>
+      </div>
+      <div class="skills-grid reveal">
+        <div class="skill"><div class="ico">🌐</div><h4>HTML &amp; CSS</h4><small>Semantic, responsive</small></div>
+        <div class="skill"><div class="ico">⚡</div><h4>JavaScript</h4><small>Vanilla &amp; modern</small></div>
+        <div class="skill"><div class="ico">🧊</div><h4>Three.js</h4><small>3D / WebGL</small></div>
+        <div class="skill"><div class="ico">🎨</div><h4>UI / Motion</h4><small>Design &amp; animation</small></div>
+        <div class="skill"><div class="ico">▲</div><h4>Vercel</h4><small>Deploy &amp; CI/CD</small></div>
+        <div class="skill"><div class="ico">🧠</div><h4>Problem Solving</h4><small>Always learning</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WORK ===== -->
+  <section id="work">
+    <div class="wrap">
+      <div class="reveal">
+        <div class="eyebrow">Selected Work</div>
+        <h2 class="title">Projects</h2>
+      </div>
+      <div class="proj-grid reveal">
+        <a class="proj-card" data-tilt href="projects/project-one.html">
+          <span class="num">01</span>
+          <h3>Project One</h3>
+          <p>A short description of the first project. Click to open the full case study.</p>
+          <div class="tags"><span class="tag">Web</span><span class="tag">Coming soon</span></div>
+          <span class="go">Explore →</span>
+        </a>
+        <a class="proj-card" data-tilt href="projects/project-two.html">
+          <span class="num">02</span>
+          <h3>Project Two</h3>
+          <p>A short description of the second project. Click to open the full case study.</p>
+          <div class="tags"><span class="tag">Design</span><span class="tag">Coming soon</span></div>
+          <span class="go">Explore →</span>
+        </a>
+        <a class="proj-card" data-tilt href="projects/project-three.html">
+          <span class="num">03</span>
+          <h3>Project Three</h3>
+          <p>A short description of the third project. Click to open the full case study.</p>
+          <div class="tags"><span class="tag">3D</span><span class="tag">Coming soon</span></div>
+          <span class="go">Explore →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section id="contact" class="contact">
+    <div class="wrap reveal">
+      <div class="eyebrow" style="justify-content:center">Say Hello</div>
+      <h2 class="title">Let's make something<br><span class="serif" style="color:var(--accent)">unforgettable.</span></h2>
+      <p>Got an idea, an opportunity, or just want to chat? My inbox is always open.</p>
+      <div class="cta">
+        <a class="btn" href="mailto:a.elarfaoui@aui.ma">Email Me</a>
+        <a class="btn ghost" href="https://github.com/armex-code" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn ghost" href="https://www.linkedin.com/in/ar-elarfaoui/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <span>© <span id="year"></span> Abderrahman Elarfaoui</span>
+      <span>
+        <a href="index.html">Basic version</a>
+        &nbsp; · &nbsp; Built with Three.js
+        <button class="btn-tiny" onclick="partyTime()" title="tiny button of joy">✦</button>
+      </span>
+    </div>
+  </footer>
+
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

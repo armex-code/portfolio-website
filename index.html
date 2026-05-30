@@ -3,140 +3,55 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Abderrahman Elarfaoui — Portfolio</title>
-  <meta name="description" content="Abderrahman Elarfaoui — student, builder, and creative developer. Portfolio with projects, skills, and contact.">
-  <link rel="stylesheet" href="css/style.css">
+  <title>Abderrahman Elarfaoui - Portfolio</title>
 </head>
 <body>
 
-  <canvas id="bg-canvas"></canvas>
+  <h1>Abderrahman Elarfaoui</h1>
+  <p>Welcome to my portfolio website.</p>
 
-  <nav>
-    <div class="brand">A<span>E</span></div>
-    <div class="links">
-      <a href="#about">About</a>
-      <a href="#skills">Skills</a>
-      <a href="#projects">Projects</a>
-      <a href="#contact">Contact</a>
-    </div>
-  </nav>
+  <h2>★ Special Button ★</h2>
+  <p>Click below to launch the ultra-modern, animated 3D version of this site:</p>
+  <p>
+    <button onclick="window.location.href='experience.html'">
+      🚀 Enter the Immersive Experience →
+    </button>
+  </p>
 
-  <!-- ===== HERO ===== -->
-  <header class="hero">
-    <div class="wrap">
-      <div class="eyebrow">Student · Builder · Creative Developer</div>
-      <h1>Abderrahman<br>Elarfaoui</h1>
-      <p class="lead">
-        I design and build modern web experiences — blending clean code with
-        3D, motion, and a little bit of chaos. Welcome to my corner of the internet.
-      </p>
-      <div class="cta">
-        <a class="btn grad" href="#projects">View Projects</a>
-        <a class="btn ghost" href="#contact">Get in Touch</a>
-        <button class="btn-tiny" onclick="partyTime()" title="don't press this">psst</button>
-      </div>
-    </div>
-    <div class="scroll-hint">Scroll ↓</div>
-  </header>
+  <h2>About Me</h2>
+  <p>
+    I am a student at Al Akhawayn University in Ifrane. I enjoy building things,
+    learning new technologies, and working on creative projects.
+  </p>
 
-  <!-- ===== ABOUT ===== -->
-  <section id="about">
-    <div class="wrap about-grid reveal">
-      <div>
-        <div class="eyebrow">About Me</div>
-        <h2 class="title">Turning ideas into things you can click.</h2>
-        <p>
-          I'm a student at Al Akhawayn University in Ifrane. I love building things,
-          experimenting with new technologies, and pushing pixels until they feel right.
-          Whether it's a web app, a 3D scene, or a weird side project — I'm in.
-        </p>
-        <div class="stat-row">
-          <div class="stat glass"><b>3+</b><span>Projects</span></div>
-          <div class="stat glass"><b>∞</b><span>Curiosity</span></div>
-          <div class="stat glass"><b>24/7</b><span>Learning</span></div>
-        </div>
-      </div>
-      <div class="glass" style="padding:30px;border-radius:20px;">
-        <p style="color:var(--text);font-weight:600;margin-bottom:10px;">Currently exploring</p>
-        <p>Web development, 3D on the web (Three.js), interaction design, and shipping fast on Vercel.</p>
-      </div>
-    </div>
-  </section>
+  <h2>Projects</h2>
+  <ul>
+    <li><a href="projects/project-one.html">Project One</a> - A short description of the first project.</li>
+    <li><a href="projects/project-two.html">Project Two</a> - A short description of the second project.</li>
+    <li><a href="projects/project-three.html">Project Three</a> - A short description of the third project.</li>
+  </ul>
 
-  <!-- ===== SKILLS ===== -->
-  <section id="skills">
-    <div class="wrap">
-      <div class="reveal">
-        <div class="eyebrow">Toolbox</div>
-        <h2 class="title">Skills &amp; Tools</h2>
-      </div>
-      <div class="skills-grid reveal">
-        <div class="skill glass"><div class="ico">🌐</div><h4>HTML &amp; CSS</h4><small>Semantic, responsive</small></div>
-        <div class="skill glass"><div class="ico">⚡</div><h4>JavaScript</h4><small>Vanilla &amp; modern</small></div>
-        <div class="skill glass"><div class="ico">🧊</div><h4>Three.js</h4><small>3D on the web</small></div>
-        <div class="skill glass"><div class="ico">🎨</div><h4>UI / Motion</h4><small>Design &amp; animation</small></div>
-        <div class="skill glass"><div class="ico">▲</div><h4>Vercel</h4><small>Deploy &amp; CI/CD</small></div>
-        <div class="skill glass"><div class="ico">🧠</div><h4>Problem Solving</h4><small>Always learning</small></div>
-      </div>
-    </div>
-  </section>
+  <h2>Links</h2>
+  <p>Use the buttons below to get in touch or see more.</p>
+  <button onclick="window.location.href='mailto:a.elarfaoui@aui.ma'">Email Me</button>
+  <button onclick="window.location.href='https://github.com/armex-code'">GitHub</button>
+  <button onclick="window.location.href='https://www.linkedin.com/in/ar-elarfaoui/'">LinkedIn</button>
 
-  <!-- ===== PROJECTS ===== -->
-  <section id="projects">
-    <div class="wrap">
-      <div class="reveal">
-        <div class="eyebrow">Selected Work</div>
-        <h2 class="title">Projects</h2>
-      </div>
-      <div class="proj-grid reveal">
-        <a class="proj-card glass" data-tilt href="projects/project-one.html">
-          <span class="num">01</span>
-          <h3>Project One</h3>
-          <p>A short description of the first project. Click to see the full case study.</p>
-          <div class="tags"><span class="tag">Web</span><span class="tag">Coming soon</span></div>
-          <span class="go">Explore →</span>
-        </a>
-        <a class="proj-card glass" data-tilt href="projects/project-two.html">
-          <span class="num">02</span>
-          <h3>Project Two</h3>
-          <p>A short description of the second project. Click to see the full case study.</p>
-          <div class="tags"><span class="tag">Design</span><span class="tag">Coming soon</span></div>
-          <span class="go">Explore →</span>
-        </a>
-        <a class="proj-card glass" data-tilt href="projects/project-three.html">
-          <span class="num">03</span>
-          <h3>Project Three</h3>
-          <p>A short description of the third project. Click to see the full case study.</p>
-          <div class="tags"><span class="tag">3D</span><span class="tag">Coming soon</span></div>
-          <span class="go">Explore →</span>
-        </a>
-      </div>
-    </div>
-  </section>
+  <h2>Fun Zone</h2>
+  <p>Need a laugh? Click to reveal:</p>
+  <details>
+    <summary>Tell me a joke</summary>
+    <p>Why do programmers prefer dark mode? Because light attracts bugs!</p>
+  </details>
 
-  <!-- ===== CONTACT ===== -->
-  <section id="contact" class="contact">
-    <div class="wrap reveal">
-      <div class="eyebrow">Say Hello</div>
-      <h2 class="title">Let's build something.</h2>
-      <p>Got an idea, an opportunity, or just want to chat? My inbox is always open.</p>
-      <div class="cta">
-        <a class="btn grad" href="mailto:a.elarfaoui@aui.ma">Email Me</a>
-        <a class="btn ghost" href="https://github.com/armex-code" target="_blank" rel="noopener">GitHub</a>
-        <a class="btn ghost" href="https://www.linkedin.com/in/ar-elarfaoui/" target="_blank" rel="noopener">LinkedIn</a>
-      </div>
-    </div>
-  </section>
+  <p>How many times can you click this button?</p>
+  <button onclick="this.firstChild.data = 'Clicked ' + (this.count = (this.count || 0) + 1) + ' times!'">Click me!</button>
 
-  <footer>
-    <div class="wrap">
-      © <span id="year"></span> Abderrahman Elarfaoui · Built with HTML, CSS, JS &amp; Three.js
-      <button class="btn-tiny" onclick="partyTime()" title="tiny button of joy">✦</button>
-    </div>
-  </footer>
+  <p>Press for a random good vibe:</p>
+  <button onclick="alert(['You are awesome!','Keep coding!','Great things ahead!','Stay curious!','You got this!'][Math.floor(Math.random()*5)])">Surprise me</button>
 
-  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="js/main.js"></script>
+  <h2>Contact</h2>
+  <p>Email: a.elarfaoui@aui.ma</p>
+
 </body>
 </html>
