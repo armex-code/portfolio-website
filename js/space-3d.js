@@ -37,7 +37,7 @@
   placeCloud();
 
   /* --- LiDAR / Nanobot Point Cloud Swarm --- */
-  const pointCount = 12000;
+  const pointCount = innerWidth < 768 ? 4000 : 12000;
   const geometry = new THREE.BufferGeometry();
   
   // Create multiple arrays for morphing targets

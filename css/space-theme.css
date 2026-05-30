@@ -30,6 +30,11 @@ body {
 ::selection { background: var(--accent); color: #000; }
 a { color: inherit; text-decoration: none; }
 
+@media (hover: none) and (pointer: coarse) {
+  .cursor, .cursor-ring { display: none !important; }
+  body { cursor: auto; }
+}
+
 /* ===== HUD Overlays ===== */
 .scanline {
   position: fixed; inset: 0; z-index: 9998; pointer-events: none;
@@ -126,6 +131,12 @@ nav .links { display: flex; gap: 30px; font-size: 0.85rem; font-family: var(--fo
 nav .links a { color: var(--text); position: relative; transition: color 0.2s; }
 nav .links a:hover { color: var(--accent); text-shadow: 0 0 8px var(--accent); }
 
+@media (max-width: 768px) {
+  nav { flex-direction: column; padding: 15px 5%; gap: 10px; }
+  nav .links { gap: 15px; font-size: 0.75rem; flex-wrap: wrap; justify-content: center; }
+  .corners i { width: 15px; height: 15px; }
+}
+
 /* ===== Hero ===== */
 .hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding-top: 80px; }
 .hero h1 {
@@ -151,7 +162,7 @@ nav .links a:hover { color: var(--accent); text-shadow: 0 0 8px var(--accent); }
 }
 
 .hero .lead { margin-top: 30px; max-width: 600px; font-size: 1.1rem; color: var(--muted); font-family: var(--font-mono); }
-.hero .cta { margin-top: 40px; display: flex; gap: 20px; }
+.hero .cta { margin-top: 40px; display: flex; gap: 20px; flex-wrap: wrap; }
 
 /* ===== Buttons ===== */
 .btn {
@@ -210,7 +221,11 @@ nav .links a:hover { color: var(--accent); text-shadow: 0 0 8px var(--accent); }
 
 /* ===== Footer ===== */
 footer { padding: 40px 0; border-top: 1px solid var(--line); font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); }
-footer .wrap { display: flex; justify-content: space-between; align-items: center; }
+footer .wrap { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; text-align: center; }
+
+@media (max-width: 600px) {
+  footer .wrap { flex-direction: column; justify-content: center; }
+}
 
 /* ===== Scroll reveal ===== */
 .reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.8s, transform 0.8s; }
