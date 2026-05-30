@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Abderrahman El Arfaoui - Portfolio</title>
+  <title>Abderrahman Elarfaoui - Portfolio</title>
 </head>
 <body>
 
-  <h1>Abderrahman El Arfaoui</h1>
+  <marquee behavior="alternate">Welcome to my corner of the internet!</marquee>
+
+  <h1>Abderrahman Elarfaoui</h1>
   <p>Welcome to my portfolio website.</p>
 
   <h2>About Me</h2>
@@ -29,6 +31,20 @@
   <button onclick="window.location.href='mailto:elarfaouiabderrahman@gmail.com'">Email Me</button>
   <button onclick="window.location.href='https://github.com'">GitHub</button>
   <button onclick="window.location.href='https://linkedin.com'">LinkedIn</button>
+
+  <h2>Fun Zone</h2>
+
+  <p>Need a laugh? Click to reveal:</p>
+  <details>
+    <summary>Tell me a joke</summary>
+    <p>Why do programmers prefer dark mode? Because light attracts bugs!</p>
+  </details>
+
+  <p>How many times can you click this button?</p>
+  <button onclick="this.firstChild.data = 'Clicked ' + (this.count = (this.count || 0) + 1) + ' times!'">Click me!</button>
+
+  <p>Press for a random good vibe:</p>
+  <button onclick="alert(['You are awesome!','Keep coding!','Great things ahead!','Stay curious!','You got this!'][Math.floor(Math.random()*5)])">Surprise me</button>
 
   <h2>Contact</h2>
   <p>Email: elarfaouiabderrahman@gmail.com</p>
