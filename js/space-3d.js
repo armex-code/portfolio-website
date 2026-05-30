@@ -1,7 +1,6 @@
 /* ============================================================
-   SPACE ROBOTIC 3D HERO
-   Three.js (r128). Wireframe rotating cyber-globe + starfield.
-   With UnrealBloom Post-Processing
+   ROBOTICS 3D HERO - LiDAR POINT CLOUD SWARM
+   Three.js (r128). Interactive point cloud with Bloom.
    ============================================================ */
 (function () {
   const canvas = document.getElementById("bg-canvas");
@@ -11,23 +10,21 @@
   scene.fog = new THREE.FogExp2(0x030613, 0.04);
 
   const camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.1, 100);
-  camera.position.z = 10;
+  camera.position.z = 12;
+  camera.position.y = 2;
 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.setSize(innerWidth, innerHeight);
 
-  // --- POST-PROCESSING ---
+  // --- POST-PROCESSING (Jaw-dropping Bloom) ---
   const renderScene = new THREE.RenderPass(scene, camera);
   const bloomPass = new THREE.UnrealBloomPass(
     new THREE.Vector2(innerWidth, innerHeight),
-    1.5, // strength
-    0.4, // radius
-    0.85 // threshold
+    2.5, // intense strength for LiDAR dots
+    0.5, // radius
+    0.3 // threshold
   );
-  bloomPass.strength = 1.8;
-  bloomPass.radius = 0.5;
-  bloomPass.threshold = 0.1;
 
   const composer = new THREE.EffectComposer(renderer);
   composer.addPass(renderScene);
@@ -36,92 +33,192 @@
   const group = new THREE.Group();
   scene.add(group);
 
-  function placeGlobe() { group.position.x = innerWidth > 820 ? 3.5 : 0; }
-  placeGlobe();
+  function placeCloud() { group.position.x = innerWidth > 820 ? 4 : 0; }
+  placeCloud();
 
-  /* --- Cyber Globe --- */
-  const geo = new THREE.IcosahedronGeometry(3.5, 2);
+  /* --- LiDAR / Nanobot Point Cloud Swarm --- */
+  const pointCount = 12000;
+  const geometry = new THREE.BufferGeometry();
   
-  // Wireframe material with neon glow
-  const mat = new THREE.MeshBasicMaterial({ 
-    color: 0x00f3ff, 
-    wireframe: true, 
-    transparent: true, 
-    opacity: 0.15 
-  });
+  // Create multiple arrays for morphing targets
+  const positionsBase = new Float32Array(pointCount * 3);
+  const positionsTargetSphere = new Float32Array(pointCount * 3);
+  const positionsTargetCube = new Float32Array(pointCount * 3);
+  const colors = new Float32Array(pointCount * 3);
+  const sizes = new Float32Array(pointCount);
   
-  const globe = new THREE.Mesh(geo, mat);
-  group.add(globe);
+  const color1 = new THREE.Color(0x00f3ff); // Cyan
+  const color2 = new THREE.Color(0x00ff88); // Matrix/LiDAR Green
 
-  // Inner dark core to hide back wireframes slightly
-  const coreMat = new THREE.MeshBasicMaterial({ color: 0x030613 });
-  const core = new THREE.Mesh(new THREE.IcosahedronGeometry(3.4, 2), coreMat);
-  group.add(core);
+  for (let i = 0; i < pointCount; i++) {
+    const i3 = i * 3;
+    
+    // Base: Random scattered cloud
+    positionsBase[i3] = (Math.random() - 0.5) * 40;
+    positionsBase[i3 + 1] = (Math.random() - 0.5) * 40;
+    positionsBase[i3 + 2] = (Math.random() - 0.5) * 40;
 
-  // Outer orbital rings
-  const ringGeo = new THREE.RingGeometry(4.5, 4.52, 64);
-  const ringMat = new THREE.MeshBasicMaterial({ color: 0x00f3ff, side: THREE.DoubleSide, transparent: true, opacity: 0.3 });
-  const ring1 = new THREE.Mesh(ringGeo, ringMat);
-  ring1.rotation.x = Math.PI / 2;
-  group.add(ring1);
+    // Target 1: Sphere
+    const radius = 4 + Math.random() * 1.5;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(Math.random() * 2 - 1);
+    positionsTargetSphere[i3] = radius * Math.sin(phi) * Math.cos(theta);
+    positionsTargetSphere[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+    positionsTargetSphere[i3 + 2] = radius * Math.cos(phi);
 
-  const ring2 = new THREE.Mesh(ringGeo, ringMat);
-  ring2.rotation.y = Math.PI / 2;
-  group.add(ring2);
+    // Target 2: Cube / Grid structure
+    positionsTargetCube[i3] = (Math.random() - 0.5) * 8;
+    positionsTargetCube[i3 + 1] = (Math.random() - 0.5) * 8;
+    positionsTargetCube[i3 + 2] = (Math.random() - 0.5) * 8;
 
-  /* --- Starfield / Data particles --- */
-  const COUNT = 1500;
-  const pPos = new Float32Array(COUNT * 3);
-  for (let i = 0; i < COUNT * 3; i++) {
-    pPos[i] = (Math.random() - 0.5) * 40;
+    // Mixed colors based on depth
+    const mixedColor = color1.clone().lerp(color2, Math.random());
+    colors[i3] = mixedColor.r;
+    colors[i3 + 1] = mixedColor.g;
+    colors[i3 + 2] = mixedColor.b;
+    
+    sizes[i] = Math.random() * 2.0;
   }
-  const pGeo = new THREE.BufferGeometry();
-  pGeo.setAttribute("position", new THREE.BufferAttribute(pPos, 3));
-  const particles = new THREE.Points(
-    pGeo,
-    new THREE.PointsMaterial({ size: 0.05, color: 0x7dd3fc, transparent: true, opacity: 0.8 })
-  );
-  scene.add(particles);
 
+  geometry.setAttribute('position', new THREE.BufferAttribute(positionsBase, 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+  
+  // Custom shader material for LiDAR dots with varying sizes
+  const material = new THREE.ShaderMaterial({
+    uniforms: {
+      time: { value: 0 },
+      mouse: { value: new THREE.Vector3() },
+      morphState: { value: 0 } // 0 = cloud, 1 = sphere, 2 = cube
+    },
+    vertexShader: `
+      uniform float time;
+      uniform vec3 mouse;
+      attribute vec3 color;
+      attribute float size;
+      varying vec3 vColor;
+      
+      void main() {
+        vColor = color;
+        
+        // Scanline effect wave
+        float wave = sin(position.y * 2.0 + time * 3.0) * 0.5 + 0.5;
+        vec3 pos = position;
+        
+        // Mouse repel
+        float dist = distance(pos, mouse * 10.0);
+        if(dist < 3.0) {
+          pos += normalize(pos - mouse * 10.0) * (3.0 - dist) * 0.5;
+        }
+
+        vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+        gl_PointSize = size * (20.0 / -mvPosition.z) * (wave * 0.8 + 0.5);
+        gl_Position = projectionMatrix * mvPosition;
+      }
+    `,
+    fragmentShader: `
+      varying vec3 vColor;
+      void main() {
+        // Circular point
+        vec2 xy = gl_PointCoord.xy - vec2(0.5);
+        float ll = length(xy);
+        if(ll > 0.5) discard;
+        
+        // Soft edge
+        float alpha = (0.5 - ll) * 2.0;
+        gl_FragColor = vec4(vColor, alpha * 0.8);
+      }
+    `,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+
+  const swarm = new THREE.Points(geometry, material);
+  group.add(swarm);
+
+  // Background ambient particles (Starfield)
+  const bgParticles = new THREE.Points(
+    geometry,
+    new THREE.PointsMaterial({ size: 0.02, color: 0x002244, transparent: true, opacity: 0.3 })
+  );
+  bgParticles.scale.set(3, 3, 3);
+  scene.add(bgParticles);
+
+  // Interaction variables
   const mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
+  const worldMouse = new THREE.Vector3();
+  
   addEventListener("mousemove", (e) => {
     mouse.targetX = (e.clientX / innerWidth - 0.5) * 2;
-    mouse.targetY = (e.clientY / innerHeight - 0.5) * 2;
+    mouse.targetY = -(e.clientY / innerHeight - 0.5) * 2; // Y is inverted for 3D Math
   });
+  
   addEventListener("resize", () => {
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(innerWidth, innerHeight);
     composer.setSize(innerWidth, innerHeight);
-    placeGlobe();
+    placeCloud();
   });
 
+  // State morphing logic
+  let currentState = 0; // 0=Cloud, 1=Sphere, 2=Cube
+  setInterval(() => {
+    currentState = (currentState + 1) % 3;
+  }, 7000); // Morph every 7 seconds
+
   const clock = new THREE.Clock();
+  
   function animate() {
     const t = clock.getElapsedTime();
-
-    // Rotate globe and rings
-    globe.rotation.y = t * 0.2;
-    globe.rotation.x = t * 0.1;
-    ring1.rotation.x = Math.PI / 2 + Math.sin(t * 0.5) * 0.2;
-    ring1.rotation.y = Math.cos(t * 0.3) * 0.2;
-    ring2.rotation.y = Math.PI / 2 + Math.cos(t * 0.4) * 0.2;
-    ring2.rotation.x = Math.sin(t * 0.6) * 0.2;
-
-    // Slowly rotate starfield
-    particles.rotation.y = t * 0.02;
-    particles.rotation.x = t * 0.01;
+    material.uniforms.time.value = t;
 
     // Smooth mouse easing
     mouse.x += (mouse.targetX - mouse.x) * 0.05;
     mouse.y += (mouse.targetY - mouse.y) * 0.05;
+    
+    worldMouse.set(mouse.x * 5, mouse.y * 5, 0);
+    material.uniforms.mouse.value.copy(worldMouse);
+
+    // Morph geometry based on state
+    const posAttribute = geometry.attributes.position;
+    for(let i=0; i<pointCount; i++) {
+        const i3 = i * 3;
+        let targetX, targetY, targetZ;
+        
+        if(currentState === 0) {
+            targetX = positionsBase[i3];
+            targetY = positionsBase[i3+1];
+            targetZ = positionsBase[i3+2];
+        } else if (currentState === 1) {
+            targetX = positionsTargetSphere[i3];
+            targetY = positionsTargetSphere[i3+1];
+            targetZ = positionsTargetSphere[i3+2];
+        } else {
+            targetX = positionsTargetCube[i3];
+            targetY = positionsTargetCube[i3+1];
+            targetZ = positionsTargetCube[i3+2];
+        }
+
+        // Lerp positions
+        posAttribute.array[i3] += (targetX - posAttribute.array[i3]) * 0.02;
+        posAttribute.array[i3+1] += (targetY - posAttribute.array[i3+1]) * 0.02;
+        posAttribute.array[i3+2] += (targetZ - posAttribute.array[i3+2]) * 0.02;
+    }
+    posAttribute.needsUpdate = true;
+
+    // Rotate swarm
+    group.rotation.y = t * 0.1;
+    group.rotation.x = Math.sin(t * 0.2) * 0.1;
+    
+    bgParticles.rotation.y = t * 0.02;
 
     // Parallax on camera
-    camera.position.x += (mouse.x * 2 - camera.position.x) * 0.05;
-    camera.position.y += (-mouse.y * 2 - camera.position.y) * 0.05;
+    camera.position.x += (mouse.x * 3 - camera.position.x) * 0.05;
+    camera.position.y += (mouse.y * 3 + 2 - camera.position.y) * 0.05;
     camera.lookAt(0, 0, 0);
 
-    // Use composer instead of renderer
     composer.render();
     requestAnimationFrame(animate);
   }
@@ -160,8 +257,8 @@
     el.addEventListener("mouseenter", () => {
       ring.style.width = '60px';
       ring.style.height = '60px';
-      ring.style.borderColor = '#00f3ff';
-      ring.style.background = 'rgba(0,243,255,0.05)';
+      ring.style.borderColor = '#00ff88'; // Change to LiDAR green on hover
+      ring.style.background = 'rgba(0,255,136,0.05)';
       document.body.style.cursor = 'crosshair';
     });
     el.addEventListener("mouseleave", () => {
