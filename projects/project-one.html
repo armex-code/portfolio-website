@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project One — Abderrahman Elarfaoui</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+
+  <nav>
+    <a class="brand" href="../index.html">A<span>E</span></a>
+    <div class="links">
+      <a href="../index.html#projects">Projects</a>
+      <a href="../index.html#contact">Contact</a>
+    </div>
+  </nav>
+
+  <section class="project-hero">
+    <div class="wrap">
+      <a class="back" href="../index.html#projects">← Back to projects</a>
+      <div class="eyebrow">Project 01</div>
+      <h1>Project One</h1>
+      <p class="lead" style="color:var(--muted);max-width:640px;margin-top:18px;">
+        A short description of the first project. This is the full case-study page —
+        ready for you to fill in with the real story, screenshots, and links.
+      </p>
+
+      <div class="tags" style="margin-top:22px;">
+        <span class="tag">Web</span><span class="tag">Coming soon</span>
+      </div>
+
+      <div class="glass placeholder-note reveal">
+        <p><b>This page is a placeholder.</b> Update it later with:</p>
+        <p style="color:var(--muted);margin-top:8px;">
+          • Overview &amp; goal &nbsp;•&nbsp; Your role &nbsp;•&nbsp; Tech stack &nbsp;•&nbsp;
+          Screenshots / demo &nbsp;•&nbsp; Live link &amp; source code
+        </p>
+      </div>
+
+      <div class="cta" style="margin-top:34px;">
+        <a class="btn grad" href="../index.html#projects">See other projects</a>
+        <a class="btn ghost" href="mailto:a.elarfaoui@aui.ma">Ask me about it</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">© <span id="year"></span> Abderrahman Elarfaoui</div>
+  </footer>
+
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="../js/main.js"></script>
+</body>
+</html>
