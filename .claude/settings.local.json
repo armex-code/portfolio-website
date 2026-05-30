@@ -10,7 +10,11 @@
       "PowerShell($prod = \\(Invoke-WebRequest -Uri \"https://portfolio-website-sigma-silk-57.vercel.app\" -UseBasicParsing\\).Content; \"PROD alias contains Fun Zone: \" + \\($prod -match 'Fun Zone'\\); \"PROD alias contains Elarfaoui \\(one word\\): \" + \\($prod -match 'Abderrahman Elarfaoui'\\))",
       "PowerShell(Start-Sleep -Seconds 8; $html = \\(Invoke-WebRequest -Uri \"https://portfolio-website-sigma-silk-57.vercel.app\" -UseBasicParsing -Headers @{\"Cache-Control\"=\"no-cache\"}\\).Content; \"Three.js loaded: \" + \\($html -match 'three.min.js'\\); \"Has 3D canvas: \" + \\($html -match 'bg-canvas'\\); \"New email: \" + \\($html -match 'a.elarfaoui@aui.ma'\\); \"LinkedIn: \" + \\($html -match 'ar-elarfaoui'\\); $p1 = \\(Invoke-WebRequest -Uri \"https://portfolio-website-sigma-silk-57.vercel.app/projects/project-one.html\" -UseBasicParsing\\).StatusCode; \"Project One page status: \" + $p1)",
       "PowerShell(Start-Sleep -Seconds 12; $exp = Invoke-WebRequest -Uri \"https://portfolio-website-sigma-silk-57.vercel.app/experience.html\" -UseBasicParsing; \"experience.html status: \" + $exp.StatusCode + \" | has marquee: \" + \\($exp.Content -match 'marquee'\\) + \" | premium font: \" + \\($exp.Content -match 'style.css'\\); $idx = Invoke-WebRequest -Uri \"https://portfolio-website-sigma-silk-57.vercel.app/\" -UseBasicParsing; \"index special button: \" + \\($idx.Content -match 'Immersive Experience'\\))",
-      "mcp__claude_ai_Vercel__get_project"
+      "mcp__claude_ai_Vercel__get_project",
+      "Bash(git pull *)",
+      "Bash(node --check js/space-3d.js)",
+      "PowerShell(node --check \"js/space-3d.js\"; if \\($?\\) { \"SYNTAX OK\" } else { \"SYNTAX FAIL\" })",
+      "PowerShell(Out-File *)"
     ]
   }
 }
