@@ -4,19 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Abderrahman Elarfaoui — Creative Developer</title>
-  <meta name="description" content="Abderrahman Elarfaoui — creative developer crafting immersive, jaw-dropping web experiences with 3D, motion and clean code.">
-  <link rel="stylesheet" href="css/style.css">
+  <meta name="description" content="Abderrahman Elarfaoui — creative developer crafting immersive, 3D, space-grade web experiences.">
+  <link rel="stylesheet" href="css/space-theme.css">
 </head>
 <body>
 
+  <!-- ===== BOOT SEQUENCE ===== -->
+  <div id="boot-screen" style="position: fixed; inset: 0; z-index: 99999; background: #030613; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #00f3ff; font-family: 'JetBrains Mono', monospace; transition: opacity 0.8s ease-out;">
+    <div id="boot-text" style="text-align: left; max-width: 600px; width: 90%; font-size: 0.9rem; line-height: 1.5; text-shadow: 0 0 10px rgba(0,243,255,0.8);">
+      <p>> INITIALIZING SYSTEM KERNEL...</p>
+    </div>
+    <div style="margin-top: 30px; width: 200px; height: 2px; background: rgba(0,243,255,0.2); position: relative; overflow: hidden;">
+      <div id="boot-bar" style="position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: #00f3ff; box-shadow: 0 0 15px #00f3ff;"></div>
+    </div>
+  </div>
+
   <canvas id="bg-canvas"></canvas>
-  <div class="scrim"></div>
-  <div class="grain"></div>
+  <div class="scanline"></div>
+  <div class="vignette"></div>
+  <div class="grid-overlay"></div>
+  <div class="corners"><i></i><i></i><i></i><i></i></div>
   <div class="cursor"></div>
   <div class="cursor-ring"></div>
 
   <nav>
-    <a class="brand" href="experience.html">AE.</a>
+    <a class="brand" href="experience.html">AE_SYS</a>
     <div class="links">
       <a href="#about">About</a>
       <a href="#work">Work</a>
@@ -28,60 +40,61 @@
   <!-- ===== HERO ===== -->
   <header class="hero">
     <div class="wrap">
-      <div class="eyebrow reveal-h">Abderrahman Elarfaoui — Creative Developer</div>
+      <div class="eyebrow reveal-h">// Abderrahman Elarfaoui · Creative Developer</div>
       <h1 class="reveal-h">
-        Crafting <span class="serif" style="color:var(--accent)">jaw&#8209;dropping</span><br>
+        Crafting <span class="glow">immersive</span><br>
         web experiences.
       </h1>
       <p class="lead reveal-h">
-        Student at Al Akhawayn University. I blend clean code with 3D, motion,
-        and just enough chaos to make people stop scrolling.
+        Student at Al Akhawayn University, exploring the frontier where clean code
+        meets 3D, motion, and just enough chaos to make people stop scrolling.
       </p>
+      <div class="telemetry reveal-h" style="font-family: var(--font-mono); color: var(--accent); font-size: 0.75rem; margin-top: 15px; letter-spacing: 0.1em;">
+        ◉ IFRANE, MA &nbsp;·&nbsp; 33.53°N 5.11°W &nbsp;·&nbsp; SYSTEM ONLINE
+      </div>
       <div class="cta reveal-h">
         <a class="btn" href="#work">View Work</a>
         <a class="btn ghost" href="#contact">Get in Touch</a>
-        <button class="btn-tiny" onclick="partyTime()" title="don't press this">psst</button>
       </div>
     </div>
-    <div class="scroll-hint">Scroll</div>
   </header>
 
   <!-- ===== MARQUEE ===== -->
-  <div class="marquee">
-    <div class="marquee-track">
-      <span>Three.js</span><span class="dot">✦</span><span>WebGL</span><span class="dot">✦</span>
-      <span>Motion</span><span class="dot">✦</span><span>Creative Code</span><span class="dot">✦</span>
-      <span>UI / UX</span><span class="dot">✦</span><span>Front&#8209;End</span><span class="dot">✦</span>
+  <div class="data-track">
+    <div class="data-track-inner">
+      <span>Shaders</span><span class="dot">✦</span><span>Starfields</span><span class="dot">✦</span>
+      <span>Creative Code</span><span class="dot">✦</span><span>Motion</span><span class="dot">✦</span>
       <span>3D</span><span class="dot">✦</span><span>Interaction</span><span class="dot">✦</span>
       <span>Three.js</span><span class="dot">✦</span><span>WebGL</span><span class="dot">✦</span>
-      <span>Motion</span><span class="dot">✦</span><span>Creative Code</span><span class="dot">✦</span>
-      <span>UI / UX</span><span class="dot">✦</span><span>Front&#8209;End</span><span class="dot">✦</span>
+      <span>Shaders</span><span class="dot">✦</span><span>Starfields</span><span class="dot">✦</span>
+      <span>Creative Code</span><span class="dot">✦</span><span>Motion</span><span class="dot">✦</span>
       <span>3D</span><span class="dot">✦</span><span>Interaction</span><span class="dot">✦</span>
+      <span>Three.js</span><span class="dot">✦</span><span>WebGL</span><span class="dot">✦</span>
     </div>
   </div>
 
   <!-- ===== ABOUT ===== -->
   <section id="about">
     <div class="wrap about-grid">
-      <div class="reveal">
-        <div class="eyebrow">About</div>
-        <p class="big">
-          I turn ideas into things you can <span class="serif">click, feel</span> and remember —
+      <div class="reveal hud-panel">
+        <div class="eyebrow">// About</div>
+        <p class="big" style="font-size: 1.8rem; font-weight: 600; margin-bottom: 15px;">
+          I turn ideas into things you can <span class="glow" style="color: var(--accent);">click, feel</span> and remember —
           building for the web with an obsession for detail and motion.
         </p>
-        <p class="body">
+        <p class="body" style="color: var(--muted);">
           Based in Ifrane, Morocco. Always experimenting, always shipping. When I'm not
-          coding, I'm probably breaking something just to learn how to rebuild it better.
+          coding, I'm probably taking something apart just to rebuild it better.
         </p>
         <div class="stat-row">
-          <div class="stat"><b>3+</b><span>Projects</span></div>
-          <div class="stat"><b>∞</b><span>Curiosity</span></div>
-          <div class="stat"><b>24/7</b><span>Learning</span></div>
+          <div class="stat"><b>3+</b><span>PROJECTS</span></div>
+          <div class="stat"><b>∞</b><span>CURIOSITY</span></div>
+          <div class="stat"><b>24/7</b><span>LEARNING</span></div>
         </div>
       </div>
-      <div class="reveal">
+      <div class="reveal hud-panel">
         <p class="body" style="border-left:2px solid var(--accent); padding-left:20px;">
-          <b style="color:var(--text)">Currently exploring</b><br>
+          <b style="color:var(--text); font-family: var(--font-mono);">// CURRENTLY EXPLORING</b><br><br>
           3D on the web, shaders, interaction design, and shipping fast on Vercel.
         </p>
       </div>
@@ -92,16 +105,46 @@
   <section id="skills">
     <div class="wrap">
       <div class="reveal">
-        <div class="eyebrow">Toolbox</div>
-        <h2 class="title">Skills &amp; tools</h2>
+        <div class="eyebrow">// Toolbox</div>
+        <h2 class="title">Skills &amp; systems</h2>
       </div>
       <div class="skills-grid reveal">
-        <div class="skill"><div class="ico">🌐</div><h4>HTML &amp; CSS</h4><small>Semantic, responsive</small></div>
-        <div class="skill"><div class="ico">⚡</div><h4>JavaScript</h4><small>Vanilla &amp; modern</small></div>
-        <div class="skill"><div class="ico">🧊</div><h4>Three.js</h4><small>3D / WebGL</small></div>
-        <div class="skill"><div class="ico">🎨</div><h4>UI / Motion</h4><small>Design &amp; animation</small></div>
-        <div class="skill"><div class="ico">▲</div><h4>Vercel</h4><small>Deploy &amp; CI/CD</small></div>
-        <div class="skill"><div class="ico">🧠</div><h4>Problem Solving</h4><small>Always learning</small></div>
+        <div class="skill-card" style="--lvl: 90%;">
+          <div class="ico" style="font-size: 1.5rem; margin-bottom: 10px;">🌐</div>
+          <h4>HTML &amp; CSS</h4>
+          <small>Semantic, responsive</small>
+          <div class="bar"></div>
+        </div>
+        <div class="skill-card" style="--lvl: 85%;">
+          <div class="ico" style="font-size: 1.5rem; margin-bottom: 10px;">⚡</div>
+          <h4>JavaScript</h4>
+          <small>Vanilla &amp; modern</small>
+          <div class="bar"></div>
+        </div>
+        <div class="skill-card" style="--lvl: 70%;">
+          <div class="ico" style="font-size: 1.5rem; margin-bottom: 10px;">🪐</div>
+          <h4>Three.js</h4>
+          <small>3D / WebGL</small>
+          <div class="bar"></div>
+        </div>
+        <div class="skill-card" style="--lvl: 80%;">
+          <div class="ico" style="font-size: 1.5rem; margin-bottom: 10px;">🎨</div>
+          <h4>UI / Motion</h4>
+          <small>Design &amp; animation</small>
+          <div class="bar"></div>
+        </div>
+        <div class="skill-card" style="--lvl: 75%;">
+          <div class="ico" style="font-size: 1.5rem; margin-bottom: 10px;">▲</div>
+          <h4>Vercel</h4>
+          <small>Deploy &amp; CI/CD</small>
+          <div class="bar"></div>
+        </div>
+        <div class="skill-card" style="--lvl: 95%;">
+          <div class="ico" style="font-size: 1.5rem; margin-bottom: 10px;">🧠</div>
+          <h4>Problem Solving</h4>
+          <small>Always learning</small>
+          <div class="bar"></div>
+        </div>
       </div>
     </div>
   </section>
@@ -110,29 +153,35 @@
   <section id="work">
     <div class="wrap">
       <div class="reveal">
-        <div class="eyebrow">Selected Work</div>
+        <div class="eyebrow">// Selected Work</div>
         <h2 class="title">Projects</h2>
       </div>
       <div class="proj-grid reveal">
-        <a class="proj-card" data-tilt href="projects/project-one.html">
-          <span class="num">01</span>
-          <h3>Project One</h3>
-          <p>A short description of the first project. Click to open the full case study.</p>
-          <div class="tags"><span class="tag">Web</span><span class="tag">Coming soon</span></div>
+        <a class="hud-panel proj-card" href="projects/project-one.html">
+          <div>
+            <span class="num">01</span>
+            <h3>Project One</h3>
+            <p style="color: var(--muted); font-size: 0.9rem;">A short description of the first project. Click to open the full case study.</p>
+            <div class="tags"><span class="tag">WEB</span><span class="tag">COMING SOON</span></div>
+          </div>
           <span class="go">Explore →</span>
         </a>
-        <a class="proj-card" data-tilt href="projects/project-two.html">
-          <span class="num">02</span>
-          <h3>Project Two</h3>
-          <p>A short description of the second project. Click to open the full case study.</p>
-          <div class="tags"><span class="tag">Design</span><span class="tag">Coming soon</span></div>
+        <a class="hud-panel proj-card" href="projects/project-two.html">
+          <div>
+            <span class="num">02</span>
+            <h3>Project Two</h3>
+            <p style="color: var(--muted); font-size: 0.9rem;">A short description of the second project. Click to open the full case study.</p>
+            <div class="tags"><span class="tag">DESIGN</span><span class="tag">COMING SOON</span></div>
+          </div>
           <span class="go">Explore →</span>
         </a>
-        <a class="proj-card" data-tilt href="projects/project-three.html">
-          <span class="num">03</span>
-          <h3>Project Three</h3>
-          <p>A short description of the third project. Click to open the full case study.</p>
-          <div class="tags"><span class="tag">3D</span><span class="tag">Coming soon</span></div>
+        <a class="hud-panel proj-card" href="projects/project-three.html">
+          <div>
+            <span class="num">03</span>
+            <h3>Project Three</h3>
+            <p style="color: var(--muted); font-size: 0.9rem;">A short description of the third project. Click to open the full case study.</p>
+            <div class="tags"><span class="tag">3D</span><span class="tag">COMING SOON</span></div>
+          </div>
           <span class="go">Explore →</span>
         </a>
       </div>
@@ -140,12 +189,12 @@
   </section>
 
   <!-- ===== CONTACT ===== -->
-  <section id="contact" class="contact">
-    <div class="wrap reveal">
-      <div class="eyebrow" style="justify-content:center">Say Hello</div>
-      <h2 class="title">Let's make something<br><span class="serif" style="color:var(--accent)">unforgettable.</span></h2>
-      <p>Got an idea, an opportunity, or just want to chat? My inbox is always open.</p>
-      <div class="cta">
+  <section id="contact" class="contact" style="text-align: center; margin-bottom: 50px;">
+    <div class="wrap reveal hud-panel" style="max-width: 800px; margin: 0 auto;">
+      <div class="eyebrow" style="justify-content:center">// Say Hello</div>
+      <h2 class="title" style="margin-bottom: 20px;">Let's make something<br><span class="glow" style="color: var(--accent);">stellar.</span></h2>
+      <p style="color: var(--muted); margin-bottom: 30px;">Got an idea, an opportunity, or just want to chat? My inbox is always open.</p>
+      <div class="cta" style="display: flex; gap: 15px; justify-content: center;">
         <a class="btn" href="mailto:a.elarfaoui@aui.ma">Email Me</a>
         <a class="btn ghost" href="https://github.com/armex-code" target="_blank" rel="noopener">GitHub</a>
         <a class="btn ghost" href="https://www.linkedin.com/in/ar-elarfaoui/" target="_blank" rel="noopener">LinkedIn</a>
@@ -155,17 +204,22 @@
 
   <footer>
     <div class="wrap">
-      <span>© <span id="year"></span> Abderrahman Elarfaoui</span>
+      <span>© <span id="year"></span> ABDERRAHMAN ELARFAOUI</span>
       <span>
-        <a href="index.html">Basic version</a>
-        &nbsp; · &nbsp; Built with Three.js
-        <button class="btn-tiny" onclick="partyTime()" title="tiny button of joy">✦</button>
+        <a href="index.html">BASIC VERSION</a>
+        &nbsp;·&nbsp; BUILT WITH THREE.JS
       </span>
     </div>
   </footer>
 
   <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="js/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+  <script src="js/space-3d.js"></script>
 </body>
 </html>
