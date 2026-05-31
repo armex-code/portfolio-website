@@ -2,200 +2,155 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Abdel Elarfaoui — CS & Robotics</title>
-  <meta name="description" content="Abdel Elarfaoui — CS student and Robotics Engineer crafting embedded systems and intelligent machines.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Rover Run — Abdel Elarfaoui's Portfolio, Playable</title>
+  <meta name="description" content="Abdel Elarfaoui's robotics portfolio reimagined as a playable 3D game. Drive a LiDAR rover, smash obstacles, collect data nodes, and explore every project.">
+  <meta name="theme-color" content="#02040c">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="css/space-theme.css">
 </head>
-<body>
+<body class="gateway">
 
-  <!-- ===== BOOT SEQUENCE ===== -->
-  <div id="boot-screen" style="position: fixed; inset: 0; z-index: 99999; background: #030613; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #00f3ff; font-family: 'JetBrains Mono', monospace; transition: opacity 0.8s ease-out;">
-    <div id="boot-text" style="text-align: left; max-width: 600px; width: 90%; font-size: 0.9rem; line-height: 1.5; text-shadow: 0 0 10px rgba(0,243,255,0.8);">
-      <p>> INITIALIZING ROBOTICS KERNEL...</p>
-    </div>
-    <div style="margin-top: 30px; width: 200px; height: 2px; background: rgba(0,243,255,0.2); position: relative; overflow: hidden;">
-      <div id="boot-bar" style="position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: #00f3ff; box-shadow: 0 0 15px #00f3ff;"></div>
-    </div>
-  </div>
-
-  <canvas id="bg-canvas"></canvas>
+  <!-- pure-CSS atmosphere (no heavy JS) -->
   <div class="scanline"></div>
   <div class="vignette"></div>
   <div class="grid-overlay"></div>
   <div class="corners"><i></i><i></i><i></i><i></i></div>
-  <div class="cursor"></div>
-  <div class="cursor-ring"></div>
+  <div class="aurora"></div>
 
   <nav>
     <a class="brand" href="experience.html">AE_SYS</a>
     <div class="links">
-      <a href="#about">About</a>
-      <a href="#work">Projects</a>
-      <a href="#contact">Contact</a>
+      <a href="#how">How to play</a>
+      <a href="rover.html">▶ Play</a>
       <a href="index.html">↩ Basic</a>
     </div>
   </nav>
 
   <!-- ===== HERO ===== -->
-  <header class="hero">
-    <div class="wrap">
-      <div class="eyebrow reveal-h">// Abdel Elarfaoui · CS Student & Robotics Engineer</div>
-      <h1 class="reveal-h">
-        Engineering <span class="glow">intelligent</span><br>
-        machines.
-      </h1>
-      <p class="lead reveal-h">
-        Computer Science student at Al Akhawayn University, exploring the frontier where low-level code meets physical hardware. I build robots, write embedded systems, and integrate AI to make machines autonomous.
+  <header class="gate-hero">
+    <div class="gate-inner">
+      <div class="badge"><span class="badge-dot"></span> PLAYABLE PORTFOLIO · 3D · v2.0</div>
+      <h1 class="gate-title">ROVER<span>RUN</span></h1>
+      <p class="gate-tagline">The portfolio you don't read — <span class="glow">you drive it.</span></p>
+      <p class="gate-lead">
+        I'm <b>Abdel Elarfaoui</b>, a CS student &amp; robotics engineer. Instead of scrolling a résumé,
+        pilot a LiDAR rover down a neon corridor — smash obstacles, collect data nodes, and unlock my
+        robotics projects one checkpoint at a time.
       </p>
-      <div class="telemetry reveal-h" style="font-family: var(--font-mono); color: var(--accent); font-size: 0.75rem; margin-top: 15px; letter-spacing: 0.1em;">
-        ◉ IFRANE, MA &nbsp;·&nbsp; ROBOTICS LAB &nbsp;·&nbsp; LiDAR SENSOR ARRAY ONLINE
+
+      <a class="game-cta" href="rover.html">
+        <span class="game-cta-blip"></span>
+        Click to see a game version of this portfolio
+        <span class="game-cta-arrow">▶</span>
+      </a>
+
+      <div class="gate-meta">
+        <span>◉ IFRANE, MA</span><span>·</span>
+        <span>WASD / TOUCH</span><span>·</span>
+        <span>~2 MIN RUN</span><span>·</span>
+        <span>THREE.JS + WEBGL</span>
       </div>
-      <div class="cta reveal-h">
-        <a class="btn" href="#work">View Projects</a>
-        <a class="btn ghost" href="#contact">Get in Touch</a>
-      </div>
+
+      <a href="#how" class="scroll-cue">HOW TO PLAY <span>▾</span></a>
     </div>
   </header>
 
-  <!-- ===== MARQUEE ===== -->
+  <!-- ===== CONTROLS MARQUEE ===== -->
   <div class="data-track">
     <div class="data-track-inner">
-      <span>C++</span><span class="dot">✦</span><span>Embedded Systems</span><span class="dot">✦</span>
-      <span>ROS (Robot Operating System)</span><span class="dot">✦</span><span>Python</span><span class="dot">✦</span>
-      <span>Computer Vision</span><span class="dot">✦</span><span>Machine Learning</span><span class="dot">✦</span>
-      <span>Microcontrollers</span><span class="dot">✦</span><span>Hardware Integration</span><span class="dot">✦</span>
-      <span>C++</span><span class="dot">✦</span><span>Embedded Systems</span><span class="dot">✦</span>
-      <span>ROS (Robot Operating System)</span><span class="dot">✦</span><span>Python</span><span class="dot">✦</span>
-      <span>Computer Vision</span><span class="dot">✦</span><span>Machine Learning</span><span class="dot">✦</span>
-      <span>Microcontrollers</span><span class="dot">✦</span><span>Hardware Integration</span><span class="dot">✦</span>
+      <span>◀ DRIVE</span><span class="dot">✦</span><span>SMASH CRATES</span><span class="dot">✦</span>
+      <span>COLLECT DATA NODES</span><span class="dot">✦</span><span>BOOST</span><span class="dot">✦</span>
+      <span>SCORE POINTS</span><span class="dot">✦</span><span>REACH THE FINISH</span><span class="dot">✦</span>
+      <span>◀ DRIVE</span><span class="dot">✦</span><span>SMASH CRATES</span><span class="dot">✦</span>
+      <span>COLLECT DATA NODES</span><span class="dot">✦</span><span>BOOST</span><span class="dot">✦</span>
+      <span>SCORE POINTS</span><span class="dot">✦</span><span>REACH THE FINISH</span><span class="dot">✦</span>
     </div>
   </div>
 
-  <!-- ===== ABOUT ===== -->
-  <section id="about">
-    <div class="wrap about-grid">
-      <div class="reveal hud-panel">
-        <div class="eyebrow">// About Me</div>
-        <p class="big" style="font-size: 1.8rem; font-weight: 600; margin-bottom: 15px;">
-          I turn code into <span class="glow" style="color: var(--accent);">physical action</span>. My passion is bridging the gap between software and hardware to create autonomous systems.
-        </p>
-        <p class="body" style="color: var(--muted);">
-          Based in Ifrane, Morocco. I'm a CS student who spends most of my time wiring circuits, programming microcontrollers, and tuning control algorithms. I love tearing down electronics just to figure out how they tick, and then rebuilding them into something new.
-        </p>
-        <div class="stat-row">
-          <div class="stat"><b>10k+</b><span>LINES OF C++</span></div>
-          <div class="stat"><b>∞</b><span>SENSOR NOISE</span></div>
-          <div class="stat"><b>24/7</b><span>DEBUGGING</span></div>
-        </div>
-      </div>
-      <div class="reveal hud-panel">
-        <p class="body" style="border-left:2px solid var(--accent); padding-left:20px;">
-          <b style="color:var(--text); font-family: var(--font-mono);">// CURRENTLY EXPLORING</b><br><br>
-          Autonomous navigation algorithms (SLAM), integrating LiDAR point clouds, and deploying lightweight AI models directly onto edge microcontrollers.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== SKILLS ===== -->
-  <section id="skills">
+  <!-- ===== HOW TO PLAY ===== -->
+  <section id="how" class="how-section">
     <div class="wrap">
-      <div class="reveal">
-        <div class="eyebrow">// Systems & Capabilities</div>
-        <h2 class="title">Tech Stack</h2>
+      <div class="eyebrow">// Mission Briefing</div>
+      <h2 class="title">How to play</h2>
+      <p class="how-intro">Four simple objectives. Chase a high score, or just cruise and explore the projects.</p>
+
+      <div class="how-grid">
+        <div class="how-card">
+          <div class="how-num">01</div>
+          <div class="how-ico">🕹️</div>
+          <h3>Drive the rover</h3>
+          <p>Steer the hovering LiDAR rover down the walled corridor. Hold boost for a burst of speed.</p>
+          <div class="keycaps">
+            <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> <small>or</small> <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd>
+            <span class="sep">·</span> <kbd>SHIFT</kbd> <small>boost</small>
+          </div>
+          <div class="touchnote">📱 On mobile: on-screen <b>joystick</b> + <b>BOOST</b> button.</div>
+        </div>
+
+        <div class="how-card">
+          <div class="how-num">02</div>
+          <div class="how-ico">📦💥</div>
+          <h3>Smash the obstacles</h3>
+          <p>Plough straight through the stacked crates blocking the lane. Real physics sends them
+             tumbling — every crate you topple is worth <b class="amber">+50</b>.</p>
+          <div class="reward amber">+50 PER CRATE · CLEAR THEM ALL FOR A BONUS</div>
+        </div>
+
+        <div class="how-card">
+          <div class="how-num">03</div>
+          <div class="how-ico">🔷</div>
+          <h3>Collect data nodes</h3>
+          <p>Glowing crystals are checkpoints. Touch one to unlock a real part of my portfolio —
+             About, my tech stack, and three robotics projects — and bank <b class="green">+150</b>.</p>
+          <div class="reward green">+150 PER NODE · 6 TO FIND</div>
+        </div>
+
+        <div class="how-card">
+          <div class="how-num">04</div>
+          <div class="how-ico">🏁</div>
+          <h3>Reach the finish</h3>
+          <p>Blast through the green finish gate at the end of the corridor to complete the run,
+             land the <b class="green">+1000</b> bonus, and see your final score.</p>
+          <div class="reward green">FINISH BONUS +1000</div>
+        </div>
       </div>
-      <div class="skills-grid reveal">
-        <div class="skill-card" style="--lvl: 90%;">
-          <div class="ico" style="font-size: 1.5rem; margin-bottom: 10px;">⚙️</div>
-          <h4>C++ & Python</h4>
-          <small>Core languages</small>
-          <div class="bar"></div>
-        </div>
-        <div class="skill-card" style="--lvl: 85%;">
-          <div class="ico" style="font-size: 1.5rem; margin-bottom: 10px;">🤖</div>
-          <h4>ROS / ROS2</h4>
-          <small>Robot Operating System</small>
-          <div class="bar"></div>
-        </div>
-        <div class="skill-card" style="--lvl: 80%;">
-          <div class="ico" style="font-size: 1.5rem; margin-bottom: 10px;">🔌</div>
-          <h4>Embedded Systems</h4>
-          <small>Arduino, ESP32, STM32</small>
-          <div class="bar"></div>
-        </div>
-        <div class="skill-card" style="--lvl: 75%;">
-          <div class="ico" style="font-size: 1.5rem; margin-bottom: 10px;">👁️</div>
-          <h4>Computer Vision</h4>
-          <small>OpenCV, Object Tracking</small>
-          <div class="bar"></div>
-        </div>
-        <div class="skill-card" style="--lvl: 70%;">
-          <div class="ico" style="font-size: 1.5rem; margin-bottom: 10px;">🧠</div>
-          <h4>Machine Learning</h4>
-          <small>AI Edge Inference</small>
-          <div class="bar"></div>
-        </div>
-        <div class="skill-card" style="--lvl: 85%;">
-          <div class="ico" style="font-size: 1.5rem; margin-bottom: 10px;">🕸️</div>
-          <h4>Web & Fullstack</h4>
-          <small>Robot UI Dashboards</small>
-          <div class="bar"></div>
-        </div>
+
+      <!-- score legend -->
+      <div class="score-legend">
+        <div class="leg"><b class="green">+150</b><span>Data node</span></div>
+        <div class="leg"><b class="amber">+50</b><span>Crate toppled</span></div>
+        <div class="leg"><b class="green">+1000</b><span>Finish gate</span></div>
+        <div class="leg"><b class="green">+250</b><span>All crates cleared</span></div>
       </div>
     </div>
   </section>
 
-  <!-- ===== WORK ===== -->
-  <section id="work">
+  <!-- ===== WHAT YOU'LL UNLOCK ===== -->
+  <section class="unlock-section">
     <div class="wrap">
-      <div class="reveal">
-        <div class="eyebrow">// Selected Work</div>
-        <h2 class="title">Robotics Projects</h2>
-      </div>
-      <div class="proj-grid reveal">
-        <a class="hud-panel proj-card" href="projects/project-one.html">
-          <div>
-            <span class="num">01</span>
-            <h3>Autonomous Rover</h3>
-            <p style="color: var(--muted); font-size: 0.9rem;">A 4-wheeled robot capable of indoor navigation using LiDAR and ROS SLAM algorithms to map unknown environments.</p>
-            <div class="tags"><span class="tag">ROS</span><span class="tag">LiDAR</span><span class="tag">C++</span></div>
-          </div>
-          <span class="go">Explore Architecture →</span>
-        </a>
-        <a class="hud-panel proj-card" href="projects/project-two.html">
-          <div>
-            <span class="num">02</span>
-            <h3>Vision-Guided Robotic Arm</h3>
-            <p style="color: var(--muted); font-size: 0.9rem;">A 6-DOF robotic manipulator controlled via inverse kinematics and OpenCV to identify and sort colored objects.</p>
-            <div class="tags"><span class="tag">Python</span><span class="tag">OpenCV</span><span class="tag">Hardware</span></div>
-          </div>
-          <span class="go">Explore Architecture →</span>
-        </a>
-        <a class="hud-panel proj-card" href="projects/project-three.html">
-          <div>
-            <span class="num">03</span>
-            <h3>Sensor Mesh Network</h3>
-            <p style="color: var(--muted); font-size: 0.9rem;">An IoT network of ESP32 microcontrollers that collect environmental data and transmit it to a centralized web dashboard.</p>
-            <div class="tags"><span class="tag">ESP32</span><span class="tag">WebSockets</span><span class="tag">IoT</span></div>
-          </div>
-          <span class="go">Explore Architecture →</span>
-        </a>
+      <div class="eyebrow">// Data Nodes = The Portfolio</div>
+      <h2 class="title">What you'll unlock</h2>
+      <div class="unlock-grid">
+        <div class="unlock-item"><span class="uc">0x01</span> About me</div>
+        <div class="unlock-item"><span class="uc">0x02</span> Tech stack</div>
+        <div class="unlock-item"><span class="uc">PRJ.01</span> Autonomous Rover</div>
+        <div class="unlock-item"><span class="uc">PRJ.02</span> Vision-Guided Arm</div>
+        <div class="unlock-item"><span class="uc">PRJ.03</span> Sensor Mesh Network</div>
+        <div class="unlock-item"><span class="uc">UPLINK</span> Contact me</div>
       </div>
     </div>
   </section>
 
-  <!-- ===== CONTACT ===== -->
-  <section id="contact" class="contact" style="text-align: center; margin-bottom: 50px;">
-    <div class="wrap reveal hud-panel" style="max-width: 800px; margin: 0 auto;">
-      <div class="eyebrow" style="justify-content:center">// Initialize Connection</div>
-      <h2 class="title" style="margin-bottom: 20px;">Let's build the<br><span class="glow" style="color: var(--accent);">future.</span></h2>
-      <p style="color: var(--muted); margin-bottom: 30px;">Got a hardware project, a robotics startup, or just want to talk tech? My inbox is always open.</p>
-      <div class="cta" style="display: flex; gap: 15px; justify-content: center;">
-        <a class="btn" href="mailto:a.elarfaoui@aui.ma">Ping Me</a>
-        <a class="btn ghost" href="https://github.com/armex-code" target="_blank" rel="noopener">GitHub</a>
-        <a class="btn ghost" href="https://www.linkedin.com/in/ar-elarfaoui/" target="_blank" rel="noopener">LinkedIn</a>
-      </div>
+  <!-- ===== FINAL CTA ===== -->
+  <section class="final-cta">
+    <div class="wrap">
+      <h2 class="title">Ready to drive?</h2>
+      <p>Best on a desktop with a keyboard — but it plays great on mobile too.</p>
+      <a class="game-cta big" href="rover.html">
+        <span class="game-cta-blip"></span>
+        ▶ Start the run
+      </a>
     </div>
   </section>
 
@@ -204,43 +159,12 @@
       <span>© <span id="year"></span> ABDEL ELARFAOUI</span>
       <span>
         <a href="index.html">BASIC VERSION</a>
-        &nbsp;·&nbsp; SIMULATION POWERED BY THREE.JS
+        &nbsp;·&nbsp; <a href="rover.html">ROVER RUN</a>
+        &nbsp;·&nbsp; POWERED BY THREE.JS
       </span>
     </div>
   </footer>
 
   <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
-  <script src="js/space-3d.js"></script>
-  <script>
-    // Boot sequence logic
-    window.addEventListener('load', () => {
-      const bar = document.getElementById('boot-bar');
-      const text = document.getElementById('boot-text');
-      const screen = document.getElementById('boot-screen');
-      
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += Math.random() * 20;
-        if(progress > 100) progress = 100;
-        bar.style.width = progress + '%';
-        
-        if(progress === 100) {
-          clearInterval(interval);
-          text.innerHTML = '<p>> SENSOR ARRAY ONLINE.</p><p>> WELCOME ABDEL.</p>';
-          setTimeout(() => {
-            screen.style.opacity = '0';
-            setTimeout(() => screen.remove(), 800);
-          }, 600);
-        }
-      }, 100);
-    });
-  </script>
 </body>
 </html>
