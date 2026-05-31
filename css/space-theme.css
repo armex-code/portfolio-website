@@ -71,6 +71,9 @@ a { color: inherit; text-decoration: none; }
 
 /* 3D canvas */
 #bg-canvas { position: fixed; inset: 0; z-index: -1; }
+/* on the dedicated game page the canvas IS the page — keep it visible above the body bg */
+body.rover-page { background: #02040c; }
+body.rover-page #bg-canvas { z-index: 0; }
 
 /* ===== Layout ===== */
 .wrap { width: min(1200px, 90%); margin: 0 auto; position: relative; z-index: 10; }
@@ -372,10 +375,245 @@ body.sim-active .cursor-ring { opacity: 0 !important; pointer-events: none; }
 body.sim-touch #sim-stick, body.sim-touch #sim-boost { display: block; }
 body.sim-touch #sim-foot .keys, body.sim-touch #sim-reticle { display: none; }
 
+/* ---- score + progress (status box) ---- */
+#sim-status .score-wrap { display: flex; align-items: baseline; justify-content: space-between; gap: 14px; margin-bottom: 8px; }
+#sim-score { font-family: var(--font-sans); font-size: 1.7rem; font-weight: 700; color: #fff; line-height: 1; text-shadow: 0 0 16px var(--accent); }
+#sim-progress { height: 5px; background: rgba(0,255,136,0.12); margin-top: 6px; position: relative; }
+#sim-progress i { position: absolute; left: 0; top: 0; height: 100%; width: 0%; background: #00ff88; box-shadow: 0 0 10px #00ff88; transition: width 0.15s linear; }
+
+/* ---- exit/restart button row ---- */
+#sim-foot .foot-btns { display: flex; gap: 10px; }
+.sim-btn { text-decoration: none; }
+
+/* ---- floating +points popups ---- */
+.pts-pop {
+  position: fixed; z-index: 9990; pointer-events: none;
+  font-family: var(--font-mono); font-weight: 700; font-size: 1.4rem;
+  text-shadow: 0 0 14px currentColor; transform: translateY(0);
+  transition: transform 0.9s ease-out, opacity 0.9s ease-out;
+}
+
+/* ============================================================
+   START / WIN OVERLAY (rover.html)
+   ============================================================ */
+#game-overlay {
+  position: fixed; inset: 0; z-index: 60; display: flex;
+  align-items: center; justify-content: center; padding: 24px;
+  background: radial-gradient(circle at 50% 40%, rgba(3,12,28,0.82), rgba(2,4,12,0.96));
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  opacity: 0; visibility: hidden; transition: opacity 0.5s var(--ease), visibility 0.5s;
+  overflow-y: auto;
+}
+#game-overlay.show { opacity: 1; visibility: visible; }
+.ov-card {
+  width: min(560px, 92vw); text-align: center;
+  border: 1px solid var(--accent); background: rgba(3,8,22,0.7);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  padding: clamp(26px, 5vw, 48px);
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+  box-shadow: 0 0 60px rgba(0,243,255,0.18);
+}
+.ov-tag { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.25em; color: var(--muted); margin-bottom: 14px; }
+.ov-card h1 {
+  font-family: var(--font-sans); font-weight: 700; text-transform: uppercase; line-height: 0.92;
+  font-size: clamp(2.6rem, 9vw, 4.4rem); color: #fff; text-shadow: 0 0 26px var(--accent-glow);
+}
+.ov-card h1 span { display: block; color: var(--accent); }
+.ov-card h1.win span { color: #00ff88; }
+.ov-sub { font-family: var(--font-mono); font-size: 0.82rem; color: var(--muted); line-height: 1.7; margin: 18px auto 0; max-width: 440px; }
+.ov-sub b { color: var(--text); }
+.ov-keys { display: flex; flex-direction: column; gap: 8px; margin: 22px 0; font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); }
+.ov-keys kbd { color: var(--accent); border: 1px solid var(--line); padding: 1px 7px; margin: 0 2px; background: rgba(0,243,255,0.06); border-radius: 3px; font-size: 0.7rem; }
+.ov-keys .ov-touch { display: none; }
+.ov-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: var(--font-mono); font-weight: 700; font-size: 0.92rem; text-transform: uppercase; letter-spacing: 0.12em;
+  padding: 16px 34px; margin-top: 8px; cursor: pointer; text-decoration: none;
+  color: #02040c; background: var(--accent); border: 1px solid var(--accent);
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  box-shadow: 0 0 28px var(--accent-glow); transition: all 0.2s;
+}
+.ov-btn:hover { background: #fff; border-color: #fff; box-shadow: 0 0 44px var(--accent); transform: translateY(-2px); }
+.ov-btn.ghost { background: transparent; color: var(--accent); box-shadow: none; }
+.ov-btn.ghost:hover { background: rgba(0,243,255,0.1); color: #fff; transform: translateY(-2px); }
+.ov-link { display: inline-block; margin-top: 18px; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; }
+.ov-link:hover { color: var(--accent); }
+.ov-score { font-family: var(--font-sans); font-weight: 700; font-size: clamp(3rem, 12vw, 5rem); color: #00ff88; line-height: 1; margin: 18px 0; text-shadow: 0 0 30px rgba(0,255,136,0.6); }
+.ov-score small { display: block; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 400; letter-spacing: 0.3em; color: var(--muted); margin-top: 8px; }
+.ov-stats { display: flex; justify-content: center; gap: clamp(16px, 6vw, 40px); margin: 22px 0; }
+.ov-stats div { display: flex; flex-direction: column; gap: 4px; }
+.ov-stats b { font-family: var(--font-mono); font-size: 1.4rem; color: var(--accent); }
+.ov-stats span { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.12em; color: var(--muted); }
+.ov-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+
+/* ============================================================
+   GATEWAY / LANDING PAGE (experience.html)
+   ============================================================ */
+body.gateway { display: block; }
+
+/* drifting aurora glow behind everything */
+.aurora {
+  position: fixed; inset: -20% -10% auto -10%; height: 90vh; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(40% 50% at 25% 30%, rgba(0,243,255,0.18), transparent 70%),
+    radial-gradient(45% 55% at 78% 20%, rgba(0,255,136,0.14), transparent 70%),
+    radial-gradient(40% 50% at 55% 60%, rgba(46,124,255,0.16), transparent 70%);
+  filter: blur(20px); animation: aurora-drift 18s ease-in-out infinite alternate;
+}
+@keyframes aurora-drift {
+  0% { transform: translate3d(-3%, 0, 0) scale(1); opacity: 0.85; }
+  100% { transform: translate3d(4%, 2%, 0) scale(1.1); opacity: 1; }
+}
+
+/* ---- hero ---- */
+.gate-hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 120px 6% 70px; position: relative; z-index: 10; }
+.gate-inner { max-width: 820px; text-align: center; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 9px;
+  font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); border: 1px solid var(--line); background: rgba(0,243,255,0.05);
+  padding: 7px 16px; border-radius: 100px; margin-bottom: 26px;
+}
+.badge-dot { width: 8px; height: 8px; border-radius: 50%; background: #00ff88; box-shadow: 0 0 10px #00ff88; animation: sim-blink 1.4s steps(2) infinite; }
+
+.gate-title {
+  font-family: var(--font-sans); font-weight: 700; text-transform: uppercase; line-height: 0.88;
+  font-size: clamp(3.4rem, 16vw, 9rem); letter-spacing: -0.01em;
+  background: linear-gradient(180deg, #ffffff 0%, #7dd3fc 55%, var(--accent) 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: var(--accent);
+  text-shadow: 0 0 50px rgba(0,243,255,0.35); filter: drop-shadow(0 0 24px rgba(0,243,255,0.25));
+}
+.gate-title span { display: block; color: var(--accent); -webkit-text-fill-color: var(--accent); }
+.gate-tagline { font-family: var(--font-sans); font-size: clamp(1.1rem, 3.4vw, 1.9rem); font-weight: 600; margin-top: 18px; color: var(--text); }
+.gate-tagline .glow { color: var(--accent); text-shadow: 0 0 18px var(--accent-glow); }
+.gate-lead { font-family: var(--font-mono); font-size: clamp(0.86rem, 2.1vw, 1.02rem); color: var(--muted); max-width: 620px; margin: 24px auto 0; line-height: 1.75; }
+.gate-lead b { color: var(--text); }
+
+.gate-meta {
+  display: flex; flex-wrap: wrap; gap: 10px 14px; justify-content: center;
+  font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.12em; color: var(--muted);
+  text-transform: uppercase; margin-top: 26px;
+}
+.gate-meta span:nth-child(even) { color: var(--accent); opacity: 0.5; }
+
+.scroll-cue {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 40px;
+  font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.2em; color: var(--muted);
+}
+.scroll-cue span { animation: cue-bounce 1.6s ease-in-out infinite; }
+.scroll-cue:hover { color: var(--accent); }
+@keyframes cue-bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+
+/* ---- the big CTA button (shared on landing) ---- */
+.game-cta {
+  display: inline-flex; align-items: center; gap: 14px; margin-top: 42px;
+  font-family: var(--font-mono); font-weight: 700; font-size: clamp(0.8rem, 2.3vw, 1.05rem);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  padding: 20px 32px; cursor: pointer; color: #02040c; background: var(--accent);
+  border: 1px solid var(--accent);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  box-shadow: 0 0 30px var(--accent-glow);
+  animation: sim-pulse 2.4s ease-in-out infinite; position: relative; overflow: hidden;
+}
+.game-cta::before {
+  content: ""; position: absolute; top: 0; left: -120%; width: 80%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent); transform: skewX(-20deg);
+  animation: cta-sheen 3.4s ease-in-out infinite;
+}
+@keyframes cta-sheen { 0%, 60% { left: -120%; } 100% { left: 160%; } }
+.game-cta:hover { background: #fff; border-color: #fff; box-shadow: 0 0 50px var(--accent); transform: translateY(-3px); }
+.game-cta.big { font-size: clamp(0.92rem, 2.6vw, 1.2rem); padding: 22px 40px; }
+.game-cta-blip { width: 10px; height: 10px; border-radius: 50%; background: #02040c; animation: sim-blink 1s steps(2) infinite; flex: none; position: relative; z-index: 1; }
+.game-cta-arrow { font-size: 0.8em; position: relative; z-index: 1; }
+
+/* ---- HOW TO PLAY ---- */
+.how-section { padding: clamp(60px, 9vw, 110px) 0; position: relative; z-index: 10; }
+.how-intro { font-family: var(--font-mono); color: var(--muted); margin: -22px 0 40px; font-size: 0.92rem; }
+.how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(248px, 1fr)); gap: 20px; }
+.how-card {
+  position: relative; padding: 30px 26px; border: 1px solid var(--line); background: var(--panel);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  transition: transform 0.3s var(--ease), border-color 0.3s, background 0.3s; overflow: hidden;
+}
+.how-card:hover { transform: translateY(-6px); border-color: var(--accent); background: var(--panel-hover); box-shadow: 0 12px 40px rgba(0,243,255,0.12); }
+.how-num { position: absolute; top: 14px; right: 18px; font-family: var(--font-mono); font-size: 2.4rem; font-weight: 700; color: rgba(0,243,255,0.12); }
+.how-ico { font-size: 2.2rem; margin-bottom: 14px; filter: drop-shadow(0 0 12px rgba(0,243,255,0.4)); }
+.how-card h3 { font-family: var(--font-sans); font-size: 1.25rem; text-transform: uppercase; margin-bottom: 10px; color: #fff; }
+.how-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.65; }
+.how-card p b { color: var(--text); }
+.amber { color: #ffae3b !important; text-shadow: 0 0 10px rgba(255,174,59,0.5); }
+.green { color: #00ff88 !important; text-shadow: 0 0 10px rgba(0,255,136,0.5); }
+
+.keycaps { margin-top: 16px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted); display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.keycaps kbd {
+  font-family: var(--font-mono); color: var(--accent); border: 1px solid var(--line);
+  padding: 3px 8px; background: rgba(0,243,255,0.07); border-radius: 4px; font-size: 0.78rem;
+  box-shadow: 0 2px 0 rgba(0,243,255,0.15);
+}
+.keycaps small { color: var(--muted); margin: 0 2px; }
+.keycaps .sep { color: var(--accent); opacity: 0.5; margin: 0 4px; }
+.touchnote { margin-top: 14px; font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted); border-top: 1px dashed var(--line); padding-top: 12px; }
+.touchnote b { color: var(--accent); }
+.reward { margin-top: 16px; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.1em; border-left: 2px solid currentColor; padding-left: 10px; }
+
+/* score legend strip */
+.score-legend {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 44px;
+  border-top: 1px dashed var(--line); border-bottom: 1px dashed var(--line); padding: 22px 0;
+}
+.score-legend .leg { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 110px; }
+.score-legend b { font-family: var(--font-mono); font-size: 1.5rem; }
+.score-legend span { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
+
+/* ---- WHAT YOU'LL UNLOCK ---- */
+.unlock-section { padding: clamp(40px, 7vw, 90px) 0; position: relative; z-index: 10; }
+.unlock-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.unlock-item {
+  display: flex; align-items: center; gap: 14px; padding: 18px 20px;
+  border: 1px solid var(--line); background: var(--panel); font-family: var(--font-mono);
+  font-size: 0.95rem; color: var(--text); transition: all 0.25s;
+}
+.unlock-item:hover { border-color: var(--accent); background: var(--panel-hover); transform: translateX(4px); }
+.unlock-item .uc { font-size: 0.7rem; color: var(--accent); border: 1px solid var(--accent); padding: 4px 8px; letter-spacing: 0.1em; white-space: nowrap; }
+
+/* ---- FINAL CTA ---- */
+.final-cta { padding: clamp(60px, 10vw, 120px) 0; text-align: center; position: relative; z-index: 10; }
+.final-cta p { font-family: var(--font-mono); color: var(--muted); margin-top: -20px; }
+.final-cta .title { margin-bottom: 14px; }
+
+/* ============================================================
+   MOBILE TUNING — simulation HUD
+   ============================================================ */
 @media (max-width: 768px) {
-  #sim-status, #sim-objectives { min-width: 0; font-size: 0.62rem; top: 20px; }
-  #sim-status { left: 20px; } #sim-objectives { right: 20px; }
+  #sim-status, #sim-objectives { min-width: 0; font-size: 0.6rem; top: 16px; padding: 9px 11px; }
+  #sim-status { left: 14px; max-width: 42vw; } #sim-objectives { right: 14px; max-width: 44vw; }
+  #sim-score { font-size: 1.3rem; }
+  #sim-minimap { bottom: auto; top: 16px; right: 50%; transform: translateX(50%); padding: 6px; }
+  #sim-map { width: 84px; height: 132px; }
+  #sim-minimap .cap { font-size: 0.5rem; }
+  #sim-foot { bottom: 18px; left: 14px; }
+  #sim-frame i { width: 26px; height: 26px; }
+  #sim-panel { right: 50%; left: auto; transform: translate(50%, 0) translateY(140%); width: 92vw; top: auto; bottom: 0; padding: 18px; }
+  #sim-panel.show { transform: translate(50%, 0); bottom: 200px; }
+  #sim-panel h3 { font-size: 1.2rem; }
+  /* bigger, thumb-friendly touch controls */
+  #sim-stick { width: 116px; height: 116px; bottom: 26px; left: 22px; }
+  #sim-stick i { width: 46px; height: 46px; margin: -23px 0 0 -23px; }
+  #sim-boost { width: 92px; height: 92px; bottom: 40px; right: 24px; font-size: 0.78rem; }
+}
+
+@media (max-width: 768px) and (pointer: coarse) {
+  /* when driving on a phone, drop the data panel low so it never hides the action */
+  #sim-objectives { font-size: 0.55rem; }
+  .ov-keys .ov-touch { display: block; color: var(--accent); }
+  .ov-keys span:not(.ov-touch) { display: none; }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  #sim-status, #sim-objectives { top: 10px; font-size: 0.55rem; }
   #sim-minimap { display: none; }
-  #sim-panel { right: 50%; transform: translate(50%, -50%) translateY(140%); width: 88vw; top: auto; bottom: 0; }
-  #sim-panel.show { transform: translate(50%, 0); bottom: 150px; }
+  #sim-stick { bottom: 14px; }
+  #sim-boost { bottom: 20px; }
 }
