@@ -587,33 +587,68 @@ body.gateway { display: block; }
    MOBILE TUNING — simulation HUD
    ============================================================ */
 @media (max-width: 768px) {
-  #sim-status, #sim-objectives { min-width: 0; font-size: 0.6rem; top: 16px; padding: 9px 11px; }
-  #sim-status { left: 14px; max-width: 42vw; } #sim-objectives { right: 14px; max-width: 44vw; }
-  #sim-score { font-size: 1.3rem; }
-  #sim-minimap { bottom: auto; top: 16px; right: 50%; transform: translateX(50%); padding: 6px; }
-  #sim-map { width: 84px; height: 132px; }
-  #sim-minimap .cap { font-size: 0.5rem; }
-  #sim-foot { bottom: 18px; left: 14px; }
-  #sim-frame i { width: 26px; height: 26px; }
-  #sim-panel { right: 50%; left: auto; transform: translate(50%, 0) translateY(140%); width: 92vw; top: auto; bottom: 0; padding: 18px; }
-  #sim-panel.show { transform: translate(50%, 0); bottom: 200px; }
-  #sim-panel h3 { font-size: 1.2rem; }
-  /* bigger, thumb-friendly touch controls */
-  #sim-stick { width: 116px; height: 116px; bottom: 26px; left: 22px; }
-  #sim-stick i { width: 46px; height: 46px; margin: -23px 0 0 -23px; }
-  #sim-boost { width: 92px; height: 92px; bottom: 40px; right: 24px; font-size: 0.78rem; }
+  /* compact status — SCORE + bars only; hide the metric text rows */
+  #sim-status { top: 12px; left: 12px; padding: 8px 10px; min-width: 0; max-width: 40vw; font-size: 0.58rem; }
+  #sim-status .row { display: none; }
+  #sim-status .score-wrap { margin-bottom: 5px; }
+  #sim-status .score-wrap .k { font-size: 0.55rem; }
+  #sim-score { font-size: 1.1rem; }
+  #sim-speedbar, #sim-progress { margin-top: 4px; height: 4px; }
+
+  /* compact objectives — counts only; hide the per-node list */
+  #sim-objectives { top: 12px; right: 12px; padding: 8px 10px; min-width: 0; max-width: 42vw; font-size: 0.58rem; }
+  #sim-objectives .obj { display: none; }
+
+  /* the minimap is too busy on a phone — hide it (3D view + progress bar suffice) */
+  #sim-minimap { display: none; }
+
+  /* restart / exit -> a small row in the freed top-centre slot */
+  #sim-foot { top: 12px; left: 50%; right: auto; bottom: auto; transform: translateX(-50%); flex-direction: row; gap: 8px; align-items: center; }
+  #sim-foot .keys { display: none; }
+  #sim-foot .sim-btn { padding: 6px 11px; font-size: 0.6rem; }
+
+  #sim-frame i { width: 22px; height: 22px; }
+
+  /* toast: slimmer + higher so it never collides with the bottom panel */
+  #sim-toast { top: 13%; width: 90vw; }
+  #sim-toast .big { font-size: 1.15rem; }
+  #sim-toast .sub { font-size: 0.62rem; }
+
+  /* data panel: compact bottom sheet floating above the controls */
+  #sim-panel {
+    left: 50%; right: auto; top: auto; bottom: 0; width: 94vw; max-width: 460px;
+    max-height: 38vh; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px 16px;
+    transform: translate(-50%, 130%);
+  }
+  #sim-panel.show { transform: translate(-50%, 0); bottom: 150px; }
+  #sim-panel h3 { font-size: 1.05rem; margin: 4px 0 8px; }
+  #sim-panel p { font-size: 0.76rem; margin-bottom: 8px; }
+  #sim-panel .pline { font-size: 0.72rem; }
+  #sim-panel .pbtns { margin-top: 12px; }
+
+  /* thumb controls */
+  #sim-stick { width: 112px; height: 112px; bottom: 24px; left: 18px; }
+  #sim-stick i { width: 44px; height: 44px; margin: -22px 0 0 -22px; }
+  #sim-boost { width: 86px; height: 86px; bottom: 32px; right: 18px; font-size: 0.72rem; }
 }
 
 @media (max-width: 768px) and (pointer: coarse) {
-  /* when driving on a phone, drop the data panel low so it never hides the action */
-  #sim-objectives { font-size: 0.55rem; }
   .ov-keys .ov-touch { display: block; color: var(--accent); }
   .ov-keys span:not(.ov-touch) { display: none; }
 }
 
+@media (max-width: 380px) {
+  #sim-status, #sim-objectives { font-size: 0.52rem; max-width: 38vw; }
+  #sim-score { font-size: 0.96rem; }
+}
+
 @media (max-height: 520px) and (orientation: landscape) {
-  #sim-status, #sim-objectives { top: 10px; font-size: 0.55rem; }
-  #sim-minimap { display: none; }
-  #sim-stick { bottom: 14px; }
-  #sim-boost { bottom: 20px; }
+  #sim-status { top: 8px; left: 8px; }
+  #sim-objectives { top: 8px; right: 8px; }
+  #sim-foot { top: 8px; }
+  #sim-toast { top: 8%; }
+  #sim-panel { max-height: 58vh; }
+  #sim-panel.show { bottom: 96px; }
+  #sim-stick { bottom: 12px; left: 12px; }
+  #sim-boost { bottom: 16px; right: 12px; }
 }

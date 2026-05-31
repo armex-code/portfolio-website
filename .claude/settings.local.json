@@ -14,7 +14,8 @@
       "Bash(git pull *)",
       "Bash(node --check js/space-3d.js)",
       "PowerShell(node --check \"js/space-3d.js\"; if \\($?\\) { \"SYNTAX OK\" } else { \"SYNTAX FAIL\" })",
-      "PowerShell(Out-File *)"
+      "PowerShell(Out-File *)",
+      "mcp__1d00e627-a478-42f9-807b-395063e389cb__deploy_to_vercel"
     ]
   }
 }
