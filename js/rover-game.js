@@ -834,11 +834,12 @@
   /* ------------------------------------------------------------
      OBSTACLE PHYSICS
   ------------------------------------------------------------ */
-  const impactDir = new THREE.Vector3();
-  function knock(o, dirX, dirZ, power) {
+  // mark a crate as knocked and launch it (velocity already includes direction)
+  function knock(o, vx, vz) {
+    if (o.knocked) return;
     o.state = "fall"; o.knocked = true;
-    o.vel.set(dirX * power, rand(3, 7), dirZ * power);
-    o.avel.set(rand(-6, 6), rand(-3, 3), rand(-6, 6));
+    o.vel.set(vx, rand(5, 9), vz);
+    o.avel.set(rand(-7, 7), rand(-3, 3), rand(-7, 7));
     state.obsCleared++;
     elObs.textContent = `${state.obsCleared}/${TOTAL_OBS}`;
     addScore(PTS_OBSTACLE, "", "#ffae3b");
@@ -847,26 +848,47 @@
       setTimeout(() => { addScore(250, "ALL CRATES!", "#ffae3b"); toast("Demolition Bonus", "Every crate cleared · +250"); }, 200);
     }
   }
+
+  // push a crate out of the rover's body so the two never visually overlap
+  const SEPARATION = ROVER_R + 1 + 0.3;   // crate half = 1
+  function separateFromRover(o) {
+    let dx = o.mesh.position.x - state.x, dz = o.mesh.position.z - state.z;
+    let d = Math.hypot(dx, dz);
+    if (d > SEPARATION) return false;
+    if (d < 0.0001) { dx = Math.sin(state.heading); dz = Math.cos(state.heading); d = 1; }
+    const nx = dx / d, nz = dz / d;
+    o.mesh.position.x = state.x + nx * SEPARATION;
+    o.mesh.position.z = state.z + nz * SEPARATION;
+    // give it outward speed so it keeps clearing instead of being dragged
+    o.vel.x += nx * 8; o.vel.z += nz * 8;
+    return true;
+  }
+
   function updateObstacles(dt) {
     obstacles.forEach((o) => {
-      if (o.state === "fall") {
-        o.vel.y += GRAVITY * dt;
-        o.mesh.position.addScaledVector(o.vel, dt);
-        o.mesh.rotation.x += o.avel.x * dt;
-        o.mesh.rotation.y += o.avel.y * dt;
-        o.mesh.rotation.z += o.avel.z * dt;
-        // floor bounce / settle
-        if (o.mesh.position.y < o.half) {
-          o.mesh.position.y = o.half;
-          if (Math.abs(o.vel.y) > 4) { o.vel.y = -o.vel.y * 0.32; }   // small bounce
-          else { o.vel.y = 0; }
-          o.vel.x *= 0.6; o.vel.z *= 0.6;                              // ground friction
-          o.avel.multiplyScalar(0.6);
-          if (o.vel.lengthSq() < 0.4 && o.avel.lengthSq() < 0.4) {
-            o.settleTimer += dt;
-            if (o.settleTimer > 0.25) o.state = "rest";
-          }
+      if (o.state === "stand") return;
+      // integrate physics for airborne / sliding crates
+      o.vel.y += GRAVITY * dt;
+      o.mesh.position.addScaledVector(o.vel, dt);
+      o.mesh.rotation.x += o.avel.x * dt;
+      o.mesh.rotation.y += o.avel.y * dt;
+      o.mesh.rotation.z += o.avel.z * dt;
+      // floor bounce / settle
+      if (o.mesh.position.y < o.half) {
+        o.mesh.position.y = o.half;
+        if (Math.abs(o.vel.y) > 4) { o.vel.y = -o.vel.y * 0.32; } else { o.vel.y = 0; }
+        o.vel.x *= 0.62; o.vel.z *= 0.62;          // ground friction
+        o.avel.multiplyScalar(0.62);
+        if (o.vel.lengthSq() < 0.4 && o.avel.lengthSq() < 0.4) {
+          o.settleTimer += dt;
+          if (o.settleTimer > 0.25) o.state = "rest";
+        } else {
+          o.settleTimer = 0;
         }
+      }
+      // never let a crate sit inside the rover — only when it's near rover height
+      if (state.playing && o.mesh.position.y < o.half + 1.6) {
+        if (separateFromRover(o)) { o.state = "fall"; o.settleTimer = 0; }
       }
     });
   }
@@ -914,20 +936,27 @@
       state.x = nx; state.z = nz;
 
       // obstacle collisions — topple any standing crate we drive into
+      const tSign = state.speed >= 0 ? 1 : -1;
+      const tvx = Math.sin(state.heading) * tSign, tvz = Math.cos(state.heading) * tSign;
       obstacles.forEach((o) => {
         if (o.state !== "stand") return;
-        const dx = state.x - o.mesh.position.x, dz = state.z - o.mesh.position.z;
-        if (dx * dx + dz * dz < (ROVER_R + o.half + 0.4) * (ROVER_R + o.half + 0.4)) {
-          impactDir.set(o.mesh.position.x - state.x, 0, o.mesh.position.z - state.z);
-          if (impactDir.lengthSq() < 0.0001) impactDir.set(Math.sin(state.heading), 0, Math.cos(state.heading));
-          impactDir.normalize();
-          const power = clamp(6 + Math.abs(state.speed) * 0.7, 8, 34);
-          // blend impact with rover heading for a satisfying plough
-          const dirX = impactDir.x * 0.6 + Math.sin(state.heading) * 0.4;
-          const dirZ = impactDir.z * 0.6 + Math.cos(state.heading) * 0.4;
-          knock(o, dirX, dirZ, power);
-          state.speed *= 0.82;       // slight slow-down on impact
-          state.pitch = lerp(state.pitch, 0.16, 0.5);
+        let ax = o.mesh.position.x - state.x, az = o.mesh.position.z - state.z;
+        const dsq = ax * ax + az * az;
+        const contact = ROVER_R + o.half + 0.5;
+        if (dsq < contact * contact) {
+          let d = Math.sqrt(dsq);
+          if (d < 0.0001) { ax = tvx; az = tvz; d = 1; }   // dead-centre hit -> use travel dir
+          ax /= d; az /= d;
+          // shove the crate just outside contact so it never overlaps the rover
+          o.mesh.position.x = state.x + ax * (contact + 0.4);
+          o.mesh.position.z = state.z + az * (contact + 0.4);
+          // launch away from the rover, biased along travel for a satisfying plough
+          let lx = ax * 0.65 + tvx * 0.5, lz = az * 0.65 + tvz * 0.5;
+          const ln = Math.hypot(lx, lz) || 1; lx /= ln; lz /= ln;
+          const power = clamp(13 + Math.abs(state.speed) * 0.8, 15, 42);
+          knock(o, lx * power, lz * power);
+          state.speed *= 0.86;       // slight slow-down on impact
+          state.pitch = lerp(state.pitch, 0.14, 0.5);
         }
       });
 
