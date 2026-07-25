@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AbdelOS Vista — a retro desktop fun project</title>
+<meta name="description" content="A Windows Vista-inspired desktop replica built with vanilla HTML, CSS and JS. Working start menu, draggable windows, Notepad, Calculator, Paint, Minesweeper and more.">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, sans-serif;
+    font-size: 13px;
+    user-select: none;
+    background: #000;
+  }
+
+  /* ============ WALLPAPERS ============ */
+  #desktop {
+    position: fixed; inset: 0 0 40px 0;
+    overflow: hidden;
+    transition: background 0.6s;
+  }
+  body.wp-aurora #desktop {
+    background:
+      radial-gradient(ellipse 90% 60% at 70% 25%, rgba(120,255,190,0.35), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 30% 70%, rgba(0,180,140,0.30), transparent 65%),
+      radial-gradient(ellipse 120% 80% at 85% 85%, rgba(0,90,160,0.45), transparent 70%),
+      linear-gradient(160deg, #0b3d2e 0%, #0a5c46 30%, #063a52 65%, #021c30 100%);
+  }
+  body.wp-sunset #desktop {
+    background:
+      radial-gradient(ellipse 80% 55% at 50% 80%, rgba(255,170,60,0.5), transparent 65%),
+      radial-gradient(ellipse 90% 60% at 80% 20%, rgba(255,80,120,0.3), transparent 60%),
+      linear-gradient(165deg, #2b1055 0%, #7597de00 100%),
+      linear-gradient(180deg, #35104f 0%, #a33262 55%, #e2703a 100%);
+  }
+  body.wp-ocean #desktop {
+    background:
+      radial-gradient(ellipse 100% 70% at 30% 20%, rgba(90,200,255,0.35), transparent 60%),
+      radial-gradient(ellipse 80% 60% at 75% 75%, rgba(0,120,220,0.4), transparent 65%),
+      linear-gradient(170deg, #05294d 0%, #0a4d8c 55%, #021326 100%);
+  }
+  body.wp-classic #desktop { background: #3a6ea5; }
+
+  /* soft light streaks, vista-ish */
+  #desktop::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.06) 45%, transparent 52%),
+      linear-gradient(100deg, transparent 60%, rgba(255,255,255,0.05) 66%, transparent 74%);
+  }
+
+  /* ============ DESKTOP ICONS ============ */
+  #icons {
+    position: absolute; top: 10px; left: 10px; bottom: 10px;
+    display: flex; flex-direction: column; flex-wrap: wrap;
+    gap: 6px; align-content: flex-start; z-index: 1;
+  }
+  .dicon {
+    width: 84px; padding: 8px 4px 6px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    border: 1px solid transparent; border-radius: 4px; cursor: pointer;
+    text-align: center;
+  }
+  .dicon:hover { background: rgba(140,200,255,0.18); border-color: rgba(160,210,255,0.35); }
+  .dicon.selected { background: rgba(120,190,255,0.32); border-color: rgba(170,215,255,0.6); }
+  .dicon .ig {
+    width: 48px; height: 48px; font-size: 34px; line-height: 46px;
+    display: flex; align-items: center; justify-content: center;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.45));
+  }
+  .dicon span {
+    color: #fff; font-size: 12px; line-height: 1.25;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.6);
+  }
+
+  /* ============ WINDOWS (Aero chrome) ============ */
+  .win {
+    position: absolute; min-width: 280px; min-height: 170px;
+    display: flex; flex-direction: column;
+    border-radius: 8px 8px 5px 5px;
+    background: rgba(150,180,205,0.55);
+    box-shadow: 0 0 0 1px rgba(0,20,40,0.75), 0 8px 30px rgba(0,0,0,0.55), inset 0 0 0 1px rgba(255,255,255,0.45);
+    padding: 0 5px 5px;
+  }
+  body.aero .win { backdrop-filter: blur(9px); -webkit-backdrop-filter: blur(9px); }
+  .win.focused {
+    background: rgba(160,195,225,0.68);
+    box-shadow: 0 0 0 1px rgba(0,20,40,0.9), 0 12px 42px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.55);
+  }
+  .win.maximized { border-radius: 0; padding: 0; }
+  .win.minimized { display: none !important; }
+
+  .titlebar {
+    height: 30px; flex: 0 0 30px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 4px 0 9px; cursor: default; touch-action: none;
+  }
+  .titlebar .ticon { font-size: 15px; }
+  .titlebar .ttext {
+    flex: 1; color: #fff; font-size: 12px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.85), 0 0 6px rgba(0,0,0,0.4);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .caption-btns { display: flex; }
+  .cbtn {
+    width: 29px; height: 19px; border: 1px solid rgba(20,40,60,0.8);
+    border-top: none; cursor: pointer; color: #fff; font-size: 10px; line-height: 17px;
+    text-align: center; text-shadow: 0 1px 1px rgba(0,0,0,0.7);
+    background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.12) 45%, rgba(90,120,150,0.25) 50%, rgba(150,180,210,0.35) 100%);
+  }
+  .cbtn:first-child { border-radius: 0 0 0 4px; border-right: none; }
+  .cbtn:last-child { border-radius: 0 0 4px 0; }
+  .cbtn:hover { background: linear-gradient(180deg, rgba(255,255,255,0.65) 0%, rgba(180,220,255,0.4) 50%, rgba(120,180,240,0.5) 100%); }
+  .cbtn.close {
+    width: 43px;
+    background: linear-gradient(180deg, #f5b8ad 0%, #e98e7c 40%, #cc3820 50%, #d95b3a 100%);
+  }
+  .cbtn.close:hover { background: linear-gradient(180deg, #ffcfc4 0%, #f5a08c 40%, #e5442a 50%, #f07048 100%); }
+
+  .winbody {
+    flex: 1; background: #fff; border: 1px solid rgba(10,30,50,0.65);
+    border-radius: 2px; overflow: auto; position: relative;
+    display: flex; flex-direction: column; user-select: text;
+  }
+  .win.maximized .winbody { border-radius: 0; }
+  .resizer {
+    position: absolute; right: 0; bottom: 0; width: 16px; height: 16px;
+    cursor: nwse-resize; z-index: 5; touch-action: none;
+    background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.7) 50%);
+    border-radius: 0 0 4px 0;
+  }
+  .win.maximized .resizer { display: none; }
+
+  /* generic app toolbar inside windows */
+  .apptools {
+    flex: 0 0 auto; display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    padding: 5px 8px; background: linear-gradient(180deg, #fdfdfd, #e8eef5);
+    border-bottom: 1px solid #cdd8e4;
+  }
+  .tbtn {
+    font: inherit; font-size: 12px; padding: 3px 10px; cursor: pointer;
+    border: 1px solid #8fa8bf; border-radius: 3px; color: #1c3a56;
+    background: linear-gradient(180deg, #fff 0%, #e9f1f8 45%, #d5e4f2 50%, #eaf2fa 100%);
+  }
+  .tbtn:hover { border-color: #4f7ba8; background: linear-gradient(180deg, #fff 0%, #dcedff 45%, #bcdcff 50%, #dceeff 100%); }
+  .tbtn:active { background: #cfe2f5; }
+  .tbtn.on { background: #bcdcff; border-color: #3a6ea5; box-shadow: inset 0 1px 3px rgba(0,0,60,0.25); }
+
+  /* ============ TASKBAR ============ */
+  #taskbar {
+    position: fixed; left: 0; right: 0; bottom: 0; height: 40px; z-index: 5000;
+    display: flex; align-items: center; gap: 4px; padding: 0 6px 0 2px;
+    background: linear-gradient(180deg, rgba(90,120,150,0.5) 0%, rgba(20,35,55,0.82) 12%, rgba(8,18,32,0.9) 50%, rgba(30,55,85,0.85) 100%);
+    border-top: 1px solid rgba(160,200,240,0.45);
+    box-shadow: 0 -3px 14px rgba(0,0,0,0.5);
+  }
+  body.aero #taskbar { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+
+  #orb {
+    width: 48px; height: 48px; margin-top: -12px; flex: 0 0 48px;
+    border: none; border-radius: 50%; cursor: pointer; position: relative;
+    background: radial-gradient(circle at 50% 30%, #9fd4ff 0%, #2f8de0 35%, #0a4f9e 65%, #06305f 100%);
+    box-shadow: 0 0 0 2px rgba(10,30,60,0.7), 0 0 12px rgba(80,170,255,0.7), inset 0 3px 6px rgba(255,255,255,0.55), inset 0 -4px 8px rgba(0,10,40,0.6);
+    color: #fff; font-size: 20px; font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #orb:hover { box-shadow: 0 0 0 2px rgba(10,30,60,0.7), 0 0 20px rgba(120,200,255,0.95), inset 0 3px 6px rgba(255,255,255,0.65), inset 0 -4px 8px rgba(0,10,40,0.6); }
+  #orb svg { width: 22px; height: 22px; filter: drop-shadow(0 1px 2px rgba(0,0,20,0.6)); }
+
+  #taskbtns { flex: 1; display: flex; gap: 4px; overflow-x: auto; padding: 4px 2px; scrollbar-width: none; }
+  #taskbtns::-webkit-scrollbar { display: none; }
+  .taskbtn {
+    flex: 0 1 165px; min-width: 44px; height: 30px;
+    display: flex; align-items: center; gap: 6px; padding: 0 9px;
+    border: 1px solid rgba(150,190,230,0.35); border-radius: 4px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04) 50%, rgba(0,0,0,0.12));
+    color: #eaf4ff; font-size: 12px; cursor: pointer;
+    white-space: nowrap; overflow: hidden;
+  }
+  .taskbtn .tb-label { overflow: hidden; text-overflow: ellipsis; }
+  .taskbtn:hover { background: linear-gradient(180deg, rgba(190,225,255,0.35), rgba(120,180,240,0.18) 50%, rgba(40,90,150,0.25)); }
+  .taskbtn.active {
+    background: linear-gradient(180deg, rgba(120,190,255,0.55), rgba(50,120,200,0.4) 50%, rgba(10,50,110,0.55));
+    border-color: rgba(190,225,255,0.75);
+    box-shadow: inset 0 1px 5px rgba(0,10,40,0.55);
+  }
+
+  #tray {
+    flex: 0 0 auto; display: flex; align-items: center; gap: 8px;
+    padding: 0 8px; height: 100%;
+    border-left: 1px solid rgba(160,200,240,0.3);
+  }
+  #clock { text-align: center; color: #eaf4ff; line-height: 1.2; cursor: default;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+  #clock .t { font-size: 13px; }
+  #clock .d { font-size: 10px; opacity: 0.85; }
+  #showdesk {
+    width: 12px; height: 100%; cursor: pointer;
+    border-left: 1px solid rgba(160,200,240,0.4);
+    background: rgba(255,255,255,0.07);
+  }
+  #showdesk:hover { background: rgba(200,230,255,0.25); }
+
+  /* ============ START MENU ============ */
+  #startmenu {
+    position: fixed; left: 4px; bottom: 44px; z-index: 6000;
+    width: 400px; max-width: calc(100vw - 8px);
+    display: none; grid-template-columns: 1fr 150px;
+    border-radius: 8px; overflow: hidden;
+    background: rgba(30,50,75,0.88);
+    box-shadow: 0 0 0 1px rgba(0,10,25,0.9), 0 10px 40px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(160,200,240,0.4);
+  }
+  body.aero #startmenu { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  #startmenu.open { display: grid; }
+
+  #sm-left { background: #fff; margin: 8px 0 8px 8px; border-radius: 4px; display: flex; flex-direction: column; overflow: hidden; }
+  #sm-programs { flex: 1; overflow-y: auto; padding: 5px; max-height: 320px; }
+  .sm-item {
+    display: flex; align-items: center; gap: 9px; padding: 6px 8px;
+    border-radius: 3px; cursor: pointer; color: #1a2a3a; font-size: 12.5px;
+  }
+  .sm-item:hover { background: linear-gradient(180deg, #dcecfd, #bcd8f7); }
+  .sm-item .si { font-size: 19px; width: 24px; text-align: center; }
+  .sm-item.hidden { display: none; }
+  #sm-search-wrap { padding: 7px; border-top: 1px solid #d8e2ec; }
+  #sm-search {
+    width: 100%; font: inherit; font-size: 12px; padding: 5px 9px;
+    border: 1px solid #9ab4cc; border-radius: 11px; outline: none;
+  }
+  #sm-search:focus { border-color: #3a86d4; box-shadow: 0 0 4px rgba(60,140,220,0.5); }
+
+  #sm-right { display: flex; flex-direction: column; padding: 12px 8px 8px; gap: 2px; }
+  #sm-user { text-align: center; margin-bottom: 8px; }
+  #sm-user .avatar {
+    width: 52px; height: 52px; margin: 0 auto 5px; border-radius: 8px; font-size: 30px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(180deg, #fff, #cfe0f0);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.55), 0 2px 6px rgba(0,0,0,0.5);
+  }
+  #sm-user b { color: #fff; font-size: 12.5px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+  .sm-link {
+    padding: 5px 9px; border-radius: 3px; color: #e8f2fc; font-size: 12px; cursor: pointer;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.6);
+  }
+  .sm-link:hover { background: rgba(150,200,250,0.28); }
+  #sm-power {
+    margin-top: auto; display: flex; gap: 5px; justify-content: flex-end; padding-top: 8px;
+  }
+  #sm-power button {
+    font: inherit; font-size: 11.5px; color: #fff; cursor: pointer;
+    padding: 5px 11px; border-radius: 4px;
+    border: 1px solid rgba(180,215,245,0.55);
+    background: linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0.06) 50%, rgba(0,0,0,0.18));
+    text-shadow: 0 1px 1px rgba(0,0,0,0.7);
+  }
+  #sm-power button:hover { background: linear-gradient(180deg, rgba(255,120,90,0.6), rgba(200,50,25,0.55)); }
+
+  /* ============ CONTEXT MENU ============ */
+  #ctxmenu {
+    position: fixed; z-index: 7000; display: none; min-width: 190px;
+    background: #f4f7fb; border: 1px solid #97a8ba; border-radius: 3px;
+    box-shadow: 3px 3px 10px rgba(0,0,0,0.4); padding: 3px;
+  }
+  #ctxmenu div { padding: 6px 12px; border-radius: 2px; cursor: pointer; color: #1a2a3a; }
+  #ctxmenu div:hover { background: linear-gradient(180deg, #dcecfd, #bcd8f7); }
+  #ctxmenu hr { border: none; border-top: 1px solid #d4dde6; margin: 3px 6px; }
+
+  /* ============ BOOT / SHUTDOWN ============ */
+  #boot {
+    position: fixed; inset: 0; z-index: 9000; background: #000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px;
+    color: #cfe4f5; cursor: pointer;
+  }
+  #boot .logo { font-size: 30px; letter-spacing: 2px; font-weight: 300; }
+  #boot .logo b { color: #6fc26f; font-weight: 600; }
+  #boot .bar { width: 190px; height: 14px; border: 1px solid #4a5a6a; border-radius: 3px; overflow: hidden; }
+  #boot .bar i {
+    display: block; width: 40%; height: 100%;
+    background: linear-gradient(90deg, transparent, #3fae49 30%, #7ee387 50%, #3fae49 70%, transparent);
+    animation: bootslide 1.1s linear infinite;
+  }
+  @keyframes bootslide { from { transform: translateX(-110%); } to { transform: translateX(300%); } }
+  #boot small { opacity: 0.5; font-size: 11px; }
+  #boot.fade { opacity: 0; transition: opacity 0.7s; pointer-events: none; }
+
+  #shutdown {
+    position: fixed; inset: 0; z-index: 9500; background: #06101c;
+    display: none; align-items: center; justify-content: center; flex-direction: column; gap: 18px;
+    color: #d5e8f7; font-size: 17px;
+  }
+  #shutdown .spin {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 3px solid rgba(140,190,240,0.25); border-top-color: #8fc9f5;
+    animation: spin 0.9s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  #sleepveil { position: fixed; inset: 0; z-index: 8800; background: #000; display: none; cursor: pointer; }
+
+  /* ============ APP: NOTEPAD ============ */
+  .notepad-ta {
+    flex: 1; resize: none; border: none; outline: none; padding: 8px;
+    font: 13px/1.5 Consolas, "Courier New", monospace; color: #111; background: #fff;
+  }
+
+  /* ============ APP: CALCULATOR ============ */
+  .calc { flex: 1; display: flex; flex-direction: column; background: #e7edf4; padding: 9px; gap: 8px; }
+  .calc-display {
+    background: #f6fbf2; border: 1px solid #9ab; border-radius: 3px;
+    font: 22px Consolas, monospace; text-align: right; padding: 8px 10px;
+    min-height: 42px; overflow: hidden; white-space: nowrap;
+  }
+  .calc-grid { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+  .calc-grid button {
+    font: 15px "Segoe UI", sans-serif; cursor: pointer; border-radius: 4px;
+    border: 1px solid #8fa8bf; min-height: 34px;
+    background: linear-gradient(180deg, #fff, #dde7f1);
+  }
+  .calc-grid button:hover { background: linear-gradient(180deg, #fff, #cfe4fb); }
+  .calc-grid button:active { background: #bcd8f4; }
+  .calc-grid button.op { color: #0a4f9e; font-weight: 600; }
+  .calc-grid button.eq { grid-row: span 2; background: linear-gradient(180deg, #cfe6ff, #7db4e8); font-weight: 700; }
+
+  /* ============ APP: PAINT ============ */
+  .paint-wrap { flex: 1; overflow: auto; background: #9aa5b1; padding: 10px; }
+  .paint-canvas { background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.4); cursor: crosshair; touch-action: none; }
+  .swatch { width: 22px; height: 22px; border-radius: 3px; border: 2px solid #fff; outline: 1px solid #789; cursor: pointer; padding: 0; }
+  .swatch.on { outline: 2px solid #0a4f9e; }
+
+  /* ============ APP: MINESWEEPER ============ */
+  .mines { flex: 1; display: flex; flex-direction: column; align-items: center; background: #d7dee6; padding: 10px; gap: 9px; overflow: auto; }
+  .mines-top { display: flex; align-items: center; gap: 12px; }
+  .lcd {
+    background: #200; color: #f33; font: 19px Consolas, monospace; font-weight: 700;
+    padding: 2px 7px; border: 2px inset #eee; min-width: 52px; text-align: center;
+  }
+  .smiley { font-size: 21px; width: 40px; height: 40px; cursor: pointer; border: 2px outset #eee; background: #d7dee6; }
+  .smiley:active { border-style: inset; }
+  .mgrid { display: grid; grid-template-columns: repeat(9, 30px); gap: 0; border: 3px inset #eef; }
+  .mcell {
+    width: 30px; height: 30px; font: bold 15px "Segoe UI", sans-serif; cursor: pointer;
+    border: 2px outset #f4f7fa; background: #c3cedb; padding: 0; line-height: 1;
+  }
+  .mcell.rev { border: 1px solid #98a6b6; background: #dde5ee; cursor: default; }
+  .mcell.boom { background: #e0442a; }
+  .mcell.c1 { color: #1717d4; } .mcell.c2 { color: #0e7a0e; } .mcell.c3 { color: #d41717; }
+  .mcell.c4 { color: #0e0e7a; } .mcell.c5 { color: #7a2a0e; } .mcell.c6 { color: #0e7a7a; }
+  .mcell.c7 { color: #111; }   .mcell.c8 { color: #666; }
+
+  /* ============ APP: BROWSER ============ */
+  .ie-bar { display: flex; gap: 6px; padding: 6px 8px; background: linear-gradient(180deg, #fdfdfd, #dfe9f3); border-bottom: 1px solid #cdd8e4; align-items: center; }
+  .ie-addr { flex: 1; font: 12px "Segoe UI"; padding: 5px 9px; border: 1px solid #9ab4cc; border-radius: 3px; outline: none; min-width: 60px; }
+  .ie-frame { flex: 1; border: none; width: 100%; background: #fff; }
+
+  /* ============ APP: EXPLORER ============ */
+  .exp { flex: 1; display: flex; flex-direction: column; }
+  .exp-crumb { padding: 6px 10px; background: linear-gradient(180deg, #fdfdfd, #e3ecf5); border-bottom: 1px solid #cdd8e4; color: #234; }
+  .exp-main { flex: 1; overflow: auto; padding: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-content: flex-start; }
+  .fitem {
+    width: 96px; padding: 9px 4px; text-align: center; border-radius: 4px; cursor: pointer;
+    display: flex; flex-direction: column; gap: 5px; align-items: center; color: #123;
+  }
+  .fitem:hover { background: #ddecfb; }
+  .fitem .fi { font-size: 33px; }
+  .fitem span { font-size: 11.5px; line-height: 1.25; }
+
+  /* ============ APP: CONTROL PANEL / welcome ============ */
+  .padded { padding: 14px 16px; overflow: auto; color: #223; line-height: 1.55; }
+  .padded h2 { font-size: 17px; font-weight: 600; color: #0a3c6e; margin-bottom: 8px; }
+  .padded h3 { font-size: 13px; color: #0a3c6e; margin: 12px 0 5px; }
+  .padded p { margin-bottom: 8px; }
+  .padded a { color: #0a63c4; }
+  .wprow { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0; }
+  .wpthumb { width: 74px; height: 46px; border-radius: 4px; cursor: pointer; border: 2px solid #b8c6d4; padding: 0; }
+  .wpthumb.on { border-color: #0a63c4; box-shadow: 0 0 6px rgba(20,110,210,0.6); }
+  .wp-t-aurora { background: linear-gradient(150deg, #0a5c46, #063a52); }
+  .wp-t-sunset { background: linear-gradient(170deg, #35104f, #a33262 60%, #e2703a); }
+  .wp-t-ocean { background: linear-gradient(160deg, #0a4d8c, #021326); }
+  .wp-t-classic { background: #3a6ea5; }
+
+  /* ============ MOBILE ============ */
+  @media (max-width: 620px) {
+    .win { left: 2vw !important; top: 2vh !important; width: 96vw !important; height: 74vh !important; }
+    #startmenu { grid-template-columns: 1fr; width: calc(100vw - 8px); }
+    #sm-right { flex-direction: row; flex-wrap: wrap; align-items: center; }
+    #sm-user { display: flex; align-items: center; gap: 8px; margin: 0 auto 0 0; }
+    #sm-user .avatar { width: 34px; height: 34px; font-size: 20px; margin: 0; }
+    .sm-link { display: none; }
+    .dicon { width: 74px; }
+  }
+</style>
+</head>
+<body class="wp-aurora aero">
+
+  <!-- boot screen -->
+  <div id="boot">
+    <div class="logo">Abdel<b>OS</b>&trade; Vista</div>
+    <div class="bar"><i></i></div>
+    <small>&copy; Abdel Elarfaoui Corporation — click to skip</small>
+  </div>
+
+  <div id="shutdown"><div class="spin"></div><span id="shutdown-msg">Shutting down…</span></div>
+  <div id="sleepveil" title="Click to wake up"></div>
+
+  <div id="desktop">
+    <div id="icons"></div>
+  </div>
+
+  <div id="ctxmenu"></div>
+
+  <!-- start menu -->
+  <div id="startmenu">
+    <div id="sm-left">
+      <div id="sm-programs"></div>
+      <div id="sm-search-wrap">
+        <input id="sm-search" type="text" placeholder="Start Search" autocomplete="off">
+      </div>
+    </div>
+    <div id="sm-right">
+      <div id="sm-user"><div class="avatar">🤖</div><b>Abdel</b></div>
+      <div class="sm-link" data-open="computer">Computer</div>
+      <div class="sm-link" data-open="notepad">Documents</div>
+      <div class="sm-link" data-open="paint">Pictures</div>
+      <div class="sm-link" data-open="control">Control Panel</div>
+      <div class="sm-link" data-open="welcome">Help and Support</div>
+      <div id="sm-power">
+        <button id="btn-sleep" title="Sleep">⏾ Sleep</button>
+        <button id="btn-shutdown" title="Back to the real portfolio">⏻ Shut Down</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- taskbar -->
+  <div id="taskbar">
+    <button id="orb" title="Start" aria-label="Start menu">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="#fff" d="M3 5.5 10.5 4.4v7.1H3V5.5zm0 13V12.5h7.5v7.1L3 18.5zm8.5 1.3v-7.3H21v8.5l-9.5-1.2zm0-15.6L21 3v8.5h-9.5V4.2z"/>
+      </svg>
+    </button>
+    <div id="taskbtns"></div>
+    <div id="tray">
+      <div id="clock"><div class="t">--:--</div><div class="d">--</div></div>
+    </div>
+    <div id="showdesk" title="Show desktop"></div>
+  </div>
+
+<script>
+"use strict";
+/* ==========================================================================
+   AbdelOS Vista — a Windows Vista-style desktop replica.
+   Fun project by Abdel Elarfaoui. Vanilla HTML/CSS/JS, no libraries.
+   ========================================================================== */
+
+const $ = s => document.querySelector(s);
+const desktop = $("#desktop");
+let zTop = 20;
+let cascade = 0;
+const wins = {}; // appId -> {el, taskBtn}
+
+/* ---------------- app registry ---------------- */
+const APPS = {
+  welcome: {
+    title: "Welcome Center", icon: "✨", w: 520, h: 400,
+    html: () =>
+      '<div class="padded">' +
+      '<h2>Welcome to AbdelOS&trade; Vista</h2>' +
+      '<p>This is a <b>fun project</b> from my portfolio: a replica of an old-school Windows' +
+      ' desktop (Vista era, Aero glass and all) built from scratch with vanilla HTML, CSS and JavaScript' +
+      ' — no frameworks, no images, one file.</p>' +
+      '<h3>Things that actually work</h3>' +
+      '<p>🪟 Drag, resize, minimize, maximize and close windows &nbsp;·&nbsp; 🔍 Start menu with live search' +
+      ' &nbsp;·&nbsp; 📝 Notepad &nbsp;·&nbsp; 🧮 Calculator &nbsp;·&nbsp; 🎨 Paint &nbsp;·&nbsp; 💣 Minesweeper' +
+      ' &nbsp;·&nbsp; 🌐 A browser that opens my real portfolio pages &nbsp;·&nbsp; 🖥️ File explorer' +
+      ' &nbsp;·&nbsp; 🎛️ Control Panel with wallpapers &nbsp;·&nbsp; 🕑 Live clock &nbsp;·&nbsp; right-click the desktop, too!</p>' +
+      '<h3>Who made this?</h3>' +
+      '<p>I\'m <b>Abdel Elarfaoui</b>, a CS student at Al Akhawayn University who likes building robots' +
+      ' (and, apparently, operating systems). Press <b>⏻ Shut Down</b> in the Start menu to go back to my portfolio,' +
+      ' or check <a href="index.html">the classic homepage</a> and <a href="experience.html">Rover Run</a>.</p>' +
+      '<button class="tbtn" data-open="mines">💣 Play Minesweeper</button> ' +
+      '<button class="tbtn" data-open="paint">🎨 Open Paint</button>' +
+      '</div>',
+    init: el => wireOpenButtons(el)
+  },
+
+  notepad: {
+    title: "Untitled - Notepad", icon: "📝", w: 460, h: 340,
+    html: () =>
+      '<div class="apptools">' +
+      '<button class="tbtn" data-np="new">New</button>' +
+      '<button class="tbtn" data-np="save">Save (.txt)</button>' +
+      '<button class="tbtn" data-np="time">Insert time</button>' +
+      '</div>' +
+      '<textarea class="notepad-ta" spellcheck="false" placeholder="Dear diary, today I booted a Windows Vista replica inside a web page..."></textarea>',
+    init: el => {
+      const ta = el.querySelector(".notepad-ta");
+      el.querySelector('[data-np="new"]').onclick = () => { ta.value = ""; ta.focus(); };
+      el.querySelector('[data-np="time"]').onclick = () => {
+        ta.value += (ta.value ? "\n" : "") + new Date().toLocaleString(); ta.focus();
+      };
+      el.querySelector('[data-np="save"]').onclick = () => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([ta.value], { type: "text/plain" }));
+        a.download = "abdelos-note.txt";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      };
+    }
+  },
+
+  calc: {
+    title: "Calculator", icon: "🧮", w: 260, h: 350,
+    html: () =>
+      '<div class="calc">' +
+      '<div class="calc-display">0</div>' +
+      '<div class="calc-grid">' +
+      '<button data-c="C">C</button><button data-c="±">±</button><button data-c="%">%</button><button data-c="÷" class="op">÷</button>' +
+      '<button data-c="7">7</button><button data-c="8">8</button><button data-c="9">9</button><button data-c="×" class="op">×</button>' +
+      '<button data-c="4">4</button><button data-c="5">5</button><button data-c="6">6</button><button data-c="−" class="op">−</button>' +
+      '<button data-c="1">1</button><button data-c="2">2</button><button data-c="3">3</button><button data-c="+" class="op">+</button>' +
+      '<button data-c="0" style="grid-column: span 2">0</button><button data-c=".">.</button><button data-c="=" class="eq">=</button>' +
+      '</div></div>',
+    init: el => {
+      const disp = el.querySelector(".calc-display");
+      let cur = "0", acc = null, op = null, fresh = true;
+      const show = v => {
+        let s = String(v);
+        if (s.length > 14) s = Number(v).toPrecision(9).replace(/\.?0+$/, "").replace(/\.?0+e/, "e");
+        disp.textContent = s;
+      };
+      const apply = () => {
+        if (op === null || acc === null) return;
+        const b = parseFloat(cur);
+        let r = acc;
+        if (op === "+") r = acc + b;
+        else if (op === "−") r = acc - b;
+        else if (op === "×") r = acc * b;
+        else if (op === "÷") r = b === 0 ? NaN : acc / b;
+        cur = Number.isNaN(r) ? "Error" : String(+r.toFixed(10));
+        acc = Number.isNaN(r) ? null : parseFloat(cur);
+      };
+      el.querySelector(".calc-grid").addEventListener("click", e => {
+        const k = e.target.dataset && e.target.dataset.c;
+        if (!k) return;
+        if (cur === "Error" && k !== "C") return;
+        if (/[0-9]/.test(k)) {
+          cur = fresh || cur === "0" ? k : cur + k; fresh = false;
+        } else if (k === ".") {
+          if (fresh) { cur = "0."; fresh = false; }
+          else if (!cur.includes(".")) cur += ".";
+        } else if (k === "C") {
+          cur = "0"; acc = null; op = null; fresh = true;
+        } else if (k === "±") {
+          cur = cur.startsWith("-") ? cur.slice(1) : (cur !== "0" ? "-" + cur : cur);
+        } else if (k === "%") {
+          cur = String(parseFloat(cur) / 100);
+        } else if (k === "=") {
+          apply(); op = null; fresh = true;
+        } else { // + − × ÷
+          if (op !== null && !fresh) apply(); else acc = parseFloat(cur);
+          op = k; fresh = true;
+        }
+        show(cur);
+      });
+    }
+  },
+
+  paint: {
+    title: "Paint", icon: "🎨", w: 640, h: 480,
+    html: () => {
+      const colors = ["#000000", "#e0442a", "#f5a623", "#f8e71c", "#3fae49", "#0a63c4", "#7b3fb3", "#ffffff"];
+      return '<div class="apptools">' +
+        colors.map(c => '<button class="swatch' + (c === "#000000" ? " on" : "") + '" data-col="' + c + '" style="background:' + c + '" title="' + c + '"></button>').join("") +
+        '<span style="margin-left:8px">Size</span>' +
+        '<input type="range" class="paint-size" min="1" max="30" value="4" style="width:80px">' +
+        '<button class="tbtn paint-eraser">Eraser</button>' +
+        '<button class="tbtn paint-clear">Clear</button>' +
+        '<button class="tbtn paint-save">Save PNG</button>' +
+        '</div>' +
+        '<div class="paint-wrap"><canvas class="paint-canvas" width="580" height="380"></canvas></div>';
+    },
+    init: el => {
+      const cv = el.querySelector(".paint-canvas");
+      const ctx = cv.getContext("2d");
+      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, cv.width, cv.height);
+      ctx.lineCap = ctx.lineJoin = "round";
+      let color = "#000000", erasing = false, drawing = false;
+      const sizeInput = el.querySelector(".paint-size");
+      const eraserBtn = el.querySelector(".paint-eraser");
+      const pos = e => {
+        const r = cv.getBoundingClientRect();
+        return [(e.clientX - r.left) * (cv.width / r.width), (e.clientY - r.top) * (cv.height / r.height)];
+      };
+      cv.addEventListener("pointerdown", e => {
+        drawing = true; cv.setPointerCapture(e.pointerId);
+        ctx.strokeStyle = erasing ? "#ffffff" : color;
+        ctx.lineWidth = +sizeInput.value * (erasing ? 3 : 1);
+        const [x, y] = pos(e);
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 0.01, y + 0.01); ctx.stroke();
+      });
+      cv.addEventListener("pointermove", e => {
+        if (!drawing) return;
+        const [x, y] = pos(e);
+        ctx.lineTo(x, y); ctx.stroke();
+      });
+      cv.addEventListener("pointerup", () => { drawing = false; });
+      el.querySelectorAll(".swatch").forEach(b => b.onclick = () => {
+        color = b.dataset.col; erasing = false; eraserBtn.classList.remove("on");
+        el.querySelectorAll(".swatch").forEach(x => x.classList.toggle("on", x === b));
+      });
+      eraserBtn.onclick = () => { erasing = !erasing; eraserBtn.classList.toggle("on", erasing); };
+      el.querySelector(".paint-clear").onclick = () => { ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, cv.width, cv.height); };
+      el.querySelector(".paint-save").onclick = () => {
+        const a = document.createElement("a");
+        a.href = cv.toDataURL("image/png");
+        a.download = "abdelos-masterpiece.png";
+        a.click();
+      };
+    }
+  },
+
+  mines: {
+    title: "Minesweeper", icon: "💣", w: 330, h: 450,
+    html: () =>
+      '<div class="mines">' +
+      '<div class="mines-top">' +
+      '<div class="lcd mines-count">010</div>' +
+      '<button class="smiley" title="New game">🙂</button>' +
+      '<div class="lcd mines-time">000</div>' +
+      '</div>' +
+      '<button class="tbtn mines-flagmode">🚩 Flag mode: off</button>' +
+      '<div class="mgrid"></div>' +
+      '<small style="color:#456">Left-click: reveal · Right-click (or flag mode): flag</small>' +
+      '</div>',
+    init: el => {
+      const W = 9, H = 9, M = 10;
+      const grid = el.querySelector(".mgrid");
+      const countEl = el.querySelector(".mines-count");
+      const timeEl = el.querySelector(".mines-time");
+      const smiley = el.querySelector(".smiley");
+      const flagBtn = el.querySelector(".mines-flagmode");
+      let cells, started, over, flags, revealed, timer, secs, flagMode = false;
+      const lcd = n => String(Math.max(0, Math.min(999, n))).padStart(3, "0");
+      const idx = (x, y) => y * W + x;
+      const neighbors = (x, y) => {
+        const out = [];
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+          if (!dx && !dy) continue;
+          const nx = x + dx, ny = y + dy;
+          if (nx >= 0 && nx < W && ny >= 0 && ny < H) out.push([nx, ny]);
+        }
+        return out;
+      };
+      const stopTimer = () => { clearInterval(timer); timer = null; };
+      const reset = () => {
+        stopTimer();
+        cells = Array.from({ length: W * H }, () => ({ mine: false, rev: false, flag: false, n: 0 }));
+        started = false; over = false; flags = 0; revealed = 0; secs = 0;
+        countEl.textContent = lcd(M); timeEl.textContent = "000"; smiley.textContent = "🙂";
+        grid.innerHTML = "";
+        for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+          const b = document.createElement("button");
+          b.className = "mcell"; b.dataset.x = x; b.dataset.y = y;
+          grid.appendChild(b);
+        }
+      };
+      const placeMines = (sx, sy) => {
+        const safe = new Set([idx(sx, sy), ...neighbors(sx, sy).map(([x, y]) => idx(x, y))]);
+        let placed = 0;
+        while (placed < M) {
+          const i = Math.floor(Math.random() * W * H);
+          if (safe.has(i) || cells[i].mine) continue;
+          cells[i].mine = true; placed++;
+        }
+        for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+          cells[idx(x, y)].n = neighbors(x, y).filter(([nx, ny]) => cells[idx(nx, ny)].mine).length;
+        }
+      };
+      const cellBtn = (x, y) => grid.children[idx(x, y)];
+      const paint = (x, y) => {
+        const c = cells[idx(x, y)], b = cellBtn(x, y);
+        if (c.rev) {
+          b.classList.add("rev");
+          b.textContent = c.mine ? "💣" : (c.n ? c.n : "");
+          if (c.n) b.className = "mcell rev c" + c.n;
+          if (c.mine) b.classList.add("rev");
+        } else {
+          b.textContent = c.flag ? "🚩" : "";
+        }
+      };
+      const loseGame = (bx, by) => {
+        over = true; stopTimer(); smiley.textContent = "😵";
+        cells.forEach((c, i) => { if (c.mine) { c.rev = true; paint(i % W, Math.floor(i / W)); } });
+        cellBtn(bx, by).classList.add("boom");
+      };
+      const winCheck = () => {
+        if (revealed === W * H - M) {
+          over = true; stopTimer(); smiley.textContent = "😎";
+          countEl.textContent = "000";
+        }
+      };
+      const reveal = (x, y) => {
+        const stack = [[x, y]];
+        while (stack.length) {
+          const [cx, cy] = stack.pop();
+          const c = cells[idx(cx, cy)];
+          if (c.rev || c.flag) continue;
+          c.rev = true; revealed++;
+          paint(cx, cy);
+          if (c.n === 0 && !c.mine) neighbors(cx, cy).forEach(p => stack.push(p));
+        }
+      };
+      const clickCell = (x, y, rightClick) => {
+        if (over) return;
+        const c = cells[idx(x, y)];
+        if (rightClick || flagMode) {
+          if (c.rev) return;
+          c.flag = !c.flag; flags += c.flag ? 1 : -1;
+          countEl.textContent = lcd(M - flags);
+          paint(x, y);
+          return;
+        }
+        if (c.flag || c.rev) return;
+        if (!started) {
+          started = true; placeMines(x, y);
+          timer = setInterval(() => { secs++; timeEl.textContent = lcd(secs); }, 1000);
+        }
+        if (c.mine) { c.rev = true; paint(x, y); loseGame(x, y); return; }
+        reveal(x, y);
+        winCheck();
+      };
+      grid.addEventListener("click", e => {
+        const b = e.target.closest(".mcell");
+        if (b) clickCell(+b.dataset.x, +b.dataset.y, false);
+      });
+      grid.addEventListener("contextmenu", e => {
+        e.preventDefault();
+        const b = e.target.closest(".mcell");
+        if (b) clickCell(+b.dataset.x, +b.dataset.y, true);
+      });
+      smiley.onclick = reset;
+      flagBtn.onclick = () => {
+        flagMode = !flagMode;
+        flagBtn.textContent = "🚩 Flag mode: " + (flagMode ? "on" : "off");
+        flagBtn.classList.toggle("on", flagMode);
+      };
+      el.closest(".win").addEventListener("winclosed", stopTimer);
+      reset();
+    }
+  },
+
+  ie: {
+    title: "Abdel Explorer", icon: "🌐", w: 720, h: 520,
+    html: () =>
+      '<div class="ie-bar">' +
+      '<button class="tbtn ie-back" title="Back">◀</button>' +
+      '<button class="tbtn ie-home" title="Home">🏠</button>' +
+      '<input class="ie-addr" value="abdel://homepage" spellcheck="false">' +
+      '<button class="tbtn ie-go">Go</button>' +
+      '</div>' +
+      '<div class="ie-bar" style="padding-top:0">' +
+      '<small style="color:#567">Quick links:</small>' +
+      '<button class="tbtn ie-q" data-url="index.html">Classic homepage</button>' +
+      '<button class="tbtn ie-q" data-url="experience.html">Rover Run</button>' +
+      '<button class="tbtn ie-q" data-url="projects/project-one.html">Robot 1</button>' +
+      '<button class="tbtn ie-q" data-url="projects/project-two.html">Robot 2</button>' +
+      '<button class="tbtn ie-q" data-url="projects/project-three.html">Robot 3</button>' +
+      '</div>' +
+      '<iframe class="ie-frame" title="Browser content"></iframe>',
+    init: (el, arg) => {
+      const frame = el.querySelector(".ie-frame");
+      const addr = el.querySelector(".ie-addr");
+      const hist = [];
+      const nav = (url, push = true) => {
+        if (push && frame.dataset.url) hist.push(frame.dataset.url);
+        frame.dataset.url = url;
+        frame.src = url;
+        addr.value = url;
+      };
+      el.querySelector(".ie-go").onclick = () => nav(addr.value.trim() || "index.html");
+      addr.addEventListener("keydown", e => { if (e.key === "Enter") nav(addr.value.trim() || "index.html"); });
+      el.querySelector(".ie-home").onclick = () => nav("index.html");
+      el.querySelector(".ie-back").onclick = () => { const u = hist.pop(); if (u) nav(u, false); };
+      el.querySelectorAll(".ie-q").forEach(b => b.onclick = () => nav(b.dataset.url));
+      nav(arg || "index.html", false);
+    }
+  },
+
+  computer: {
+    title: "Computer", icon: "🖥️", w: 560, h: 400,
+    html: () => '<div class="exp"><div class="exp-crumb"></div><div class="exp-main"></div></div>',
+    init: el => {
+      const crumb = el.querySelector(".exp-crumb");
+      const main = el.querySelector(".exp-main");
+      const FS = {
+        root: {
+          label: "💻 Computer", items: [
+            { icon: "💽", name: "Local Disk (C:)", go: "c" },
+            { icon: "📀", name: "DVD Drive (D:) — empty", act: () => alert("Please insert a disc.\n\n(You don't have a DVD drive. It's 2026.)") },
+            { icon: "📁", name: "My Projects", go: "projects" },
+            { icon: "🗑️", name: "Recycle Bin", act: () => openApp("recycle") }
+          ]
+        },
+        c: {
+          label: "💻 Computer ▸ 💽 Local Disk (C:)", items: [
+            { icon: "⬅️", name: "Back", go: "root" },
+            { icon: "📁", name: "Windows", act: () => alert("Access denied.\n\nNice try though.") },
+            { icon: "📁", name: "Program Files", go: "programs" },
+            { icon: "📄", name: "hiberfil.sys (4 GB)", act: () => alert("Why is this file so big? Nobody knows. Very authentic.") }
+          ]
+        },
+        programs: {
+          label: "💻 ▸ 💽 (C:) ▸ 📁 Program Files", items: [
+            { icon: "⬅️", name: "Back", go: "c" },
+            { icon: "📝", name: "Notepad", act: () => openApp("notepad") },
+            { icon: "🧮", name: "Calculator", act: () => openApp("calc") },
+            { icon: "🎨", name: "Paint", act: () => openApp("paint") },
+            { icon: "💣", name: "Minesweeper", act: () => openApp("mines") },
+            { icon: "🌐", name: "Abdel Explorer", act: () => openApp("ie") }
+          ]
+        },
+        projects: {
+          label: "💻 Computer ▸ 📁 My Projects (the real ones)", items: [
+            { icon: "⬅️", name: "Back", go: "root" },
+            { icon: "🤖", name: "Robot 1", act: () => openApp("ie", "projects/project-one.html") },
+            { icon: "🦾", name: "Robot 2", act: () => openApp("ie", "projects/project-two.html") },
+            { icon: "🛰️", name: "Robot 3", act: () => openApp("ie", "projects/project-three.html") },
+            { icon: "🕹️", name: "Rover Run (3D game)", act: () => openApp("ie", "experience.html") }
+          ]
+        }
+      };
+      const render = key => {
+        const node = FS[key];
+        crumb.textContent = node.label;
+        main.innerHTML = "";
+        node.items.forEach(it => {
+          const d = document.createElement("div");
+          d.className = "fitem";
+          d.innerHTML = '<div class="fi">' + it.icon + '</div><span>' + it.name + '</span>';
+          d.onclick = () => it.go ? render(it.go) : it.act();
+          main.appendChild(d);
+        });
+      };
+      render("root");
+    }
+  },
+
+  recycle: {
+    title: "Recycle Bin", icon: "🗑️", w: 420, h: 300,
+    html: () =>
+      '<div class="apptools"><button class="tbtn rb-empty">Empty Recycle Bin</button></div>' +
+      '<div class="exp-main rb-main">' +
+      '<div class="fitem"><div class="fi">📄</div><span>old_portfolio_design.html</span></div>' +
+      '<div class="fitem"><div class="fi">📄</div><span>todo_2019.txt</span></div>' +
+      '<div class="fitem"><div class="fi">🖼️</div><span>haircut_experiment.jpg</span></div>' +
+      '</div>',
+    init: el => {
+      el.querySelector(".rb-empty").onclick = () => {
+        el.querySelector(".rb-main").innerHTML =
+          '<p style="padding:20px;color:#678">The Recycle Bin is empty. So fresh. So clean.</p>';
+      };
+    }
+  },
+
+  control: {
+    title: "Control Panel", icon: "🎛️", w: 480, h: 400,
+    html: () =>
+      '<div class="padded">' +
+      '<h2>Personalization</h2>' +
+      '<h3>Desktop background</h3>' +
+      '<div class="wprow">' +
+      '<button class="wpthumb wp-t-aurora" data-wp="wp-aurora" title="Aurora"></button>' +
+      '<button class="wpthumb wp-t-sunset" data-wp="wp-sunset" title="Sunset"></button>' +
+      '<button class="wpthumb wp-t-ocean" data-wp="wp-ocean" title="Ocean"></button>' +
+      '<button class="wpthumb wp-t-classic" data-wp="wp-classic" title="Classic"></button>' +
+      '</div>' +
+      '<h3>Window color and appearance</h3>' +
+      '<p><button class="tbtn cp-aero">Toggle Aero glass transparency</button><br>' +
+      '<small style="color:#678">If your GPU starts making airplane noises, this button is for you.</small></p>' +
+      '<h3>System</h3>' +
+      '<p>Rating: <b>9.9</b> Abdel Experience Index<br>' +
+      'Processor: Imagination&trade; Core @ 3.0 GHz<br>' +
+      'Memory (RAM): plenty of childhood nostalgia<br>' +
+      'System type: 100% handmade web operating system</p>' +
+      '</div>',
+    init: el => {
+      const sync = () => el.querySelectorAll(".wpthumb").forEach(b =>
+        b.classList.toggle("on", document.body.classList.contains(b.dataset.wp)));
+      el.querySelectorAll(".wpthumb").forEach(b => b.onclick = () => { setWallpaper(b.dataset.wp); sync(); });
+      el.querySelector(".cp-aero").onclick = () => document.body.classList.toggle("aero");
+      sync();
+    }
+  }
+};
+
+const WALLPAPERS = ["wp-aurora", "wp-sunset", "wp-ocean", "wp-classic"];
+function setWallpaper(cls) {
+  WALLPAPERS.forEach(w => document.body.classList.remove(w));
+  document.body.classList.add(cls);
+}
+function nextWallpaper() {
+  const i = WALLPAPERS.findIndex(w => document.body.classList.contains(w));
+  setWallpaper(WALLPAPERS[(i + 1) % WALLPAPERS.length]);
+}
+
+function wireOpenButtons(scope) {
+  scope.querySelectorAll("[data-open]").forEach(b => b.addEventListener("click", () => openApp(b.dataset.open)));
+}
+
+/* ---------------- window manager ---------------- */
+function focusWin(id) {
+  Object.entries(wins).forEach(([wid, w]) => {
+    const on = wid === id;
+    w.el.classList.toggle("focused", on);
+    w.taskBtn.classList.toggle("active", on);
+  });
+  const w = wins[id];
+  if (w) w.el.style.zIndex = ++zTop;
+}
+
+function openApp(id, arg) {
+  const app = APPS[id];
+  if (!app) return;
+  if (wins[id]) {
+    wins[id].el.classList.remove("minimized");
+    focusWin(id);
+    return;
+  }
+
+  const el = document.createElement("div");
+  el.className = "win";
+  const small = window.innerWidth <= 620;
+  const w = Math.min(app.w, window.innerWidth - 20);
+  const h = Math.min(app.h, window.innerHeight - 70);
+  el.style.width = w + "px";
+  el.style.height = h + "px";
+  el.style.left = Math.max(6, Math.min(90 + cascade * 26, window.innerWidth - w - 10)) + "px";
+  el.style.top = Math.max(6, Math.min(40 + cascade * 24, window.innerHeight - h - 60)) + "px";
+  cascade = (cascade + 1) % 8;
+
+  el.innerHTML =
+    '<div class="titlebar">' +
+    '<span class="ticon">' + app.icon + '</span>' +
+    '<span class="ttext">' + app.title + '</span>' +
+    '<div class="caption-btns">' +
+    '<div class="cbtn" data-wm="min" title="Minimize">▁</div>' +
+    '<div class="cbtn" data-wm="max" title="Maximize">▢</div>' +
+    '<div class="cbtn close" data-wm="close" title="Close">✕</div>' +
+    '</div></div>' +
+    '<div class="winbody"></div>' +
+    '<div class="resizer"></div>';
+  desktop.appendChild(el);
+
+  const body = el.querySelector(".winbody");
+  body.innerHTML = app.html();
+
+  // taskbar button
+  const tb = document.createElement("button");
+  tb.className = "taskbtn";
+  tb.innerHTML = '<span>' + app.icon + '</span><span class="tb-label">' + app.title + '</span>';
+  tb.onclick = () => {
+    const win = wins[id];
+    if (!win) return;
+    if (win.el.classList.contains("minimized")) {
+      win.el.classList.remove("minimized"); focusWin(id);
+    } else if (win.el.classList.contains("focused")) {
+      win.el.classList.add("minimized"); tb.classList.remove("active");
+    } else focusWin(id);
+  };
+  $("#taskbtns").appendChild(tb);
+  wins[id] = { el, taskBtn: tb };
+
+  // caption buttons
+  let prevRect = null;
+  el.querySelector('[data-wm="min"]').onclick = e => {
+    e.stopPropagation(); el.classList.add("minimized"); tb.classList.remove("active");
+  };
+  const toggleMax = () => {
+    if (el.classList.contains("maximized")) {
+      el.classList.remove("maximized");
+      if (prevRect) Object.assign(el.style, prevRect);
+    } else {
+      prevRect = { left: el.style.left, top: el.style.top, width: el.style.width, height: el.style.height };
+      el.classList.add("maximized");
+      Object.assign(el.style, { left: "0px", top: "0px", width: "100vw", height: "calc(100vh - 40px)" });
+    }
+  };
+  el.querySelector('[data-wm="max"]').onclick = e => { e.stopPropagation(); toggleMax(); };
+  el.querySelector('[data-wm="close"]').onclick = e => {
+    e.stopPropagation();
+    el.dispatchEvent(new Event("winclosed"));
+    el.remove(); tb.remove(); delete wins[id];
+  };
+
+  // dragging
+  const bar = el.querySelector(".titlebar");
+  bar.addEventListener("dblclick", e => { if (!e.target.closest(".cbtn")) toggleMax(); });
+  bar.addEventListener("pointerdown", e => {
+    if (e.target.closest(".cbtn") || el.classList.contains("maximized")) return;
+    focusWin(id);
+    const startX = e.clientX, startY = e.clientY;
+    const origL = parseFloat(el.style.left), origT = parseFloat(el.style.top);
+    bar.setPointerCapture(e.pointerId);
+    const move = ev => {
+      let nl = origL + ev.clientX - startX;
+      let nt = origT + ev.clientY - startY;
+      nl = Math.max(60 - el.offsetWidth, Math.min(nl, window.innerWidth - 60));
+      nt = Math.max(0, Math.min(nt, window.innerHeight - 70));
+      el.style.left = nl + "px"; el.style.top = nt + "px";
+    };
+    const up = () => {
+      bar.removeEventListener("pointermove", move);
+      bar.removeEventListener("pointerup", up);
+    };
+    bar.addEventListener("pointermove", move);
+    bar.addEventListener("pointerup", up);
+  });
+
+  // resizing
+  const rz = el.querySelector(".resizer");
+  rz.addEventListener("pointerdown", e => {
+    e.preventDefault(); focusWin(id);
+    const startX = e.clientX, startY = e.clientY;
+    const origW = el.offsetWidth, origH = el.offsetHeight;
+    rz.setPointerCapture(e.pointerId);
+    const move = ev => {
+      el.style.width = Math.max(280, origW + ev.clientX - startX) + "px";
+      el.style.height = Math.max(170, origH + ev.clientY - startY) + "px";
+    };
+    const up = () => {
+      rz.removeEventListener("pointermove", move);
+      rz.removeEventListener("pointerup", up);
+    };
+    rz.addEventListener("pointermove", move);
+    rz.addEventListener("pointerup", up);
+  });
+
+  el.addEventListener("pointerdown", () => focusWin(id), true);
+
+  if (small) toggleMax();
+  if (app.init) app.init(body, arg);
+  focusWin(id);
+}
+
+/* ---------------- desktop icons ---------------- */
+const DESKTOP_ICONS = [
+  { icon: "🖥️", label: "Computer", open: "computer" },
+  { icon: "🌐", label: "Abdel Explorer", open: "ie" },
+  { icon: "📝", label: "Notepad", open: "notepad" },
+  { icon: "🧮", label: "Calculator", open: "calc" },
+  { icon: "🎨", label: "Paint", open: "paint" },
+  { icon: "💣", label: "Minesweeper", open: "mines" },
+  { icon: "🎛️", label: "Control Panel", open: "control" },
+  { icon: "🗑️", label: "Recycle Bin", open: "recycle" },
+  { icon: "✨", label: "Welcome Center", open: "welcome" },
+  { icon: "⏏️", label: "Exit to Portfolio", href: "index.html" }
+];
+const iconsBox = $("#icons");
+DESKTOP_ICONS.forEach(d => {
+  const div = document.createElement("div");
+  div.className = "dicon";
+  div.innerHTML = '<div class="ig">' + d.icon + '</div><span>' + d.label + '</span>';
+  div.addEventListener("click", () => {
+    document.querySelectorAll(".dicon").forEach(x => x.classList.remove("selected"));
+    div.classList.add("selected");
+    if (d.href) window.location.href = d.href;
+    else openApp(d.open);
+  });
+  iconsBox.appendChild(div);
+});
+
+/* ---------------- start menu ---------------- */
+const startmenu = $("#startmenu");
+const smPrograms = $("#sm-programs");
+const smSearch = $("#sm-search");
+const START_PROGRAMS = [
+  ["ie", "Abdel Explorer"], ["notepad", "Notepad"], ["calc", "Calculator"],
+  ["paint", "Paint"], ["mines", "Minesweeper"], ["computer", "Computer"],
+  ["recycle", "Recycle Bin"], ["control", "Control Panel"], ["welcome", "Welcome Center"]
+];
+START_PROGRAMS.forEach(([id, label]) => {
+  const d = document.createElement("div");
+  d.className = "sm-item";
+  d.dataset.name = label.toLowerCase();
+  d.innerHTML = '<span class="si">' + APPS[id].icon + '</span>' + label;
+  d.onclick = () => { closeStart(); openApp(id); };
+  smPrograms.appendChild(d);
+});
+function toggleStart() {
+  startmenu.classList.toggle("open");
+  if (startmenu.classList.contains("open")) { smSearch.value = ""; filterStart(); smSearch.focus(); }
+}
+function closeStart() { startmenu.classList.remove("open"); }
+function filterStart() {
+  const q = smSearch.value.trim().toLowerCase();
+  smPrograms.querySelectorAll(".sm-item").forEach(d =>
+    d.classList.toggle("hidden", q !== "" && !d.dataset.name.includes(q)));
+}
+smSearch.addEventListener("input", filterStart);
+smSearch.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    const first = smPrograms.querySelector(".sm-item:not(.hidden)");
+    if (first) first.click();
+  }
+});
+$("#orb").addEventListener("click", e => { e.stopPropagation(); toggleStart(); });
+document.querySelectorAll(".sm-link").forEach(l => l.addEventListener("click", () => {
+  closeStart(); openApp(l.dataset.open);
+}));
+
+/* power */
+$("#btn-shutdown").addEventListener("click", () => {
+  closeStart();
+  $("#shutdown").style.display = "flex";
+  setTimeout(() => { window.location.href = "index.html"; }, 1800);
+});
+$("#btn-sleep").addEventListener("click", () => {
+  closeStart();
+  const veil = $("#sleepveil");
+  veil.style.display = "block";
+  veil.onclick = () => { veil.style.display = "none"; };
+});
+
+/* ---------------- context menu ---------------- */
+const ctx = $("#ctxmenu");
+desktop.addEventListener("contextmenu", e => {
+  if (e.target.closest(".win")) return; // apps keep their own context behaviour
+  e.preventDefault();
+  ctx.innerHTML = "";
+  [
+    ["🔄 Refresh", () => { ctx.style.display = "none"; }],
+    ["🖼️ Next wallpaper", nextWallpaper],
+    ["📝 New text document", () => openApp("notepad")],
+    ["hr"],
+    ["🎛️ Personalize", () => openApp("control")],
+    ["✨ About AbdelOS", () => openApp("welcome")]
+  ].forEach(([label, fn]) => {
+    if (label === "hr") { ctx.appendChild(document.createElement("hr")); return; }
+    const d = document.createElement("div");
+    d.textContent = label;
+    d.onclick = () => { ctx.style.display = "none"; fn(); };
+    ctx.appendChild(d);
+  });
+  ctx.style.display = "block";
+  ctx.style.left = Math.min(e.clientX, window.innerWidth - 200) + "px";
+  ctx.style.top = Math.min(e.clientY, window.innerHeight - ctx.offsetHeight - 45) + "px";
+});
+document.addEventListener("click", e => {
+  if (!e.target.closest("#ctxmenu")) ctx.style.display = "none";
+  if (!e.target.closest("#startmenu") && !e.target.closest("#orb")) closeStart();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closeStart(); ctx.style.display = "none"; } });
+
+/* show desktop */
+$("#showdesk").addEventListener("click", () => {
+  Object.values(wins).forEach(w => { w.el.classList.add("minimized"); w.taskBtn.classList.remove("active"); });
+});
+
+/* ---------------- clock ---------------- */
+function tickClock() {
+  const n = new Date();
+  let h = n.getHours();
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  $("#clock .t").textContent = h + ":" + String(n.getMinutes()).padStart(2, "0") + " " + ampm;
+  $("#clock .d").textContent = n.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+tickClock();
+setInterval(tickClock, 1000);
+
+/* ---------------- boot ---------------- */
+const boot = $("#boot");
+function finishBoot() {
+  if (boot.classList.contains("fade")) return;
+  boot.classList.add("fade");
+  setTimeout(() => boot.remove(), 750);
+  setTimeout(() => openApp("welcome"), 450);
+}
+boot.addEventListener("click", finishBoot);
+setTimeout(finishBoot, 2400);
+</script>
+</body>
+</html>
