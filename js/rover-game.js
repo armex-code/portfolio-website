@@ -41,43 +41,91 @@
   ------------------------------------------------------------ */
   const SECTIONS = [
     {
-      id: "about", code: "SYS.BIO // 0x01", title: "About", z: 42, x: -7,
-      intro: "I turn code into physical action — bridging software and hardware into autonomous systems.",
+      id: "about", code: "SYS.BIO // 0x01", title: "About", z: 28, x: -7,
+      intro: "Abdel Elarfaoui — final-year CS student (AI &amp; Mechatronics) who turns code into physical motion.",
       lines: [
-        "CS student @ Al Akhawayn University, Ifrane, MA.",
-        "Wiring circuits, programming microcontrollers, tuning control loops.",
-        "Currently exploring SLAM, LiDAR point clouds & edge AI."
+        "BSc Computer Science, AI &amp; Mechatronics — Al Akhawayn University, Ifrane MA (Dec 2026).",
+        "Exchange semester @ Kyungpook National University, South Korea — CV, ML &amp; Cloud.",
+        "Dual French &amp; Moroccan citizen — EU/EFTA free movement, no work visa needed in Switzerland.",
+        "Looking for a robotics engineering internship in Switzerland, available January 2027."
       ]
     },
     {
-      id: "skills", code: "SYS.CAP // 0x02", title: "Tech Stack", z: 90, x: 7,
-      intro: "Systems & capabilities — from low-level C++ to robot dashboards.",
+      id: "skills", code: "SYS.CAP // 0x02", title: "Tech Stack", z: 58, x: 7,
+      intro: "From SLAM stacks and ROS2 nodes down to soldered boards and CNC-cut parts.",
       bars: [
-        ["C++ & Python", 90], ["ROS / ROS2", 85], ["Embedded (ESP32/STM32)", 80],
-        ["Computer Vision", 75], ["Machine Learning", 70], ["Web & Fullstack", 85]
+        ["Python / C / C++", 90],
+        ["ROS2 · Gazebo · SLAM", 85],
+        ["Embedded &amp; electronics", 85],
+        ["CAD &amp; fabrication", 80],
+        ["Computer vision · PyTorch", 75],
+        ["Isaac Sim · Unity · WebXR", 70]
       ]
     },
     {
-      id: "p1", code: "PRJ.01 // ROVER", title: "Autonomous Rover", z: 138, x: -7,
-      link: "projects/project-one.html",
-      intro: "A 4-wheeled robot navigating indoors with LiDAR + ROS SLAM to map unknown spaces.",
-      tags: ["ROS", "LiDAR", "C++"]
+      id: "knu", code: "LOG.01 // FIELD", title: "Field Robotics @ KNU", z: 88, x: -7,
+      intro: "Undergraduate intern, Field &amp; Underwater Robotics Lab — Kyungpook National University, South Korea (Oct–Dec 2024).",
+      lines: [
+        "Tested and iterated on mobile field robots equipped with 2D/3D LiDAR.",
+        "Implemented and debugged SLAM algorithms in outdoor environments.",
+        "Ran hardware-in-the-loop testing, sensor integration and real-time capture on Ubuntu."
+      ],
+      tags: ["SLAM", "LiDAR", "ROS2", "Linux"]
     },
     {
-      id: "p2", code: "PRJ.02 // ARM", title: "Vision-Guided Arm", z: 186, x: 7,
-      link: "projects/project-two.html",
-      intro: "A 6-DOF manipulator using inverse kinematics + OpenCV to identify and sort colored objects.",
-      tags: ["Python", "OpenCV", "Hardware"]
+      id: "aui", code: "LOG.02 // COMMAND", title: "Head of AUI Robotics", z: 118, x: 7,
+      intro: "Led a 22-student multinational robotics team for two years (Sep 2022 – Jun 2024).",
+      lines: [
+        "Built competitive robots and represented Morocco in the USA, Germany and Croatia.",
+        "Managed lab operations, component inventory and a ~$10,000 budget.",
+        "Directed AUROBAT, a national robotics contest with 100+ participants."
+      ],
+      tags: ["VEX V5", "Team lead", "Rapid prototyping"]
     },
     {
-      id: "p3", code: "PRJ.03 // MESH", title: "Sensor Mesh Network", z: 234, x: -7,
-      link: "projects/project-three.html",
-      intro: "An IoT net of ESP32 nodes streaming environmental data to a live web dashboard.",
-      tags: ["ESP32", "WebSockets", "IoT"]
+      id: "p1", code: "PRJ.01 // XR", title: "Quest → VEX Teleop", z: 148, x: -7,
+      intro: "Meta Quest teleoperation of a VEX V5 robot, mirrored in real time by a digital twin.",
+      lines: [
+        "Headset tracking streamed to the robot; the twin plays back what the hardware is doing.",
+        "Built with WebXR, Unity and the VEX V5 stack."
+      ],
+      tags: ["WebXR", "Unity", "Digital twin", "VEX V5"],
+      links: [["Source on GitHub", "https://github.com/armex-code/quest-v5-teleop"]]
     },
     {
-      id: "contact", code: "SYS.NET // UPLINK", title: "Establish Uplink", z: 278, x: 0,
-      intro: "Got a hardware project, a robotics startup, or just want to talk tech?",
+      id: "p2", code: "PRJ.02 // AI OPS", title: "Pharma AI Automation", z: 178, x: 7,
+      intro: "IT &amp; AI consultant at Stallergenes Greer, France / remote — summer 2025 to now.",
+      lines: [
+        "Built an AI automation tool that scrapes, analyses and processes manufacturing data.",
+        "Currently building a smart KPI dashboard for anomaly detection and decision-making."
+      ],
+      tags: ["Python", "AI automation", "Streamlit"]
+    },
+    {
+      id: "log3", code: "LOG.03 // SIDE", title: "Other Missions", z: 208, x: -7,
+      intro: "The rest of the log — R&amp;D, full-stack, and a lot of teaching.",
+      lines: [
+        "Capgemini R&amp;D intern: smart hydroponic station prototype with IoT sensors.",
+        "Deviteam: order-tracking system for campus restaurants serving 5,000+ students.",
+        "Co-organised a Huawei-sponsored hackathon with 30+ teams.",
+        "Robotics instructor since 2019 — Python/Scratch, electronics and 3D printing for K-12."
+      ],
+      tags: ["IoT", "Full-stack", "Teaching"]
+    },
+    {
+      id: "awards", code: "SYS.AWD // TROPHY", title: "Trophy Shelf", z: 238, x: 7,
+      intro: "Competition robotics since 2019 — usually somewhere on the podium.",
+      lines: [
+        "3× National VEX Robotics Champion — 2022, 2023, 2024.",
+        "2× National WRO Champion — 2019, 2022.",
+        "5th best FLL Innovation Project worldwide — 2021.",
+        "1st place in two national hackathons — IEEE WIE 2024 &amp; neoHack 2022.",
+        "Excellence Scholarship recipient @ Al Akhawayn University."
+      ]
+    },
+    {
+      id: "contact", code: "SYS.NET // UPLINK", title: "Establish Uplink", z: 272, x: 0,
+      intro: "Hiring for a robotics internship from January 2027, or just want to talk hardware?",
       links: [
         ["Ping Me", "mailto:a.elarfaoui@aui.ma"],
         ["GitHub", "https://github.com/armex-code"],
@@ -417,10 +465,18 @@
   function makeLabel(text) {
     const cv = document.createElement("canvas"); cv.width = 512; cv.height = 128;
     const x = cv.getContext("2d");
-    x.font = "bold 54px 'JetBrains Mono', monospace"; x.fillStyle = "#aef6ff";
+    const caption = text.toUpperCase();
+    // shrink long titles so they never clip the sprite texture
+    const MAXW = 476;
+    let size = 54;
+    const setFont = () => { x.font = `bold ${size}px 'JetBrains Mono', monospace`; };
+    setFont();
+    const w = x.measureText(caption).width;
+    if (w > MAXW) { size = Math.max(24, Math.floor(size * MAXW / w)); setFont(); }
+    x.fillStyle = "#aef6ff";
     x.textAlign = "center"; x.textBaseline = "middle";
     x.shadowColor = "#00f3ff"; x.shadowBlur = 22;
-    x.fillText(text.toUpperCase(), 256, 64);
+    x.fillText(caption, 256, 64);
     const tex = new THREE.CanvasTexture(cv); tex.anisotropy = 4;
     const spr = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
     spr.scale.set(7, 1.75, 1);
@@ -484,11 +540,12 @@
   }
   // stacks/rows of crates between the nodes
   const CLUSTERS = [
-    { z: 66, xs: [-9, -4, 4, 9] },
-    { z: 114, xs: [-7, 0, 7] },
-    { z: 162, xs: [-10, -5, 5, 10] },
-    { z: 210, xs: [-6, 6] },
-    { z: 256, xs: [-9, -3, 3, 9] }
+    { z: 43, xs: [-9, -4, 4, 9] },
+    { z: 73, xs: [-7, 0, 7] },
+    { z: 133, xs: [-10, -5, 5, 10] },
+    { z: 163, xs: [-6, 6] },
+    { z: 223, xs: [-9, -3, 3, 9] },
+    { z: 255, xs: [-8, -2, 4, 10] }
   ];
   CLUSTERS.forEach((cl) => {
     cl.xs.forEach((x, i) => {
@@ -526,7 +583,7 @@
       <div class="keys"><kbd>W A S D</kbd>/<kbd>↑ ↓ ← →</kbd> drive &nbsp; <kbd>SHIFT</kbd> boost</div>
       <div class="foot-btns">
         <button class="sim-btn" id="sim-restart">⟲ Restart</button>
-        <a class="sim-btn" id="sim-exit" href="experience.html">⏏ Exit</a>
+        <a class="sim-btn" id="sim-exit" href="index.html">⏏ Exit</a>
       </div>
     </div>
     <div id="sim-reticle"></div>
@@ -702,16 +759,17 @@
       <div class="ov-card">
         <div class="ov-tag">// AE_SYS · ROVER RUN</div>
         <h1>ROVER<span>RUN</span></h1>
-        <p class="ov-sub">A playable version of the portfolio. Pilot the LiDAR rover down the
-        corridor, <b>smash crate stacks</b> for points, <b>collect data nodes</b> to unlock each
-        project, and blast through the <b>finish gate</b>.</p>
+        <p class="ov-sub">Abdel Elarfaoui's résumé, but you drive it. Pilot the LiDAR rover down the
+        corridor, <b>smash crate stacks</b> for points, <b>collect the ${SECTIONS.length} data nodes</b>
+        to unlock the real CV — labs, teams, projects and trophies — then blast through the
+        <b>finish gate</b>.</p>
         <div class="ov-keys">
           <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / arrows — drive</span>
           <span><kbd>SHIFT</kbd> — boost</span>
           <span class="ov-touch">Touch: joystick + BOOST</span>
         </div>
         <button class="ov-btn" id="ov-start">▶ START RUN</button>
-        <a class="ov-link" href="experience.html">← back to site</a>
+        <a class="ov-link" href="index.html">← back to site</a>
       </div>`;
     overlay.classList.add("show");
     $("ov-start").addEventListener("click", startRun);
@@ -733,7 +791,7 @@
         </div>
         <div class="ov-actions">
           <button class="ov-btn" id="ov-again">⟲ RUN AGAIN</button>
-          <a class="ov-btn ghost" href="experience.html">← back to site</a>
+          <a class="ov-btn ghost" href="index.html">← back to site</a>
         </div>
       </div>`;
     overlay.classList.add("show");
