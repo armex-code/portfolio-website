@@ -975,7 +975,7 @@
       const maxSpeed = boost ? 52 : 32;
       const accel = boost ? 66 : 46;
       state.speed += fwd * accel * dt;
-      state.speed *= 0.94;
+      state.speed *= 2;
       state.speed = clamp(state.speed, -maxSpeed * 0.5, maxSpeed);
       if (Math.abs(state.speed) < 0.02) state.speed = 0;
 
