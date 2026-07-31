@@ -31,6 +31,16 @@
   const DETECT = 7;         // data-node pickup radius
   const GRAVITY = -42;      // obstacle physics
 
+  /* --- rover handling ---------------------------------------------------
+     Top speed is ACCEL / DRAG, clamped by MAX_SPEED. Keep ACCEL slightly
+     above MAX_SPEED * DRAG so the rover actually reaches its cap.
+     DRAG is per second (1/DRAG ≈ how long it takes to coast to a stop). --- */
+  const MAX_SPEED = 32;       // m/s cruising
+  const MAX_SPEED_BOOST = 54; // m/s with SHIFT / BOOST held
+  const ACCEL = 58;           // m/s² cruising
+  const ACCEL_BOOST = 95;     // m/s² while boosting
+  const DRAG = 1.7;           // per-second velocity decay
+
   const PTS_NODE = 150;     // score per data node
   const PTS_OBSTACLE = 50;  // score per toppled obstacle
   const PTS_FINISH = 1000;  // finish bonus
@@ -972,14 +982,16 @@
       if (touch.active) { fwd += clamp(-touch.y, -1, 1); turn += clamp(-touch.x, -1, 1); }
       if (touch.boost) boost = true;
 
-      const maxSpeed = boost ? 52 : 32;
-      const accel = boost ? 66 : 46;
+      const maxSpeed = boost ? MAX_SPEED_BOOST : MAX_SPEED;
+      const accel = boost ? ACCEL_BOOST : ACCEL;
       state.speed += fwd * accel * dt;
-      state.speed *= 0.94;
+      // frame-rate independent drag: a per-frame multiplier made top speed
+      // depend on the refresh rate and capped the rover far below maxSpeed.
+      state.speed *= Math.exp(-DRAG * dt);
       state.speed = clamp(state.speed, -maxSpeed * 0.5, maxSpeed);
       if (Math.abs(state.speed) < 0.02) state.speed = 0;
 
-      const turnRate = 2.0 * (0.4 + Math.min(1, Math.abs(state.speed) / 16));
+      const turnRate = 2.0 * (0.4 + Math.min(1, Math.abs(state.speed) / 22));
       state.heading += turn * turnRate * dt * (state.speed >= 0 ? 1 : -1);
 
       let nx = state.x + Math.sin(state.heading) * state.speed * dt;
@@ -1011,9 +1023,9 @@
           // launch away from the rover, biased along travel for a satisfying plough
           let lx = ax * 0.65 + tvx * 0.5, lz = az * 0.65 + tvz * 0.5;
           const ln = Math.hypot(lx, lz) || 1; lx /= ln; lz /= ln;
-          const power = clamp(13 + Math.abs(state.speed) * 0.8, 15, 42);
+          const power = clamp(13 + Math.abs(state.speed) * 0.8, 15, 52);
           knock(o, lx * power, lz * power);
-          state.speed *= 0.86;       // slight slow-down on impact
+          state.speed *= 0.9;        // slight slow-down on impact
           state.pitch = lerp(state.pitch, 0.14, 0.5);
         }
       });
@@ -1021,7 +1033,7 @@
       // finish detection
       if (state.z >= TRACK_LEN) { finishRun(); }
 
-      state.bank = lerp(state.bank, -turn * 0.32 * Math.min(1, Math.abs(state.speed) / 14), 0.12);
+      state.bank = lerp(state.bank, -turn * 0.32 * Math.min(1, Math.abs(state.speed) / 26), 0.12);
       state.pitch = lerp(state.pitch, -fwd * 0.1, 0.1);
 
       if (humGain && !muted) {
@@ -1050,7 +1062,7 @@
     scBeam.rotation.y = t * 4.0;
     core.scale.setScalar(1 + Math.sin(t * 5) * 0.18);
     blinker.visible = Math.sin(t * 6) > 0;
-    const thr = clamp(0.4 + Math.abs(state.speed) / 30, 0.4, 1.4);
+    const thr = clamp(0.4 + Math.abs(state.speed) / 46, 0.4, 1.4);
     thrusters.forEach((f, i) => { f.scale.set(1, thr + Math.sin(t * 20 + i) * 0.15, 1); f.material.opacity = 0.5 + thr * 0.3; });
 
     pad.position.set(state.x, 0.04, state.z);
@@ -1142,7 +1154,7 @@
     // HUD text
     if (state.playing) {
       elVel.textContent = `${Math.abs(state.speed).toFixed(1)} m/s`;
-      elSpeed.style.width = `${clamp(Math.abs(state.speed) / 52 * 100, 0, 100)}%`;
+      elSpeed.style.width = `${clamp(Math.abs(state.speed) / MAX_SPEED_BOOST * 100, 0, 100)}%`;
       elTime.textContent = `${state.time.toFixed(1)}s`;
       const prog = clamp((state.z - START_Z) / (TRACK_LEN - START_Z) * 100, 0, 100);
       elDist.textContent = `${Math.max(0, state.z).toFixed(0)} / ${TRACK_LEN}m`;
