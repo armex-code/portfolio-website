@@ -340,6 +340,7 @@ body.sim-active .cursor-ring { opacity: 0 !important; pointer-events: none; }
 #sim-panel {
   position: absolute; top: 50%; right: 34px; transform: translateY(-50%) translateX(120%);
   width: min(360px, 78vw); pointer-events: auto;
+  max-height: 76vh; overflow-y: auto;
   border: 1px solid var(--accent); background: rgba(3,8,22,0.82);
   backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   padding: 26px; transition: transform 0.5s var(--ease), border-color 0.4s;
