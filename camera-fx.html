@@ -6,13 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CamFX</title>
     <meta name="description" content="CamFX: turn your camera into live ASCII art, edge detection or a 3D point cloud. Everything runs in your browser, nothing is recorded.">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
     <style>
-        /* keep this page as plain as the homepage: a few boxes, no theming */
+        /* keep this page as plain as the homepage: a few boxes, no theming.
+           everything is sized to fit one screen, so the "nothing is recorded"
+           note is always visible without scrolling. */
+        body {
+            margin: 8px;
+        }
+
+        hr {
+            margin: 8px 0;
+        }
+
+        /* the frame gives up whatever height the rest of the page needs:
+           270px covers the header, controls, note and links. */
         .frame {
-            width: 100%;
-            max-width: 640px;
+            width: min(100%, 640px, (100dvh - 290px) * 4 / 3);
             aspect-ratio: 4 / 3;
             margin: 0 auto;
             border: 2px inset #c0c0c0;
@@ -47,18 +57,27 @@
             position: absolute;
             inset: 0;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
             padding: 16px;
             font-family: Verdana, Arial, sans-serif;
+            font-size: 15px;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        #placeholder span {
+            font-weight: normal;
             font-size: 12px;
             color: #555555;
+            margin-top: 6px;
         }
 
         .controls {
             text-align: center;
-            margin: 12px auto 0;
+            margin: 8px auto 0;
             font-family: Verdana, Arial, sans-serif;
             font-size: 13px;
         }
@@ -72,7 +91,13 @@
             font-family: Verdana, Arial, sans-serif;
             font-size: 13px;
             padding: 5px 12px;
-            margin: 0 3px;
+            margin: 6px 3px 0;
+        }
+
+        /* the one button people need to press first */
+        #bStart {
+            font-weight: bold;
+            padding: 7px 20px;
         }
 
         .note {
@@ -80,7 +105,7 @@
             font-size: 11px;
             color: #555555;
             text-align: center;
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
         #err {
@@ -88,12 +113,12 @@
             font-size: 12px;
             color: #aa0000;
             text-align: center;
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
         .link-btn {
             display: inline-block;
-            padding: 7px 18px;
+            padding: 5px 14px;
             margin: 0 4px;
             border: 2px outset #c0c0c0;
             background: #e8e8e8;
@@ -119,22 +144,26 @@
         .disclaimer {
             border: 1px solid #808080;
             background: #f4f4f4;
-            padding: 10px 12px;
+            padding: 7px 10px;
             font-family: Verdana, Arial, sans-serif;
             font-size: 12px;
+            text-align: center;
             max-width: 640px;
             margin: 0 auto;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 8px;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 12px;
         }
     </style>
 </head>
 
 <body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
 
-    <b>CamFX</b> &#8212; live camera filters
-    <br><br>
-    Your camera feed, redrawn three different ways: as ASCII characters, as edge detection,
-    or as a 3D point cloud you can spin around.
-    <br><br>
+    <b>CamFX</b> &#8212; your camera as ASCII characters, edge detection or a 3D point cloud.
 
     <hr>
 
@@ -142,47 +171,41 @@
         <video id="cam" playsinline autoplay muted></video>
         <canvas id="fx"></canvas>
         <canvas id="gl"></canvas>
-        <div id="placeholder">The camera is off. Press &#8220;Start camera&#8221; below.</div>
+        <div id="placeholder">
+            Click &#8220;Start camera&#8221; below to begin.
+            <span>Your browser will ask for camera permission.</span>
+        </div>
     </div>
 
     <div class="controls">
         <div>
+            <button id="bStart" type="button">&#9654; Start camera</button>
+            <button id="bStop" type="button" disabled>Stop camera</button>
+            <button id="bFlip" type="button" disabled>Switch camera</button>
+        </div>
+        <div style="margin-top:8px">
             <label><input type="radio" name="filter" value="ascii" checked> ASCII</label>
             <label><input type="radio" name="filter" value="edges"> Edges</label>
             <label><input type="radio" name="filter" value="cloud" id="rCloud"> 3D point cloud</label>
-        </div>
-        <br>
-        <div>
-            <button id="bStart" type="button">Start camera</button>
-            <button id="bStop" type="button" disabled>Stop camera</button>
-            <button id="bFlip" type="button" disabled>Switch camera</button>
         </div>
         <div class="note" id="hint">Drag inside the frame to rotate the point cloud.</div>
         <div id="err"></div>
     </div>
 
-    <br>
     <hr>
 
     <div class="disclaimer">
-        <b>Nothing is recorded.</b> Every frame is processed inside your own browser and thrown
-        away immediately. There is no upload, no server, no recording and no save button. Closing
-        this page ends it. You can also press &#8220;Stop camera&#8221; at any time.
+        <b>Nothing is recorded.</b> Every frame is processed inside your own browser and thrown away
+        immediately &#8212; no upload, no server, no saving. Press &#8220;Stop camera&#8221; or close
+        the page to end it.
     </div>
 
-    <br>
-    <hr>
-
-    <a href="index.html">&#8592; back to the homepage</a>
-
-    <br><br>
-
-    <div style="text-align:center">
+    <div class="footer">
+        <a href="index.html">&#8592; back to the homepage</a>
+        &nbsp;
         <a class="link-btn" href="https://github.com/armex-code">GitHub</a>
         <a class="link-btn" href="https://www.linkedin.com/in/ar-elarfaoui/">LinkedIn</a>
     </div>
-
-    <br><br>
 
     <noscript>
         <hr>
@@ -488,7 +511,7 @@
                 if (stream) { stream.getTracks().forEach(function (tr) { tr.stop(); }); stream = null; }
                 V.srcObject = null;
                 CX.clearRect(0, 0, W, H);
-                placeholder.textContent = 'The camera is off. Press "Start camera" below.';
+                placeholder.innerHTML = 'The camera is off. Click “Start camera” to begin again.';
                 placeholder.style.display = 'flex';
                 bStart.disabled = false;
                 bStop.disabled = true;
