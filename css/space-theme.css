@@ -370,9 +370,10 @@ body.sim-active .cursor-ring { opacity: 0 !important; pointer-events: none; }
 #sim-toast .sub { font-size: 0.78rem; color: var(--accent); letter-spacing: 0.2em; margin-top: 6px; }
 
 /* mobile joystick */
-#sim-stick { position: absolute; bottom: 30px; left: 30px; width: 130px; height: 130px; border-radius: 50%; border: 1px solid var(--line); background: rgba(0,243,255,0.05); pointer-events: auto; display: none; touch-action: none; }
+#sim-stick { position: absolute; bottom: 30px; left: 30px; width: 130px; height: 130px; border-radius: 50%; border: 1px solid var(--line); background: rgba(0,243,255,0.05); pointer-events: auto; display: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
 #sim-stick i { position: absolute; top: 50%; left: 50%; width: 52px; height: 52px; margin: -26px 0 0 -26px; border-radius: 50%; background: rgba(0,243,255,0.25); border: 1px solid var(--accent); box-shadow: 0 0 16px var(--accent-glow); }
-#sim-boost { position: absolute; bottom: 46px; right: 34px; width: 84px; height: 84px; border-radius: 50%; border: 1px solid var(--accent); background: rgba(0,243,255,0.08); color: var(--accent); font-family: var(--font-mono); font-size: 0.7rem; pointer-events: auto; display: none; }
+#sim-boost { position: absolute; bottom: 46px; right: 34px; width: 84px; height: 84px; border-radius: 50%; border: 1px solid var(--accent); background: rgba(0,243,255,0.08); color: var(--accent); font-family: var(--font-mono); font-size: 0.7rem; pointer-events: auto; display: none; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+#sim-boost:active { background: rgba(0,243,255,0.22); box-shadow: 0 0 18px var(--accent-glow); }
 body.sim-touch #sim-stick, body.sim-touch #sim-boost { display: block; }
 body.sim-touch #sim-foot .keys, body.sim-touch #sim-reticle { display: none; }
 

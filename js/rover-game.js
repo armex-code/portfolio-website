@@ -36,6 +36,24 @@
   const PTS_FINISH = 1000;  // finish bonus
 
   /* ------------------------------------------------------------
+     DRIVING MODEL — every rate below is per SECOND, never per
+     frame, so the rover handles the same on a 60Hz laptop and a
+     144Hz monitor.
+  ------------------------------------------------------------ */
+  const MAX_SPEED = 32;     // m/s cruising cap
+  const MAX_BOOST = 52;     // m/s with SHIFT / BOOST held
+  const ACCEL = 46;         // m/s² on the throttle
+  const ACCEL_BOOST = 66;   // m/s² while boosting
+  const REVERSE_FRAC = 0.5; // reverse tops out at half the forward cap
+  const COAST = 18;         // m/s² engine braking when you let go
+  const BRAKE = 55;         // m/s² on SPACE
+  const OVERCAP = 48;       // m/s² pulling you back under the cap — must beat
+                            // ACCEL so the cap still holds with the throttle down
+  const DRAG = 0.9;         // 1/s air resistance
+  const TURN_RATE = 2.4;    // rad/s at full grip
+  const STEER_SMOOTH = 12;  // 1/s — how fast steering input ramps in
+
+  /* ------------------------------------------------------------
      SECTION DATA — each becomes a collectible node along the lane.
      Content mirrors the portfolio so the game IS the portfolio.
   ------------------------------------------------------------ */
@@ -580,7 +598,7 @@
       <canvas id="sim-map" width="120" height="200"></canvas>
     </div>
     <div id="sim-foot">
-      <div class="keys"><kbd>W A S D</kbd>/<kbd>↑ ↓ ← →</kbd> drive &nbsp; <kbd>SHIFT</kbd> boost</div>
+      <div class="keys"><kbd>W A S D</kbd>/<kbd>↑ ↓ ← →</kbd> drive &nbsp; <kbd>SHIFT</kbd> boost &nbsp; <kbd>SPACE</kbd> brake &nbsp; <kbd>R</kbd> restart</div>
       <div class="foot-btns">
         <button class="sim-btn" id="sim-restart">⟲ Restart</button>
         <a class="sim-btn" id="sim-exit" href="index.html">⏏ Exit</a>
@@ -649,15 +667,39 @@
   const touch = { active: false, x: 0, y: 0, boost: false };
   let camDist = 12, camHeight = 6.5;
 
+  // Map physical key positions as well as printed labels, so WASD works on
+  // AZERTY/QWERTZ/Dvorak, and so a key pressed before SHIFT still releases
+  // (e.key changes case mid-hold, e.code never does).
+  const CODE_KEYS = {
+    KeyW: "w", KeyA: "a", KeyS: "s", KeyD: "d",
+    ArrowUp: "arrowup", ArrowDown: "arrowdown",
+    ArrowLeft: "arrowleft", ArrowRight: "arrowright",
+    ShiftLeft: "shift", ShiftRight: "shift",
+    Space: " "
+  };
+  const HELD = ["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "shift", " "];
+  function clearKeys() { HELD.forEach((k) => { keys[k] = false; }); }
+
   addEventListener("keydown", (e) => {
-    const k = e.key.toLowerCase();
+    if (e.repeat) return;
+    const k = (e.key || "").toLowerCase();
+    const code = CODE_KEYS[e.code];
     if (k === "enter" && !state.playing && !state.finished) startRun();
     if (k === "r") restart();
-    if (state.playing && ["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(k)) e.preventDefault();
-    keys[k] = true;
+    // don't let arrows/space scroll the page out from under the run
+    if (state.playing && ["arrowup", "arrowdown", "arrowleft", "arrowright", " "].includes(code || k)) e.preventDefault();
+    if (k) keys[k] = true;
+    if (code) keys[code] = true;
   });
-  addEventListener("keyup", (e) => { keys[e.key.toLowerCase()] = false; });
-  addEventListener("blur", () => { for (const k in keys) keys[k] = false; });
+  addEventListener("keyup", (e) => {
+    const k = (e.key || "").toLowerCase();
+    const code = CODE_KEYS[e.code];
+    if (k) keys[k] = false;
+    if (code) keys[code] = false;
+  });
+  // a key held while the tab loses focus never sends keyup — drop everything
+  addEventListener("blur", clearKeys);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) clearKeys(); });
 
   canvas.addEventListener("wheel", (e) => {
     if (!state.playing) return;
@@ -667,20 +709,54 @@
   }, { passive: false });
 
   const stick = $("sim-stick"), stickNub = stick.firstElementChild, boostBtn = $("sim-boost");
+  const STICK_DEAD = 0.16;   // ignore the first 16% so a resting thumb doesn't creep
+  let stickId = null, boostId = null;
+
   function stickMove(cx, cy) {
     const r = stick.getBoundingClientRect();
     let dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2);
     const max = r.width / 2, m = Math.hypot(dx, dy);
     if (m > max) { dx = dx / m * max; dy = dy / m * max; }
     stickNub.style.transform = `translate(${dx}px, ${dy}px)`;
-    touch.x = dx / max; touch.y = dy / max; touch.active = true;
+    let nx = dx / max, ny = dy / max;
+    const n = Math.hypot(nx, ny);
+    if (n < STICK_DEAD) { nx = 0; ny = 0; }
+    else { const s = (n - STICK_DEAD) / (1 - STICK_DEAD) / n; nx *= s; ny *= s; }
+    touch.x = clamp(nx, -1, 1); touch.y = clamp(ny, -1, 1); touch.active = true;
   }
-  function stickEnd() { touch.active = false; touch.x = touch.y = 0; stickNub.style.transform = "translate(0,0)"; }
-  stick.addEventListener("touchstart", (e) => { e.preventDefault(); stickMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
-  stick.addEventListener("touchmove", (e) => { e.preventDefault(); stickMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
-  stick.addEventListener("touchend", stickEnd);
-  boostBtn.addEventListener("touchstart", (e) => { e.preventDefault(); touch.boost = true; });
-  boostBtn.addEventListener("touchend", () => { touch.boost = false; });
+  function stickEnd() {
+    stickId = null; touch.active = false; touch.x = touch.y = 0;
+    stickNub.style.transform = "translate(0,0)";
+  }
+
+  // Pointer events keep each finger separate (stick and BOOST at the same time)
+  // and capture guarantees an "up" even if the thumb slides off the control.
+  stick.addEventListener("pointerdown", (e) => {
+    if (stickId !== null) return;
+    e.preventDefault();
+    stickId = e.pointerId;
+    if (stick.setPointerCapture) stick.setPointerCapture(e.pointerId);
+    stickMove(e.clientX, e.clientY);
+  });
+  stick.addEventListener("pointermove", (e) => {
+    if (e.pointerId !== stickId) return;
+    e.preventDefault();
+    stickMove(e.clientX, e.clientY);
+  });
+  ["pointerup", "pointercancel"].forEach((t) => {
+    stick.addEventListener(t, (e) => { if (e.pointerId === stickId) stickEnd(); });
+  });
+
+  boostBtn.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    boostId = e.pointerId;
+    if (boostBtn.setPointerCapture) boostBtn.setPointerCapture(e.pointerId);
+    touch.boost = true;
+  });
+  ["pointerup", "pointercancel"].forEach((t) => {
+    boostBtn.addEventListener(t, (e) => { if (e.pointerId === boostId) { boostId = null; touch.boost = false; } });
+  });
+  addEventListener("blur", () => { stickEnd(); boostId = null; touch.boost = false; });
 
   /* ------------------------------------------------------------
      STATE + GAME FLOW
@@ -688,7 +764,7 @@
   const isTouch = matchMedia("(hover: none), (pointer: coarse)").matches;
   const state = {
     playing: false, finished: false,
-    x: 0, z: 0, heading: 0, speed: 0,
+    x: 0, z: 0, heading: 0, speed: 0, steer: 0,
     bank: 0, pitch: 0, bob: 0,
     found: 0, obsCleared: 0, score: 0, time: 0,
     activeNode: null
@@ -717,8 +793,9 @@
   }
 
   function resetWorld() {
-    state.x = 0; state.z = 0; state.heading = 0; state.speed = 0;
+    state.x = 0; state.z = 0; state.heading = 0; state.speed = 0; state.steer = 0;
     state.bank = state.pitch = state.bob = 0;
+    clearKeys();
     state.found = 0; state.obsCleared = 0; state.score = 0; state.time = 0;
     state.activeNode = null;
     elScore.textContent = "0"; elCount.textContent = `0/${SECTIONS.length}`;
@@ -766,6 +843,8 @@
         <div class="ov-keys">
           <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / arrows — drive</span>
           <span><kbd>SHIFT</kbd> — boost</span>
+          <span><kbd>SPACE</kbd> — brake</span>
+          <span><kbd>R</kbd> — restart</span>
           <span class="ov-touch">Touch: joystick + BOOST</span>
         </div>
         <button class="ov-btn" id="ov-start">▶ START RUN</button>
@@ -963,24 +1042,43 @@
   function update(dt, t) {
     if (state.playing) {
       state.time += dt;
-      let fwd = 0, turn = 0, boost = false;
+      let fwd = 0, turn = 0, boost = false, braking = false;
       if (keys["w"] || keys["arrowup"]) fwd += 1;
       if (keys["s"] || keys["arrowdown"]) fwd -= 1;
       if (keys["a"] || keys["arrowleft"]) turn += 1;
       if (keys["d"] || keys["arrowright"]) turn -= 1;
       if (keys["shift"]) boost = true;
-      if (touch.active) { fwd += clamp(-touch.y, -1, 1); turn += clamp(-touch.x, -1, 1); }
+      if (keys[" "]) braking = true;
+      if (touch.active) { fwd += -touch.y; turn += -touch.x; }
       if (touch.boost) boost = true;
+      // keyboard and stick can both be pushed at once — one unit of input, max
+      fwd = clamp(fwd, -1, 1); turn = clamp(turn, -1, 1);
 
-      const maxSpeed = boost ? 52 : 32;
-      const accel = boost ? 66 : 46;
-      state.speed += fwd * accel * dt;
-      state.speed *= 2;
-      state.speed = clamp(state.speed, -maxSpeed * 0.5, maxSpeed);
-      if (Math.abs(state.speed) < 0.02) state.speed = 0;
+      const maxSpeed = boost ? MAX_BOOST : MAX_SPEED;
+      const accel = boost ? ACCEL_BOOST : ACCEL;
 
-      const turnRate = 2.0 * (0.4 + Math.min(1, Math.abs(state.speed) / 16));
-      state.heading += turn * turnRate * dt * (state.speed >= 0 ? 1 : -1);
+      // throttle / brake / coast — all in m/s², integrated over dt
+      if (braking) {
+        state.speed -= Math.sign(state.speed) * Math.min(Math.abs(state.speed), BRAKE * dt);
+      } else if (fwd !== 0) {
+        state.speed += fwd * accel * dt;
+      } else {
+        state.speed -= Math.sign(state.speed) * Math.min(Math.abs(state.speed), COAST * dt);
+      }
+      state.speed -= state.speed * DRAG * dt;          // air resistance
+      // ease back under the cap rather than snapping (e.g. when boost is let go)
+      const capF = maxSpeed, capR = -maxSpeed * REVERSE_FRAC;
+      if (state.speed > capF) state.speed = Math.max(capF, state.speed - OVERCAP * dt);
+      if (state.speed < capR) state.speed = Math.min(capR, state.speed + OVERCAP * dt);
+      if (Math.abs(state.speed) < 0.05) state.speed = 0;
+
+      // steering — ramp the input in so taps aren't twitchy, then scale it:
+      // slow pivot when crawling, calmer wheel when flat out.
+      const spd = Math.abs(state.speed);
+      state.steer += (turn - state.steer) * Math.min(1, dt * STEER_SMOOTH);
+      const grip = 0.45 + 0.55 * Math.min(1, spd / 12);
+      const trim = 1 - 0.3 * Math.min(1, spd / MAX_SPEED);
+      state.heading += state.steer * TURN_RATE * grip * trim * dt * (state.speed >= 0 ? 1 : -1);
 
       let nx = state.x + Math.sin(state.heading) * state.speed * dt;
       let nz = state.z + Math.cos(state.heading) * state.speed * dt;
@@ -1021,12 +1119,12 @@
       // finish detection
       if (state.z >= TRACK_LEN) { finishRun(); }
 
-      state.bank = lerp(state.bank, -turn * 0.32 * Math.min(1, Math.abs(state.speed) / 14), 0.12);
-      state.pitch = lerp(state.pitch, -fwd * 0.1, 0.1);
+      state.bank = lerp(state.bank, -state.steer * 0.32 * Math.min(1, spd / 14), 1 - Math.exp(-8 * dt));
+      state.pitch = lerp(state.pitch, -fwd * 0.1, 1 - Math.exp(-6 * dt));
 
       if (humGain && !muted) {
-        const sp = Math.abs(state.speed) / maxSpeed;
-        humGain.gain.value = lerp(humGain.gain.value, 0.015 + sp * 0.06, 0.1);
+        const sp = spd / maxSpeed;
+        humGain.gain.value = lerp(humGain.gain.value, 0.015 + sp * 0.06, 1 - Math.exp(-6 * dt));
         hum.frequency.value = 46 + sp * 90;
       }
     } else {
@@ -1142,7 +1240,7 @@
     // HUD text
     if (state.playing) {
       elVel.textContent = `${Math.abs(state.speed).toFixed(1)} m/s`;
-      elSpeed.style.width = `${clamp(Math.abs(state.speed) / 52 * 100, 0, 100)}%`;
+      elSpeed.style.width = `${clamp(Math.abs(state.speed) / MAX_BOOST * 100, 0, 100)}%`;
       elTime.textContent = `${state.time.toFixed(1)}s`;
       const prog = clamp((state.z - START_Z) / (TRACK_LEN - START_Z) * 100, 0, 100);
       elDist.textContent = `${Math.max(0, state.z).toFixed(0)} / ${TRACK_LEN}m`;
