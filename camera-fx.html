@@ -1,1265 +1,542 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>CamFX — live ASCII &amp; 3D camera filters</title>
-<meta name="description" content="Turn your webcam into live ASCII art, neon edges, thermal vision, halftone, glitch and real-time 3D voxels, point clouds and holograms. Vanilla HTML, works on mobile.">
-<meta name="theme-color" content="#02040c">
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  :root {
-    --bg: #02040c;
-    --accent: #00f3ff;
-    --accent2: #00ff88;
-    --muted: #7dd3fc;
-    --line: rgba(0, 243, 255, 0.25);
-    --panel: rgba(3, 10, 24, 0.82);
-    --mono: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
-  }
-  html, body {
-    height: 100%; overflow: hidden; background: var(--bg);
-    color: var(--muted); font-family: var(--mono);
-    overscroll-behavior: none;
-  }
-  body { touch-action: manipulation; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CamFX</title>
+    <meta name="description" content="CamFX: turn your camera into live ASCII art, edge detection or a 3D point cloud. Everything runs in your browser, nothing is recorded.">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
-  /* ---------- stage ---------- */
-  #stage { position: fixed; inset: 0; background: #000; }
-  #fx, #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  #gl { display: none; }
-  #cam { position: absolute; width: 2px; height: 2px; opacity: 0; pointer-events: none; top: 0; left: 0; }
+    <style>
+        /* keep this page as plain as the homepage: a few boxes, no theming */
+        .frame {
+            width: 100%;
+            max-width: 640px;
+            aspect-ratio: 4 / 3;
+            margin: 0 auto;
+            border: 2px inset #c0c0c0;
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
 
-  /* scanline + vignette, purely cosmetic */
-  #grain {
-    position: fixed; inset: 0; pointer-events: none; z-index: 5; opacity: 0.5;
-    background:
-      repeating-linear-gradient(0deg, rgba(0,0,0,0.28) 0px, rgba(0,0,0,0.28) 1px, transparent 1px, transparent 3px),
-      radial-gradient(ellipse 90% 75% at 50% 50%, transparent 55%, rgba(0,0,0,0.75) 100%);
-  }
-  body.clean #grain { opacity: 0; }
+        .frame canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
 
-  /* ---------- chrome ---------- */
-  .ui { position: fixed; z-index: 10; transition: opacity .25s, transform .25s; }
-  body.hide-ui .ui { opacity: 0; pointer-events: none; transform: translateY(6px); }
+        #gl {
+            display: none;
+            touch-action: none;
+        }
 
-  #top {
-    top: 0; left: 0; right: 0;
-    padding: calc(10px + env(safe-area-inset-top)) 14px 22px;
-    display: flex; align-items: center; gap: 12px;
-    background: linear-gradient(180deg, rgba(2,4,12,0.85), transparent);
-    font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
-  }
-  #top a { color: var(--muted); text-decoration: none; white-space: nowrap; }
-  #top a:hover { color: var(--accent); }
-  #title { color: var(--accent); font-weight: 700; text-shadow: 0 0 12px rgba(0,243,255,0.6); }
-  #title small { display: block; font-size: 0.62rem; letter-spacing: 0.2em; color: var(--muted); font-weight: 400; text-shadow: none; }
-  #hud { margin-left: auto; text-align: right; color: rgba(125,211,252,0.65); font-size: 0.62rem; line-height: 1.5; }
-  #hud b { color: var(--accent2); font-weight: 700; }
+        #cam {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
 
-  #bottom {
-    left: 0; right: 0; bottom: 0;
-    padding: 26px 0 calc(10px + env(safe-area-inset-bottom));
-    background: linear-gradient(0deg, rgba(2,4,12,0.9) 45%, transparent);
-    display: flex; flex-direction: column; gap: 10px;
-  }
+        #placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 16px;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 12px;
+            color: #555555;
+        }
 
-  /* filter chips */
-  #chips {
-    display: flex; gap: 8px; overflow-x: auto; overflow-y: hidden;
-    padding: 2px 14px 4px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
-  }
-  #chips::-webkit-scrollbar { display: none; }
-  .chip {
-    flex: 0 0 auto; padding: 9px 14px; border: 1px solid var(--line);
-    background: rgba(0,243,255,0.05); color: var(--muted);
-    font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
-    cursor: pointer; white-space: nowrap; border-radius: 2px; transition: .15s;
-  }
-  .chip .k { opacity: 0.45; margin-right: 7px; }
-  .chip[data-kind="3d"] { border-color: rgba(0,255,136,0.3); }
-  .chip:hover { background: rgba(0,243,255,0.13); color: #fff; }
-  .chip.on {
-    background: var(--accent); border-color: var(--accent); color: #02040c; font-weight: 700;
-    box-shadow: 0 0 18px rgba(0,243,255,0.45);
-  }
-  .chip[data-kind="3d"].on { background: var(--accent2); border-color: var(--accent2); box-shadow: 0 0 18px rgba(0,255,136,0.45); }
+        .controls {
+            text-align: center;
+            margin: 12px auto 0;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 13px;
+        }
 
-  /* control row */
-  #ctrls { display: flex; gap: 8px; padding: 0 14px; align-items: center; flex-wrap: wrap; }
-  .btn {
-    min-width: 46px; height: 44px; padding: 0 12px;
-    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-    border: 1px solid var(--line); background: rgba(0,243,255,0.05); color: var(--muted);
-    font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
-    cursor: pointer; border-radius: 2px; transition: .15s;
-  }
-  .btn:hover { background: rgba(0,243,255,0.14); color: #fff; }
-  .btn.on { border-color: var(--accent2); color: var(--accent2); }
-  .btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.6; }
-  .btn .lbl { display: inline; }
-  @media (max-width: 620px) { .btn .lbl { display: none; } .btn { padding: 0 10px; } }
+        .controls label {
+            margin: 0 8px;
+            white-space: nowrap;
+        }
 
-  /* settings drawer */
-  #settings {
-    display: none; margin: 0 14px; padding: 14px; border: 1px solid var(--line);
-    background: var(--panel); backdrop-filter: blur(8px); border-radius: 3px;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px;
-  }
-  #settings.open { display: grid; }
-  .row { display: flex; flex-direction: column; gap: 6px; }
-  .row label { font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(125,211,252,0.7); }
-  .row label b { color: var(--accent); font-weight: 700; }
-  input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: transparent; cursor: pointer; }
-  input[type=range]::-webkit-slider-runnable-track { height: 2px; background: var(--line); }
-  input[type=range]::-moz-range-track { height: 2px; background: var(--line); }
-  input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none; width: 16px; height: 16px; margin-top: -7px; border-radius: 50%;
-    background: var(--accent); box-shadow: 0 0 10px var(--accent);
-  }
-  input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border: 0; border-radius: 50%; background: var(--accent); }
-  .toggles { display: flex; flex-wrap: wrap; gap: 6px; }
-  .toggles .btn { height: 34px; font-size: 0.62rem; }
+        .controls button {
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 13px;
+            padding: 5px 12px;
+            margin: 0 3px;
+        }
 
-  /* ---------- overlay ---------- */
-  #overlay {
-    position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center;
-    padding: 24px; text-align: center; background: radial-gradient(ellipse at 50% 45%, #08172e 0%, #02040c 70%);
-  }
-  #overlay.gone { display: none; }
-  .ov-inner { max-width: 460px; }
-  .ov-art {
-    font-size: clamp(0.5rem, 2.1vw, 0.8rem); line-height: 1.05; color: var(--accent);
-    white-space: pre; margin-bottom: 22px; text-shadow: 0 0 14px rgba(0,243,255,0.5); overflow: hidden;
-  }
-  .ov-tag { font-size: 0.66rem; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; }
-  .ov-inner h1 {
-    font-size: clamp(2rem, 8vw, 3.2rem); line-height: 1; text-transform: uppercase; color: #fff;
-    margin: 12px 0 14px; letter-spacing: -0.02em; text-shadow: 0 0 26px rgba(0,243,255,0.55);
-  }
-  .ov-inner p { font-size: 0.8rem; line-height: 1.75; color: var(--muted); margin-bottom: 8px; }
-  .ov-inner p.fine { font-size: 0.68rem; color: rgba(125,211,252,0.6); }
-  #go {
-    margin: 24px 0 16px; padding: 15px 34px; border: 1px solid var(--accent); background: var(--accent);
-    color: #02040c; font-family: var(--mono); font-weight: 700; font-size: 0.85rem;
-    letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; border-radius: 2px;
-    box-shadow: 0 0 30px rgba(0,243,255,0.45);
-  }
-  #go:hover { background: #fff; border-color: #fff; box-shadow: 0 0 40px rgba(255,255,255,0.5); }
-  #err { color: #ff5c7a; font-size: 0.72rem; line-height: 1.7; margin-top: 10px; min-height: 1.2em; }
-  .ov-links { margin-top: 18px; font-size: 0.68rem; }
-  .ov-links a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--line); }
-  .ov-links a:hover { color: var(--accent); }
+        .note {
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 11px;
+            color: #555555;
+            text-align: center;
+            margin-top: 8px;
+        }
 
-  #toast {
-    position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.96); z-index: 20;
-    padding: 14px 26px; border: 1px solid var(--accent); background: rgba(2,4,12,0.85);
-    color: #fff; font-size: 0.8rem; letter-spacing: 0.16em; text-transform: uppercase;
-    pointer-events: none; opacity: 0; transition: opacity .2s, transform .2s; border-radius: 2px;
-    box-shadow: 0 0 30px rgba(0,243,255,0.35); text-align: center;
-  }
-  #toast.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-  #flash { position: fixed; inset: 0; background: #fff; opacity: 0; pointer-events: none; z-index: 25; }
-  #flash.on { animation: pop .35s ease-out; }
-  @keyframes pop { 0% { opacity: 0.85; } 100% { opacity: 0; } }
-</style>
+        #err {
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 12px;
+            color: #aa0000;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .link-btn {
+            display: inline-block;
+            padding: 7px 18px;
+            margin: 0 4px;
+            border: 2px outset #c0c0c0;
+            background: #e8e8e8;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 13px;
+            color: #000080;
+            text-decoration: none;
+        }
+
+        .link-btn:link,
+        .link-btn:visited {
+            color: #000080;
+        }
+
+        .link-btn:hover {
+            background: #d8d8d8;
+        }
+
+        .link-btn:active {
+            border-style: inset;
+        }
+
+        .disclaimer {
+            border: 1px solid #808080;
+            background: #f4f4f4;
+            padding: 10px 12px;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 12px;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+    </style>
 </head>
-<body>
 
-<div id="stage">
-  <video id="cam" playsinline autoplay muted></video>
-  <canvas id="fx"></canvas>
-  <canvas id="gl"></canvas>
-</div>
-<div id="grain"></div>
-<div id="flash"></div>
-<div id="toast"></div>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
 
-<!-- ============ TOP BAR ============ -->
-<div id="top" class="ui">
-  <a href="index.html">&larr; back</a>
-  <div id="title">CamFX<small>live filters</small></div>
-  <div id="hud"><b id="fps">--</b> fps<br><span id="mode">ascii</span></div>
-</div>
+    <b>CamFX</b> &#8212; live camera filters
+    <br><br>
+    Your camera feed, redrawn three different ways: as ASCII characters, as edge detection,
+    or as a 3D point cloud you can spin around.
+    <br><br>
 
-<!-- ============ BOTTOM BAR ============ -->
-<div id="bottom" class="ui">
-  <div id="settings">
-    <div class="row">
-      <label>cell size <b id="densVal">1.0</b>&times;</label>
-      <input id="dens" type="range" min="0.6" max="2.6" step="0.1" value="1">
+    <hr>
+
+    <div class="frame">
+        <video id="cam" playsinline autoplay muted></video>
+        <canvas id="fx"></canvas>
+        <canvas id="gl"></canvas>
+        <div id="placeholder">The camera is off. Press &#8220;Start camera&#8221; below.</div>
     </div>
-    <div class="row">
-      <label>effect amount <b id="ampVal">1.0</b>&times;</label>
-      <input id="amp" type="range" min="0.2" max="2" step="0.1" value="1">
+
+    <div class="controls">
+        <div>
+            <label><input type="radio" name="filter" value="ascii" checked> ASCII</label>
+            <label><input type="radio" name="filter" value="edges"> Edges</label>
+            <label><input type="radio" name="filter" value="cloud" id="rCloud"> 3D point cloud</label>
+        </div>
+        <br>
+        <div>
+            <button id="bStart" type="button">Start camera</button>
+            <button id="bStop" type="button" disabled>Stop camera</button>
+            <button id="bFlip" type="button" disabled>Switch camera</button>
+        </div>
+        <div class="note" id="hint">Drag inside the frame to rotate the point cloud.</div>
+        <div id="err"></div>
     </div>
-    <div class="row">
-      <label>options</label>
-      <div class="toggles">
-        <button class="btn on" id="tColor">color</button>
-        <button class="btn on" id="tMirror">mirror</button>
-        <button class="btn on" id="tGlow">glow</button>
-        <button class="btn on" id="tGrain">scanlines</button>
-      </div>
+
+    <br>
+    <hr>
+
+    <div class="disclaimer">
+        <b>Nothing is recorded.</b> Every frame is processed inside your own browser and thrown
+        away immediately. There is no upload, no server, no recording and no save button. Closing
+        this page ends it. You can also press &#8220;Stop camera&#8221; at any time.
     </div>
-  </div>
 
-  <div id="chips"></div>
+    <br>
+    <hr>
 
-  <div id="ctrls">
-    <button class="btn" id="bShot" title="Snapshot (S)">
-      <svg viewBox="0 0 24 24"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.6"/></svg>
-      <span class="lbl">shot</span>
-    </button>
-    <button class="btn" id="bFlip" title="Switch camera (C)">
-      <svg viewBox="0 0 24 24"><path d="M4 8V6h5M20 16v2h-5"/><path d="M20 12a8 8 0 0 0-13.6-5.7M4 12a8 8 0 0 0 13.6 5.7"/></svg>
-      <span class="lbl">flip</span>
-    </button>
-    <button class="btn" id="bSet" title="Settings">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/></svg>
-      <span class="lbl">tune</span>
-    </button>
-    <button class="btn" id="bHide" title="Hide interface (H)">
-      <svg viewBox="0 0 24 24"><path d="M2 12s4-6 10-6 10 6 10 6-4 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg>
-      <span class="lbl">hide ui</span>
-    </button>
-    <button class="btn" id="bFull" title="Fullscreen (F)">
-      <svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
-      <span class="lbl">full</span>
-    </button>
-  </div>
-</div>
+    <a href="index.html">&#8592; back to the homepage</a>
 
-<!-- ============ START OVERLAY ============ -->
-<div id="overlay">
-  <div class="ov-inner">
-    <div class="ov-art">  .:-=+*#%@  ASCII  @%#*+=-:.  </div>
-    <div class="ov-tag">fun project</div>
-    <h1>CamFX</h1>
-    <p>Your camera feed, mangled in real time — ASCII art, neon edge detection, thermal vision,
-       halftone print, glitch, plus live 3D voxels, point clouds and holograms.</p>
-    <p class="fine">Everything runs locally in your browser. No frame ever leaves this device,
-       nothing is recorded or uploaded.</p>
-    <button id="go">Enable camera</button>
-    <div id="err"></div>
-    <div class="ov-links">
-      <a href="index.html">&larr; back to the site</a> &nbsp;·&nbsp;
-      <a href="retro-os.html">AbdelOS Vista</a> &nbsp;·&nbsp;
-      <a href="rover.html">Rover Run</a>
+    <br><br>
+
+    <div style="text-align:center">
+        <a class="link-btn" href="https://github.com/armex-code">GitHub</a>
+        <a class="link-btn" href="https://www.linkedin.com/in/ar-elarfaoui/">LinkedIn</a>
     </div>
-  </div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-(function () {
-"use strict";
-
-/* =========================================================
-   Setup & state
-   ========================================================= */
-var V      = document.getElementById('cam');
-var FX     = document.getElementById('fx');
-var CX     = FX.getContext('2d');
-var GL     = document.getElementById('gl');
-var overlay= document.getElementById('overlay');
-var errBox = document.getElementById('err');
-var toastEl= document.getElementById('toast');
-
-var isTouch  = matchMedia('(pointer: coarse)').matches;
-var isMobile = isTouch || innerWidth < 760;
-
-var S = {
-  filter : 'ascii',
-  mirror : true,
-  color  : true,
-  glow   : !isMobile,
-  grain  : true,
-  dens   : isMobile ? 1.3 : 1,
-  amp    : 1,
-  facing : 'user',
-  live   : false,
-  hideUI : false
-};
-
-var W = 0, H = 0, DPR = 1;           /* output canvas size, in device pixels */
-var stream = null, wantShot = false, t0 = performance.now();
-
-/* filter catalogue -------------------------------------------------- */
-var FILTERS = [
-  { id:'ascii',    name:'ascii',       kind:'2d' },
-  { id:'matrix',   name:'matrix',      kind:'2d' },
-  { id:'blocks',   name:'blocks',      kind:'2d' },
-  { id:'edges',    name:'edges',       kind:'2d' },
-  { id:'thermal',  name:'thermal',     kind:'2d' },
-  { id:'halftone', name:'halftone',    kind:'2d' },
-  { id:'pixel',    name:'pixels',      kind:'2d' },
-  { id:'echo',     name:'echo',        kind:'2d' },
-  { id:'glitch',   name:'glitch',      kind:'2d' },
-  { id:'voxels',   name:'3d voxels',   kind:'3d' },
-  { id:'cloud',    name:'3d cloud',    kind:'3d' },
-  { id:'holo',     name:'hologram',    kind:'3d' }
-];
-
-/* =========================================================
-   Sampling helpers — one shared offscreen canvas
-   ========================================================= */
-var samp = document.createElement('canvas');
-var SCX  = samp.getContext('2d', { willReadFrequently: true });
-
-/** source rect that "cover"-fits the video into a dw x dh target */
-function cover(dw, dh) {
-  var vw = V.videoWidth || 640, vh = V.videoHeight || 480;
-  var k = Math.max(dw / vw, dh / vh);
-  var sw = dw / k, sh = dh / k;
-  return { sx: (vw - sw) / 2, sy: (vh - sh) / 2, sw: sw, sh: sh };
-}
-
-/** draw the (optionally mirrored) camera frame into any 2d context */
-function paintVideo(ctx, dw, dh) {
-  var r = cover(dw, dh);
-  ctx.save();
-  if (S.mirror) { ctx.translate(dw, 0); ctx.scale(-1, 1); }
-  ctx.drawImage(V, r.sx, r.sy, r.sw, r.sh, 0, 0, dw, dh);
-  ctx.restore();
-}
-
-/** downsample the camera to a w x h pixel grid and hand back the raw bytes */
-function grab(w, h) {
-  if (samp.width !== w || samp.height !== h) { samp.width = w; samp.height = h; }
-  paintVideo(SCX, w, h);
-  return SCX.getImageData(0, 0, w, h).data;
-}
-
-/* a second scratch canvas for filters that render small and upscale */
-var work = document.createElement('canvas');
-var WCX  = work.getContext('2d', { willReadFrequently: true });
-function workCanvas(w, h) {
-  if (work.width !== w || work.height !== h) { work.width = w; work.height = h; }
-  return WCX;
-}
-/** cap a full-res dimension pair to maxW while keeping the aspect */
-function capped(maxW) {
-  var k = Math.min(1, maxW / W);
-  return { w: Math.max(2, Math.round(W * k)), h: Math.max(2, Math.round(H * k)) };
-}
-function blowUp(smooth) {
-  CX.imageSmoothingEnabled = smooth !== false;
-  CX.drawImage(work, 0, 0, work.width, work.height, 0, 0, W, H);
-  CX.imageSmoothingEnabled = true;
-}
-
-/* =========================================================
-   Canvas sizing
-   ========================================================= */
-function resize() {
-  DPR = Math.min(devicePixelRatio || 1, isMobile ? 2 : 2);
-  var cssW = innerWidth, cssH = innerHeight;
-  W = Math.round(cssW * DPR); H = Math.round(cssH * DPR);
-  FX.width = W; FX.height = H;
-  if (R3) {
-    R3.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
-    R3.setSize(cssW, cssH, false);
-    CAM3.aspect = cssW / cssH;
-    CAM3.updateProjectionMatrix();
-  }
-}
-addEventListener('resize', resize);
-addEventListener('orientationchange', function () { setTimeout(resize, 250); });
-
-/* =========================================================
-   2D FILTERS
-   ========================================================= */
-var RAMP  = ' .:-=+*#%@';                     /* dark -> light            */
-var RAMP2 = ' .\'`^:;+ilrxnvzXYUJCLQ0OZmwqpb#MW&8%B@';
-var GLYPH = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎ01234789Z:."=*+-<>';
-
-/** shared metrics for every character-grid filter */
-function gridMetrics() {
-  var fs = Math.max(6, Math.round(11 * S.dens * DPR));
-  CX.font = '700 ' + fs + 'px ' + '"SFMono-Regular", Menlo, Consolas, monospace';
-  var cw = CX.measureText('M').width || fs * 0.6;
-  var ch = fs;
-  return { fs: fs, cw: cw, ch: ch, cols: Math.max(1, Math.floor(W / cw)), rows: Math.max(1, Math.floor(H / ch)) };
-}
-
-/* Character grids are painted in two passes: every row is stamped as one white
-   fillText (a few dozen draw calls instead of tens of thousands), then a
-   cols x rows colour map is scaled over the glyphs with "source-in" so each
-   character picks up its own colour. Keeps ASCII at full frame rate. */
-var txt = document.createElement('canvas'), TCX = txt.getContext('2d');
-var cmap = document.createElement('canvas'), MCX = cmap.getContext('2d');
-
-var cmapImg = null;
-function colourMap(cols, rows) {
-  if (cmap.width !== cols || cmap.height !== rows || !cmapImg) {
-    cmap.width = cols; cmap.height = rows;
-    cmapImg = MCX.createImageData(cols, rows);
-  }
-  return cmapImg;   /* reused every frame — cells left untouched draw a space */
-}
-
-function gridPaint(m, lines, src, solid) {
-  if (txt.width !== W || txt.height !== H) { txt.width = W; txt.height = H; }
-  TCX.clearRect(0, 0, W, H);
-  TCX.font = CX.font;
-  TCX.textBaseline = 'top';
-  TCX.fillStyle = '#fff';
-  for (var y = 0; y < lines.length; y++) if (lines[y]) TCX.fillText(lines[y], 0, y * m.ch);
-
-  TCX.globalCompositeOperation = 'source-in';
-  if (solid) {
-    TCX.fillStyle = solid;
-    TCX.fillRect(0, 0, W, H);
-  } else {
-    TCX.imageSmoothingEnabled = false;
-    TCX.filter = 'saturate(1.7) brightness(1.2)';
-    TCX.drawImage(src, 0, 0, m.cols, m.rows, 0, 0, m.cols * m.cw, m.rows * m.ch);
-    TCX.filter = 'none';
-    TCX.imageSmoothingEnabled = true;
-  }
-  TCX.globalCompositeOperation = 'source-over';
-
-  CX.fillStyle = '#000'; CX.fillRect(0, 0, W, H);
-  CX.drawImage(txt, 0, 0);
-}
-
-/* bloom on the cheap: blur a quarter-size copy and add it back on top */
-var glowCv = document.createElement('canvas'), GCX = glowCv.getContext('2d');
-function fGlow(alpha) {
-  if (!S.glow) return;
-  var gw = Math.max(48, W >> 2), gh = Math.max(48, H >> 2);
-  if (glowCv.width !== gw || glowCv.height !== gh) { glowCv.width = gw; glowCv.height = gh; }
-  GCX.clearRect(0, 0, gw, gh);
-  GCX.filter = 'blur(2px)';
-  GCX.drawImage(FX, 0, 0, gw, gh);
-  GCX.filter = 'none';
-  CX.save();
-  CX.globalCompositeOperation = 'lighter';
-  CX.globalAlpha = alpha;
-  CX.drawImage(glowCv, 0, 0, gw, gh, 0, 0, W, H);
-  CX.restore();
-}
-
-/* ---- 1. ASCII ------------------------------------------------------ */
-function drawAscii() {
-  var m = gridMetrics();
-  var d = grab(m.cols, m.rows);
-  var ramp = m.fs >= 16 ? RAMP2 : RAMP, last = ramp.length - 1;
-  var boost = S.amp, lines = new Array(m.rows);
-
-  for (var y = 0; y < m.rows; y++) {
-    var line = '';
-    for (var x = 0; x < m.cols; x++) {
-      var i = (y * m.cols + x) * 4;
-      var l = (d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114) / 255;
-      l = Math.min(1, Math.pow(l, 1 / boost));
-      line += ramp[Math.round(l * last)];
-    }
-    lines[y] = line;
-  }
-  gridPaint(m, lines, samp, S.color ? null : '#00ff88');
-  fGlow(0.55);
-}
-
-/* ---- 2. MATRIX ----------------------------------------------------- */
-var rainHeads = null, rainSpeed = null;
-function drawMatrix(t) {
-  var m = gridMetrics();
-  var d = grab(m.cols, m.rows);
-  if (!rainHeads || rainHeads.length !== m.cols) {
-    rainHeads = new Float32Array(m.cols);
-    rainSpeed = new Float32Array(m.cols);
-    for (var c = 0; c < m.cols; c++) {
-      rainHeads[c] = Math.random() * m.rows;
-      rainSpeed[c] = 0.25 + Math.random() * 0.75;
-    }
-  }
-  for (var x = 0; x < m.cols; x++) {
-    rainHeads[x] += rainSpeed[x] * (0.6 + S.amp);
-    if (rainHeads[x] > m.rows + 14) rainHeads[x] = -Math.random() * 20;
-  }
-
-  var map = colourMap(m.cols, m.rows), mp = map.data;
-  var rows = new Array(m.rows), tick = (t / 90) | 0, GN = GLYPH.length;
-  for (var y = 0; y < m.rows; y++) {
-    var line = '';
-    for (var x2 = 0; x2 < m.cols; x2++) {
-      var i = (y * m.cols + x2) * 4;
-      var l = (d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114) / 255;
-      var dist = rainHeads[x2] - y;
-      var trail = (dist >= 0 && dist < 18) ? 1 - dist / 18 : 0.05;
-      var a = Math.min(1, Math.pow(l, 1.7) * (0.12 + trail * 1.7));
-      if (a < 0.09) { line += ' '; continue; }
-      line += GLYPH[(x2 * 31 + y * 17 + tick + y) % GN];
-      var head = (dist >= 0 && dist < 1.4);
-      mp[i]     = head ? 225 : 0;
-      mp[i + 1] = 255;
-      mp[i + 2] = head ? 235 : 110 + ((l * 70) | 0);
-      mp[i + 3] = a * 255;
-    }
-    rows[y] = line;
-  }
-  MCX.putImageData(map, 0, 0);
-  gridPaint(m, rows, cmap, null);
-  fGlow(0.6);
-}
-
-/* ---- 3. BLOCKS (unicode shade blocks) ------------------------------ */
-var BLK = ' ░▒▓█';
-function drawBlocks() {
-  var m = gridMetrics();
-  var d = grab(m.cols, m.rows);
-  var lines = new Array(m.rows);
-  for (var y = 0; y < m.rows; y++) {
-    var line = '';
-    for (var x = 0; x < m.cols; x++) {
-      var i = (y * m.cols + x) * 4;
-      var l = Math.min(1, Math.pow((d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114) / 255, 1 / S.amp));
-      line += BLK[Math.min(4, Math.round(l * 4))];
-    }
-    lines[y] = line;
-  }
-  gridPaint(m, lines, samp, S.color ? null : '#00f3ff');
-  fGlow(0.4);
-}
-
-/* ---- 4. EDGES (sobel) ---------------------------------------------- */
-function drawEdges() {
-  var s = capped(isMobile ? 400 : 560);
-  var ctx = workCanvas(s.w, s.h);
-  paintVideo(ctx, s.w, s.h);
-  var img = ctx.getImageData(0, 0, s.w, s.h), p = img.data;
-  var n = s.w * s.h, gray = new Float32Array(n);
-  for (var i = 0; i < n; i++) gray[i] = (p[i * 4] * 0.299 + p[i * 4 + 1] * 0.587 + p[i * 4 + 2] * 0.114) / 255;
-
-  var gain = 2.2 * S.amp;
-  for (var y = 0; y < s.h; y++) {
-    for (var x = 0; x < s.w; x++) {
-      var o = y * s.w + x, q = o * 4;
-      if (x === 0 || y === 0 || x === s.w - 1 || y === s.h - 1) { p[q] = p[q + 1] = p[q + 2] = 0; continue; }
-      var tl = gray[o - s.w - 1], tc = gray[o - s.w], tr = gray[o - s.w + 1];
-      var ml = gray[o - 1],       mr = gray[o + 1];
-      var bl = gray[o + s.w - 1], bc = gray[o + s.w], br = gray[o + s.w + 1];
-      var gx = (tr + 2 * mr + br) - (tl + 2 * ml + bl);
-      var gy = (bl + 2 * bc + br) - (tl + 2 * tc + tr);
-      var mag = Math.min(1, Math.sqrt(gx * gx + gy * gy) * gain);
-      if (S.color) {
-        /* direction -> hue, magnitude -> brightness */
-        var ang = (Math.atan2(gy, gx) + Math.PI) / (2 * Math.PI);
-        var h6 = ang * 6, f = h6 - Math.floor(h6), v = mag * 255;
-        var seg = Math.floor(h6) % 6;
-        var up = v * f, dn = v * (1 - f);
-        if (seg === 0) { p[q] = v; p[q+1] = up; p[q+2] = 0; }
-        else if (seg === 1) { p[q] = dn; p[q+1] = v; p[q+2] = 0; }
-        else if (seg === 2) { p[q] = 0; p[q+1] = v; p[q+2] = up; }
-        else if (seg === 3) { p[q] = 0; p[q+1] = dn; p[q+2] = v; }
-        else if (seg === 4) { p[q] = up; p[q+1] = 0; p[q+2] = v; }
-        else { p[q] = v; p[q+1] = 0; p[q+2] = dn; }
-      } else {
-        p[q] = mag * 40; p[q + 1] = mag * 255; p[q + 2] = mag * 200;
-      }
-    }
-  }
-  ctx.putImageData(img, 0, 0);
-  CX.fillStyle = '#000'; CX.fillRect(0, 0, W, H);
-  blowUp(true);
-  fGlow(0.5);
-}
-
-/* ---- 5. THERMAL ---------------------------------------------------- */
-var HEAT = null;
-function heatLUT() {
-  if (HEAT) return HEAT;
-  /* black -> indigo -> magenta -> red -> orange -> yellow -> white */
-  var stops = [[0,0,12],[30,0,90],[120,0,140],[220,20,90],[255,90,20],[255,190,40],[255,255,230]];
-  HEAT = new Uint8Array(256 * 3);
-  for (var i = 0; i < 256; i++) {
-    var f = i / 255 * (stops.length - 1), a = Math.floor(f), b = Math.min(stops.length - 1, a + 1), k = f - a;
-    for (var c = 0; c < 3; c++) HEAT[i * 3 + c] = stops[a][c] + (stops[b][c] - stops[a][c]) * k;
-  }
-  return HEAT;
-}
-function drawThermal() {
-  var s = capped(isMobile ? 480 : 720);
-  var ctx = workCanvas(s.w, s.h);
-  paintVideo(ctx, s.w, s.h);
-  var img = ctx.getImageData(0, 0, s.w, s.h), p = img.data, lut = heatLUT();
-  for (var i = 0; i < p.length; i += 4) {
-    var l = (p[i] * 0.299 + p[i + 1] * 0.587 + p[i + 2] * 0.114) / 255;
-    var v = Math.max(0, Math.min(255, Math.round(Math.pow(l, 1 / S.amp) * 255)));
-    p[i] = lut[v * 3]; p[i + 1] = lut[v * 3 + 1]; p[i + 2] = lut[v * 3 + 2];
-  }
-  ctx.putImageData(img, 0, 0);
-  blowUp(true);
-}
-
-/* ---- 6. HALFTONE --------------------------------------------------- */
-function drawHalftone() {
-  var s = capped(isMobile ? 520 : 900);
-  var cell = Math.max(3, Math.round(6 * S.dens));
-  var gx = Math.max(2, Math.floor(s.w / cell)), gy = Math.max(2, Math.floor(s.h / cell));
-  var d = grab(gx, gy);
-  var ctx = workCanvas(gx * cell, gy * cell);
-  ctx.fillStyle = '#f4f7ff'; ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  var rMax = cell * 0.72;
-  for (var y = 0; y < gy; y++) {
-    for (var x = 0; x < gx; x++) {
-      var i = (y * gx + x) * 4;
-      var r = d[i], g = d[i + 1], b = d[i + 2];
-      var l = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
-      var rad = (1 - Math.pow(l, 1 / S.amp)) * rMax;
-      if (rad < 0.35) continue;
-      ctx.fillStyle = S.color ? 'rgba(' + ((r * 0.55) | 0) + ',' + ((g * 0.55) | 0) + ',' + ((b * 0.55) | 0) + ',0.92)' : '#0b1020';
-      ctx.beginPath();
-      ctx.arc(x * cell + cell / 2, y * cell + cell / 2, rad, 0, 6.2832);
-      ctx.fill();
-    }
-  }
-  CX.fillStyle = '#f4f7ff'; CX.fillRect(0, 0, W, H);
-  blowUp(true);
-}
-
-/* ---- 7. PIXELS ----------------------------------------------------- */
-function drawPixel() {
-  var cell = Math.max(3, Math.round(9 * S.dens * DPR));
-  var gx = Math.max(2, Math.floor(W / cell)), gy = Math.max(2, Math.floor(H / cell));
-  var ctx = workCanvas(gx, gy);
-  paintVideo(ctx, gx, gy);
-  if (!S.color) {
-    var img = ctx.getImageData(0, 0, gx, gy), p = img.data;
-    for (var i = 0; i < p.length; i += 4) {
-      var l = (p[i] * 0.299 + p[i + 1] * 0.587 + p[i + 2] * 0.114);
-      l = Math.min(255, l * S.amp);
-      p[i] = l * 0.1; p[i + 1] = l; p[i + 2] = l * 0.75;
-    }
-    ctx.putImageData(img, 0, 0);
-  }
-  CX.fillStyle = '#000'; CX.fillRect(0, 0, W, H);
-  blowUp(false);
-  /* pixel gutters */
-  CX.globalAlpha = 0.35; CX.fillStyle = '#000';
-  var sw = W / gx, sh = H / gy, gap = Math.max(1, Math.round(DPR));
-  if (sw > 5) { for (var x = 1; x < gx; x++) CX.fillRect(Math.round(x * sw) - gap, 0, gap, H); }
-  if (sh > 5) { for (var y = 1; y < gy; y++) CX.fillRect(0, Math.round(y * sh) - gap, W, gap); }
-  CX.globalAlpha = 1;
-}
-
-/* ---- 8. ECHO (motion trails) --------------------------------------- */
-var echoCv = document.createElement('canvas'), echoCtx = echoCv.getContext('2d');
-function drawEcho(t) {
-  var s = capped(isMobile ? 540 : 860);
-  if (echoCv.width !== s.w || echoCv.height !== s.h) {
-    echoCv.width = s.w; echoCv.height = s.h;
-    echoCtx.fillStyle = '#000'; echoCtx.fillRect(0, 0, s.w, s.h);
-  }
-  /* fade what is already there, then add the new frame on top */
-  echoCtx.globalCompositeOperation = 'source-over';
-  echoCtx.fillStyle = 'rgba(0,0,0,' + (0.055 + 0.1 / S.amp) + ')';
-  echoCtx.fillRect(0, 0, s.w, s.h);
-  echoCtx.globalCompositeOperation = 'lighter';
-  echoCtx.globalAlpha = 0.34;
-  if (S.color) echoCtx.filter = 'hue-rotate(' + ((t / 22) % 360) + 'deg) saturate(1.6)';
-  paintVideo(echoCtx, s.w, s.h);
-  echoCtx.filter = 'none';
-  echoCtx.globalAlpha = 1;
-  echoCtx.globalCompositeOperation = 'source-over';
-
-  CX.fillStyle = '#000'; CX.fillRect(0, 0, W, H);
-  CX.drawImage(echoCv, 0, 0, s.w, s.h, 0, 0, W, H);
-  fGlow(0.35);
-}
-
-/* ---- 9. GLITCH ----------------------------------------------------- */
-function drawGlitch(t) {
-  var s = capped(isMobile ? 520 : 800);
-  var ctx = workCanvas(s.w, s.h);
-  paintVideo(ctx, s.w, s.h);
-
-  /* chromatic aberration, done straight on the pixel buffer */
-  var img = ctx.getImageData(0, 0, s.w, s.h), p = img.data;
-  var off = Math.max(1, Math.round((3 + Math.sin(t / 260) * 4) * S.amp));
-  for (var y = 0; y < s.h; y++) {
-    var row = y * s.w * 4;
-    for (var x = s.w - 1; x >= 0; x--) {
-      var q = row + x * 4;
-      var xr = Math.max(0, x - off), xb = Math.min(s.w - 1, x + off);
-      p[q]     = p[row + xr * 4];
-      p[q + 2] = p[row + xb * 4 + 2];
-    }
-  }
-  ctx.putImageData(img, 0, 0);
-
-  CX.fillStyle = '#000'; CX.fillRect(0, 0, W, H);
-  blowUp(true);
-
-  /* torn slices */
-  var slices = 3 + ((Math.random() * 5 * S.amp) | 0);
-  for (var i = 0; i < slices; i++) {
-    var sh = (10 + Math.random() * 70) * DPR;
-    var sy = Math.random() * H;
-    var dx = (Math.random() - 0.5) * 90 * DPR * S.amp;
-    CX.drawImage(work, 0, (sy / H) * work.height, work.width, (sh / H) * work.height,
-                 dx, sy, W, sh);
-  }
-  /* colour flash bars */
-  CX.globalCompositeOperation = 'lighter';
-  for (var b = 0; b < 2; b++) {
-    if (Math.random() > 0.55) {
-      CX.fillStyle = b ? 'rgba(0,243,255,0.16)' : 'rgba(255,0,120,0.16)';
-      CX.fillRect(0, Math.random() * H, W, (2 + Math.random() * 22) * DPR);
-    }
-  }
-  CX.globalCompositeOperation = 'source-over';
-}
-
-/* =========================================================
-   3D FILTERS (three.js)
-   ========================================================= */
-var R3 = null, SCENE = null, CAM3 = null, RIGS = {}, ok3d = true;
-var orb = { rx: 0.14, ry: -0.42, tx: 0.14, ty: -0.42, dist: 52, tdist: 46, drag: false, px: 0, py: 0, pinch: 0 };
-
-function gridFor(base) {   /* keep mobile grids smaller */
-  var f = (isMobile ? 0.65 : 1) / S.dens;
-  var gx = Math.max(12, Math.round(base * f));
-  var gy = Math.max(9, Math.round(gx * 0.72));
-  return { gx: gx, gy: gy };
-}
-
-function init3D() {
-  if (R3) return true;
-  if (!window.THREE) { ok3d = false; return false; }
-  try {
-    R3 = new THREE.WebGLRenderer({ canvas: GL, antialias: !isMobile, alpha: false });
-  } catch (e) { ok3d = false; return false; }
-  R3.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
-  R3.setSize(innerWidth, innerHeight, false);
-
-  SCENE = new THREE.Scene();
-  SCENE.background = new THREE.Color(0x02040c);
-  SCENE.fog = new THREE.FogExp2(0x02040c, 0.012);
-
-  CAM3 = new THREE.PerspectiveCamera(52, innerWidth / innerHeight, 0.1, 600);
-  CAM3.position.set(0, 0, orb.dist);
-
-  SCENE.add(new THREE.AmbientLight(0x6688aa, 0.75));
-  var key = new THREE.DirectionalLight(0xffffff, 0.95); key.position.set(-20, 24, 34); SCENE.add(key);
-  var rim = new THREE.PointLight(0x00f3ff, 1.4, 160); rim.position.set(26, -14, 26); SCENE.add(rim);
-  var rim2 = new THREE.PointLight(0x00ff88, 0.9, 160); rim2.position.set(-30, 18, -10); SCENE.add(rim2);
-
-  /* backdrop starfield, shared by all 3d modes */
-  var sn = 900, sp = new Float32Array(sn * 3);
-  for (var i = 0; i < sn; i++) {
-    var r = 120 + Math.random() * 220, a = Math.random() * 6.2832, b = Math.acos(2 * Math.random() - 1);
-    sp[i*3]   = r * Math.sin(b) * Math.cos(a);
-    sp[i*3+1] = r * Math.sin(b) * Math.sin(a);
-    sp[i*3+2] = r * Math.cos(b);
-  }
-  var sg = new THREE.BufferGeometry();
-  sg.setAttribute('position', new THREE.BufferAttribute(sp, 3));
-  SCENE.add(new THREE.Points(sg, new THREE.PointsMaterial({ color: 0x2f6f9a, size: 1.1, sizeAttenuation: true })));
-
-  /* faint floor grid */
-  var grid = new THREE.GridHelper(160, 40, 0x00f3ff, 0x0b3a55);
-  grid.material.transparent = true; grid.material.opacity = 0.16;
-  grid.position.y = -22;
-  SCENE.add(grid);
-
-  buildVoxels(); buildCloud(); buildHolo();
-  bindOrbit();
-  return true;
-}
-
-/* the cell-size slider changes the 3d grid resolution too, so the rigs get
-   thrown away and rebuilt (debounced — 'input' fires on every pixel dragged) */
-function rebuild3D() {
-  if (!R3) return;
-  ['voxels', 'cloud', 'holo'].forEach(function (k) {
-    var rig = RIGS[k];
-    if (!rig) return;
-    var root = rig.root;
-    SCENE.remove(root);
-    root.traverse(function (o) {
-      if (o.geometry) o.geometry.dispose();
-      if (o.material) { [].concat(o.material).forEach(function (mm) { mm.dispose(); }); }
-    });
-  });
-  buildVoxels(); buildCloud(); buildHolo();
-}
-
-/* ---- voxel wall ---------------------------------------------------- */
-var voxDummy = null;
-function buildVoxels() {
-  var g = gridFor(isMobile ? 64 : 76);
-  var geo = new THREE.BoxGeometry(1, 1, 1);
-  /* per-instance colours only reach the shader when USE_COLOR is compiled in,
-     which needs vertexColors *and* a base colour attribute on the geometry */
-  var white = new Float32Array(geo.attributes.position.count * 3).fill(1);
-  geo.setAttribute('color', new THREE.BufferAttribute(white, 3));
-  var mat = new THREE.MeshLambertMaterial({ vertexColors: true });
-  var mesh = new THREE.InstancedMesh(geo, mat, g.gx * g.gy);
-  mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-  if (mesh.setColorAt) mesh.setColorAt(0, new THREE.Color(0xffffff));
-  mesh.visible = false;
-  SCENE.add(mesh);
-  voxDummy = new THREE.Object3D();
-  RIGS.voxels = { root: mesh, mesh: mesh, g: g, spanX: 52 };
-}
-function updVoxels(t) {
-  var rig = RIGS.voxels, g = rig.g, m = rig.mesh;
-  var d = grab(g.gx, g.gy);
-  var cw = rig.spanX / g.gx, ch = cw, i = 0;
-  var col = new THREE.Color();
-  for (var y = 0; y < g.gy; y++) {
-    for (var x = 0; x < g.gx; x++, i++) {
-      var q = i * 4, r = d[q], gg = d[q + 1], b = d[q + 2];
-      var l = (r * 0.299 + gg * 0.587 + b * 0.114) / 255;
-      var dz = 0.4 + Math.pow(l, 1.4) * 22 * S.amp;
-      voxDummy.position.set((x - g.gx / 2 + 0.5) * cw, (g.gy / 2 - y - 0.5) * ch, dz / 2 - 6);
-      voxDummy.scale.set(cw * 0.88, ch * 0.88, dz);
-      voxDummy.updateMatrix();
-      m.setMatrixAt(i, voxDummy.matrix);
-      if (m.setColorAt) {
-        if (S.color) col.setRGB((r / 255) * (r / 255), (gg / 255) * (gg / 255), (b / 255) * (b / 255));
-        else col.setRGB(l * l * 0.1, l * l, l * l * 0.7);
-        m.setColorAt(i, col);
-      }
-    }
-  }
-  m.instanceMatrix.needsUpdate = true;
-  if (m.instanceColor) m.instanceColor.needsUpdate = true;
-  m.rotation.y = orb.ry + Math.sin(t / 4200) * 0.12;
-  m.rotation.x = orb.rx + Math.cos(t / 5600) * 0.06;
-}
-
-/* ---- point cloud --------------------------------------------------- */
-function dotTexture() {
-  var c = document.createElement('canvas'); c.width = c.height = 64;
-  var x = c.getContext('2d');
-  var gr = x.createRadialGradient(32, 32, 0, 32, 32, 32);
-  gr.addColorStop(0, 'rgba(255,255,255,1)');
-  gr.addColorStop(0.35, 'rgba(255,255,255,0.7)');
-  gr.addColorStop(1, 'rgba(255,255,255,0)');
-  x.fillStyle = gr; x.fillRect(0, 0, 64, 64);
-  return new THREE.CanvasTexture(c);
-}
-function buildCloud() {
-  var g = gridFor(isMobile ? 110 : 165);
-  var n = g.gx * g.gy;
-  var pos = new Float32Array(n * 3), col = new Float32Array(n * 3);
-  var geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
-  var mat = new THREE.PointsMaterial({
-    size: (isMobile ? 0.6 : 0.45) * (1 + S.dens * 0.3), vertexColors: true, map: dotTexture(),
-    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true
-  });
-  var pts = new THREE.Points(geo, mat);
-  pts.visible = false;
-  SCENE.add(pts);
-  RIGS.cloud = { root: pts, pts: pts, g: g, spanX: 54 };
-}
-function updCloud(t) {
-  var rig = RIGS.cloud, g = rig.g, pts = rig.pts;
-  var d = grab(g.gx, g.gy);
-  var pos = pts.geometry.attributes.position.array;
-  var col = pts.geometry.attributes.color.array;
-  var cw = rig.spanX / g.gx, i = 0;
-  for (var y = 0; y < g.gy; y++) {
-    for (var x = 0; x < g.gx; x++, i++) {
-      var q = i * 4, r = d[q] / 255, gg = d[q + 1] / 255, b = d[q + 2] / 255;
-      var l = r * 0.299 + gg * 0.587 + b * 0.114;
-      pos[i*3]     = (x - g.gx / 2 + 0.5) * cw;
-      pos[i*3 + 1] = (g.gy / 2 - y - 0.5) * cw;
-      pos[i*3 + 2] = (Math.pow(l, 1.6) - 0.25) * 34 * S.amp + Math.sin(t / 900 + x * 0.12) * 0.6;
-      if (S.color) {
-        col[i*3]     = r * (0.5 + l);
-        col[i*3 + 1] = gg * (0.5 + l);
-        col[i*3 + 2] = b * (0.5 + l) + 0.12;
-      } else {
-        col[i*3] = l * 0.12; col[i*3 + 1] = l * 1.2; col[i*3 + 2] = l * 0.85;
-      }
-    }
-  }
-  pts.geometry.attributes.position.needsUpdate = true;
-  pts.geometry.attributes.color.needsUpdate = true;
-  pts.rotation.y = orb.ry + Math.sin(t / 3800) * 0.28;
-  pts.rotation.x = orb.rx + Math.cos(t / 5200) * 0.1;
-}
-
-/* ---- hologram (wireframe relief) ----------------------------------- */
-function buildHolo() {
-  var g = gridFor(isMobile ? 74 : 104);
-  var spanX = 52, spanY = spanX * (g.gy / g.gx);
-  var geo = new THREE.PlaneGeometry(spanX, spanY, g.gx - 1, g.gy - 1);
-  var mat = new THREE.MeshBasicMaterial({
-    color: 0x00f3ff, wireframe: true, transparent: true, opacity: 0.55,
-    blending: THREE.AdditiveBlending, depthWrite: false
-  });
-  var mesh = new THREE.Mesh(geo, mat);
-
-  var pmat = new THREE.PointsMaterial({
-    size: 0.34, vertexColors: true, map: dotTexture(), transparent: true,
-    depthWrite: false, blending: THREE.AdditiveBlending
-  });
-  var pgeo = new THREE.BufferGeometry();
-  var n = g.gx * g.gy;
-  pgeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(geo.attributes.position.array), 3));
-  pgeo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
-  var pts = new THREE.Points(pgeo, pmat);
-
-  var grp = new THREE.Group();
-  grp.add(mesh); grp.add(pts);
-  grp.visible = false;
-  SCENE.add(grp);
-  RIGS.holo = { root: grp, grp: grp, mesh: mesh, pts: pts, g: g };
-}
-function updHolo(t) {
-  var rig = RIGS.holo, g = rig.g;
-  var d = grab(g.gx, g.gy);
-  var mp = rig.mesh.geometry.attributes.position.array;
-  var pp = rig.pts.geometry.attributes.position.array;
-  var pc = rig.pts.geometry.attributes.color.array;
-  var n = g.gx * g.gy;
-  for (var i = 0; i < n; i++) {
-    var q = i * 4, r = d[q] / 255, gg = d[q + 1] / 255, b = d[q + 2] / 255;
-    var l = r * 0.299 + gg * 0.587 + b * 0.114;
-    var z = (Math.pow(l, 1.5) - 0.3) * 22 * S.amp;
-    mp[i*3 + 2] = z;
-    pp[i*3]     = mp[i*3];
-    pp[i*3 + 1] = mp[i*3 + 1];
-    pp[i*3 + 2] = z;
-    if (S.color) { pc[i*3] = r * 1.1; pc[i*3+1] = gg * 1.1; pc[i*3+2] = b * 1.1; }
-    else { pc[i*3] = l * 0.15; pc[i*3+1] = l * 1.15; pc[i*3+2] = l * 0.9; }
-  }
-  rig.mesh.geometry.attributes.position.needsUpdate = true;
-  rig.pts.geometry.attributes.position.needsUpdate = true;
-  rig.pts.geometry.attributes.color.needsUpdate = true;
-  rig.mesh.material.color.setHex(S.color ? 0x00f3ff : 0x00ff88);
-  rig.grp.rotation.y = orb.ry + Math.sin(t / 3400) * 0.34;
-  rig.grp.rotation.x = orb.rx - 0.18 + Math.cos(t / 4800) * 0.08;
-}
-
-/* ---- orbit input ---------------------------------------------------- */
-function bindOrbit() {
-  function down(e) {
-    orb.drag = true;
-    var p = e.touches ? e.touches[0] : e;
-    orb.px = p.clientX; orb.py = p.clientY;
-    if (e.touches && e.touches.length === 2) orb.pinch = pinchDist(e);
-  }
-  function move(e) {
-    if (e.touches && e.touches.length === 2) {
-      var dnew = pinchDist(e);
-      if (orb.pinch) orb.tdist = clamp(orb.tdist * (orb.pinch / dnew), 16, 130);
-      orb.pinch = dnew;
-      e.preventDefault();
-      return;
-    }
-    if (!orb.drag) return;
-    var p = e.touches ? e.touches[0] : e;
-    orb.ty += (p.clientX - orb.px) * 0.006;
-    orb.tx += (p.clientY - orb.py) * 0.005;
-    orb.tx = clamp(orb.tx, -1.1, 1.1);
-    orb.px = p.clientX; orb.py = p.clientY;
-    if (e.touches) e.preventDefault();
-  }
-  function up() { orb.drag = false; orb.pinch = 0; }
-  function pinchDist(e) {
-    var a = e.touches[0], b = e.touches[1];
-    return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
-  }
-  GL.addEventListener('mousedown', down);
-  addEventListener('mousemove', move);
-  addEventListener('mouseup', up);
-  GL.addEventListener('touchstart', down, { passive: true });
-  GL.addEventListener('touchmove', move, { passive: false });
-  addEventListener('touchend', up);
-  GL.addEventListener('wheel', function (e) {
-    orb.tdist = clamp(orb.tdist + e.deltaY * 0.05, 16, 130);
-    e.preventDefault();
-  }, { passive: false });
-}
-function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
-
-function draw3D(t) {
-  if (!init3D()) { toast('3d unavailable — webgl blocked'); pick('ascii'); return; }
-  orb.rx += (orb.tx - orb.rx) * 0.08;
-  orb.ry += (orb.ty - orb.ry) * 0.08;
-  orb.dist += (orb.tdist - orb.dist) * 0.08;
-  CAM3.position.z = orb.dist;
-  CAM3.lookAt(0, 0, 0);
-
-  RIGS.voxels.mesh.visible = (S.filter === 'voxels');
-  RIGS.cloud.pts.visible   = (S.filter === 'cloud');
-  RIGS.holo.grp.visible    = (S.filter === 'holo');
-
-  if (S.filter === 'voxels') updVoxels(t);
-  else if (S.filter === 'cloud') updCloud(t);
-  else updHolo(t);
-
-  R3.render(SCENE, CAM3);
-}
-
-/* =========================================================
-   Main loop
-   ========================================================= */
-var frames = 0, fpsMark = performance.now();
-function loop() {
-  requestAnimationFrame(loop);
-  if (!S.live || V.readyState < 2) return;
-
-  var t = performance.now() - t0;
-  var is3d = kindOf(S.filter) === '3d';
-  FX.style.display = is3d ? 'none' : 'block';
-  GL.style.display = is3d ? 'block' : 'none';
-
-  try {
-    if (is3d) draw3D(t);
-    else {
-      switch (S.filter) {
-        case 'ascii':    drawAscii(); break;
-        case 'matrix':   drawMatrix(t); break;
-        case 'blocks':   drawBlocks(); break;
-        case 'edges':    drawEdges(); break;
-        case 'thermal':  drawThermal(); break;
-        case 'halftone': drawHalftone(); break;
-        case 'pixel':    drawPixel(); break;
-        case 'echo':     drawEcho(t); break;
-        case 'glitch':   drawGlitch(t); break;
-      }
-    }
-  } catch (e) { /* a dropped frame is not worth killing the loop over */ }
-
-  if (wantShot) { wantShot = false; saveShot(is3d); }
-
-  frames++;
-  var now = performance.now();
-  if (now - fpsMark > 500) {
-    document.getElementById('fps').textContent = Math.round(frames * 1000 / (now - fpsMark));
-    frames = 0; fpsMark = now;
-  }
-}
-requestAnimationFrame(loop);
-
-function kindOf(id) {
-  for (var i = 0; i < FILTERS.length; i++) if (FILTERS[i].id === id) return FILTERS[i].kind;
-  return '2d';
-}
-
-/* =========================================================
-   Camera
-   ========================================================= */
-function start() {
-  errBox.textContent = '';
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    errBox.innerHTML = 'This browser has no camera API.' +
-      (location.protocol === 'http:' && location.hostname !== 'localhost'
-        ? '<br>Camera access needs <b>https</b> — try the https:// version of this page.' : '');
-    return;
-  }
-  document.getElementById('go').textContent = 'starting…';
-  navigator.mediaDevices.getUserMedia({
-    video: { facingMode: S.facing, width: { ideal: 1280 }, height: { ideal: 720 } },
-    audio: false
-  }).then(function (st) {
-    if (stream) stream.getTracks().forEach(function (tr) { tr.stop(); });
-    stream = st;
-    V.srcObject = st;
-    return V.play();
-  }).then(function () {
-    S.live = true;
-    overlay.classList.add('gone');
-    resize();
-    toast(isTouch ? 'tap a filter · drag in 3d' : 'keys 1-9 · h hides the ui');
-  }).catch(function (e) {
-    document.getElementById('go').textContent = 'Enable camera';
-    var msg = 'Could not open the camera.';
-    if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) {
-      msg = 'Camera permission was blocked. Allow it in the address bar / site settings, then hit the button again.';
-    } else if (e && e.name === 'NotFoundError') {
-      msg = 'No camera found on this device.';
-    } else if (e && e.name === 'NotReadableError') {
-      msg = 'The camera is busy — close other apps or tabs using it and retry.';
-    } else if (e) { msg += ' (' + e.name + ')'; }
-    errBox.textContent = msg;
-  });
-}
-
-function flip() {
-  if (!S.live) return;
-  S.facing = (S.facing === 'user') ? 'environment' : 'user';
-  S.mirror = (S.facing === 'user');
-  syncToggles();
-  navigator.mediaDevices.getUserMedia({
-    video: { facingMode: { ideal: S.facing }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: false
-  }).then(function (st) {
-    if (stream) stream.getTracks().forEach(function (tr) { tr.stop(); });
-    stream = st; V.srcObject = st; V.play();
-    toast(S.facing === 'user' ? 'front camera' : 'rear camera');
-  }).catch(function () { toast('only one camera here'); });
-}
-
-/* =========================================================
-   Snapshot
-   ========================================================= */
-function saveShot(is3d) {
-  var src = is3d ? GL : FX;
-  var out = document.createElement('canvas');
-  out.width = src.width; out.height = src.height;
-  var o = out.getContext('2d');
-  o.drawImage(src, 0, 0);
-  /* small signature so shared shots point back home */
-  var pad = Math.round(out.width * 0.018);
-  o.font = '700 ' + Math.max(11, Math.round(out.width * 0.014)) + 'px ' + '"SFMono-Regular", Menlo, monospace';
-  o.textAlign = 'right'; o.textBaseline = 'bottom';
-  o.fillStyle = 'rgba(0,0,0,0.45)';
-  o.fillText('camfx · heyabdel.com', out.width - pad + 1, out.height - pad + 1);
-  o.fillStyle = 'rgba(0,243,255,0.85)';
-  o.fillText('camfx · heyabdel.com', out.width - pad, out.height - pad);
-
-  out.toBlob(function (blob) {
-    if (!blob) { toast('snapshot failed'); return; }
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'camfx-' + S.filter + '-' + Date.now() + '.png';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
-  }, 'image/png');
-
-  var f = document.getElementById('flash');
-  f.classList.remove('on'); void f.offsetWidth; f.classList.add('on');
-  toast('saved');
-}
-
-/* =========================================================
-   UI wiring
-   ========================================================= */
-var chips = document.getElementById('chips');
-FILTERS.forEach(function (f, i) {
-  var b = document.createElement('button');
-  b.className = 'chip' + (f.id === S.filter ? ' on' : '');
-  b.dataset.id = f.id;
-  b.dataset.kind = f.kind;
-  b.innerHTML = (i < 10 ? '<span class="k">' + ((i + 1) % 10) + '</span>' : '') + f.name;
-  b.addEventListener('click', function () { pick(f.id); });
-  chips.appendChild(b);
-});
-
-function pick(id) {
-  S.filter = id;
-  [].forEach.call(chips.children, function (c) { c.classList.toggle('on', c.dataset.id === id); });
-  document.getElementById('mode').textContent = id;
-  var el = chips.querySelector('.chip.on');
-  if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
-  if (kindOf(id) === '3d' && !init3D()) { toast('webgl unavailable'); }
-}
-
-function toast(msg) {
-  toastEl.textContent = msg;
-  toastEl.classList.add('show');
-  clearTimeout(toast._t);
-  toast._t = setTimeout(function () { toastEl.classList.remove('show'); }, 1500);
-}
-
-document.getElementById('go').addEventListener('click', start);
-document.getElementById('bShot').addEventListener('click', function () { wantShot = true; });
-document.getElementById('bFlip').addEventListener('click', flip);
-document.getElementById('bSet').addEventListener('click', function () {
-  var s = document.getElementById('settings');
-  s.classList.toggle('open');
-  this.classList.toggle('on', s.classList.contains('open'));
-});
-document.getElementById('bHide').addEventListener('click', hideUI);
-document.getElementById('bFull').addEventListener('click', function () {
-  if (!document.fullscreenElement) {
-    (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen || function(){}).call(document.documentElement);
-  } else { document.exitFullscreen(); }
-});
-
-function hideUI() {
-  S.hideUI = true;
-  document.body.classList.add('hide-ui');
-  toast(isTouch ? 'tap anywhere for the ui' : 'press h for the ui');
-}
-function showUI() { S.hideUI = false; document.body.classList.remove('hide-ui'); }
-
-/* tapping the stage brings the interface back */
-document.getElementById('stage').addEventListener('click', function () { if (S.hideUI) showUI(); });
-
-/* sliders + toggles */
-var densEl = document.getElementById('dens'), ampEl = document.getElementById('amp');
-densEl.value = S.dens;
-document.getElementById('densVal').textContent = (+S.dens).toFixed(1);
-var densTimer = 0;
-densEl.addEventListener('input', function () {
-  S.dens = +this.value;
-  document.getElementById('densVal').textContent = S.dens.toFixed(1);
-  rainHeads = null;
-  clearTimeout(densTimer);
-  densTimer = setTimeout(rebuild3D, 180);
-});
-ampEl.addEventListener('input', function () {
-  S.amp = +this.value;
-  document.getElementById('ampVal').textContent = S.amp.toFixed(1);
-});
-
-function toggle(btnId, key, after) {
-  var b = document.getElementById(btnId);
-  b.addEventListener('click', function () {
-    S[key] = !S[key];
-    b.classList.toggle('on', S[key]);
-    if (after) after();
-  });
-}
-toggle('tColor', 'color');
-toggle('tMirror', 'mirror');
-toggle('tGlow', 'glow');
-toggle('tGrain', 'grain', function () { document.body.classList.toggle('clean', !S.grain); });
-function syncToggles() {
-  document.getElementById('tMirror').classList.toggle('on', S.mirror);
-}
-syncToggles();
-document.getElementById('tGlow').classList.toggle('on', S.glow);
-
-/* keyboard */
-addEventListener('keydown', function (e) {
-  if (e.metaKey || e.ctrlKey || e.altKey) return;
-  var k = e.key.toLowerCase();
-  if (k >= '0' && k <= '9') {
-    var idx = (k === '0') ? 9 : (+k - 1);
-    if (FILTERS[idx]) pick(FILTERS[idx].id);
-    return;
-  }
-  var cur = FILTERS.map(function (f) { return f.id; }).indexOf(S.filter);
-  if (k === 'arrowright') pick(FILTERS[(cur + 1) % FILTERS.length].id);
-  else if (k === 'arrowleft') pick(FILTERS[(cur - 1 + FILTERS.length) % FILTERS.length].id);
-  else if (k === 's') wantShot = true;
-  else if (k === 'c') flip();
-  else if (k === 'h') { S.hideUI ? showUI() : hideUI(); }
-  else if (k === 'f') document.getElementById('bFull').click();
-  else if (k === 'm') { S.mirror = !S.mirror; syncToggles(); }
-});
-
-/* pause the loop when the tab is hidden, resume cleanly after */
-document.addEventListener('visibilitychange', function () {
-  if (document.hidden) { S.live = false; }
-  else if (stream && stream.active) { S.live = true; V.play().catch(function(){}); }
-});
-
-resize();
-if (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
-  errBox.innerHTML = 'Heads up: browsers only hand out the camera over <b>https</b>.';
-}
-})();
-</script>
-
-<noscript>
-  <div style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#02040c;color:#00f3ff;font-family:monospace;text-align:center;padding:20px;z-index:99;">
-    CamFX needs JavaScript and a camera. <a href="index.html" style="color:#00ff88;">← back to the site</a>
-  </div>
-</noscript>
+
+    <br><br>
+
+    <noscript>
+        <hr>
+        <b>CamFX needs JavaScript.</b>
+    </noscript>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        (function () {
+            var V = document.getElementById('cam');
+            var FX = document.getElementById('fx');
+            var GL = document.getElementById('gl');
+            var CX = FX.getContext('2d');
+            var frameEl = document.querySelector('.frame');
+            var placeholder = document.getElementById('placeholder');
+            var errBox = document.getElementById('err');
+            var hint = document.getElementById('hint');
+            var bStart = document.getElementById('bStart');
+            var bStop = document.getElementById('bStop');
+            var bFlip = document.getElementById('bFlip');
+
+            var S = { filter: 'ascii', facing: 'user', mirror: true, live: false };
+            var W = 0, H = 0, DPR = 1, stream = null;
+
+            function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+
+            /* ---- sizing ------------------------------------------------ */
+            function resize() {
+                var r = frameEl.getBoundingClientRect();
+                if (!r.width || !r.height) return;
+                DPR = Math.min(window.devicePixelRatio || 1, 2);
+                W = Math.max(2, Math.round(r.width * DPR));
+                H = Math.max(2, Math.round(r.height * DPR));
+                FX.width = W; FX.height = H;
+                if (R3) {
+                    R3.setSize(r.width, r.height, false);
+                    CAM3.aspect = r.width / r.height;
+                    CAM3.updateProjectionMatrix();
+                }
+            }
+            window.addEventListener('resize', resize);
+            window.addEventListener('orientationchange', function () { setTimeout(resize, 250); });
+
+            /* ---- sampling ---------------------------------------------- */
+            var samp = document.createElement('canvas');
+            var SCX = samp.getContext('2d', { willReadFrequently: true });
+
+            /* source rect that "cover"-fits the video into a dw x dh target */
+            function cover(dw, dh) {
+                var vw = V.videoWidth || 640, vh = V.videoHeight || 480;
+                var k = Math.max(dw / vw, dh / vh);
+                var sw = dw / k, sh = dh / k;
+                return { sx: (vw - sw) / 2, sy: (vh - sh) / 2, sw: sw, sh: sh };
+            }
+
+            function paintVideo(ctx, dw, dh) {
+                var r = cover(dw, dh);
+                ctx.save();
+                if (S.mirror) { ctx.translate(dw, 0); ctx.scale(-1, 1); }
+                ctx.drawImage(V, r.sx, r.sy, r.sw, r.sh, 0, 0, dw, dh);
+                ctx.restore();
+            }
+
+            /* downsample the camera to a w x h grid and hand back the bytes */
+            function grab(w, h) {
+                if (samp.width !== w || samp.height !== h) { samp.width = w; samp.height = h; }
+                paintVideo(SCX, w, h);
+                return SCX.getImageData(0, 0, w, h).data;
+            }
+
+            var work = document.createElement('canvas');
+            var WCX = work.getContext('2d', { willReadFrequently: true });
+
+            /* ---- 1. ASCII (black characters on white) ------------------- */
+            var RAMP = '@%#*+=-:. ';   /* dark pixel -> heavy glyph, light -> space */
+
+            function drawAscii() {
+                var fs = Math.max(6, Math.round(9 * DPR));
+                CX.font = '700 ' + fs + 'px "SFMono-Regular", Menlo, Consolas, monospace';
+                var cw = CX.measureText('M').width || fs * 0.6;
+                var cols = Math.max(1, Math.floor(W / cw));
+                var rows = Math.max(1, Math.floor(H / fs));
+                var d = grab(cols, rows), last = RAMP.length - 1;
+
+                CX.fillStyle = '#ffffff';
+                CX.fillRect(0, 0, W, H);
+                CX.fillStyle = '#000000';
+                CX.textBaseline = 'top';
+
+                for (var y = 0; y < rows; y++) {
+                    var line = '';
+                    for (var x = 0; x < cols; x++) {
+                        var i = (y * cols + x) * 4;
+                        var l = (d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114) / 255;
+                        line += RAMP[Math.round(l * last)];
+                    }
+                    CX.fillText(line, 0, y * fs);
+                }
+            }
+
+            /* ---- 2. EDGES (Sobel, black lines on white) ----------------- */
+            function drawEdges() {
+                var k = Math.min(1, 520 / W);
+                var w = Math.max(3, Math.round(W * k)), h = Math.max(3, Math.round(H * k));
+                if (work.width !== w || work.height !== h) { work.width = w; work.height = h; }
+                paintVideo(WCX, w, h);
+
+                var img = WCX.getImageData(0, 0, w, h), p = img.data;
+                var n = w * h, gray = new Float32Array(n);
+                for (var i = 0; i < n; i++) {
+                    gray[i] = (p[i * 4] * 0.299 + p[i * 4 + 1] * 0.587 + p[i * 4 + 2] * 0.114) / 255;
+                }
+
+                for (var y = 0; y < h; y++) {
+                    for (var x = 0; x < w; x++) {
+                        var o = y * w + x, q = o * 4, v;
+                        if (x === 0 || y === 0 || x === w - 1 || y === h - 1) {
+                            v = 255;
+                        } else {
+                            var tl = gray[o - w - 1], tc = gray[o - w], tr = gray[o - w + 1];
+                            var ml = gray[o - 1], mr = gray[o + 1];
+                            var bl = gray[o + w - 1], bc = gray[o + w], br = gray[o + w + 1];
+                            var gx = (tr + 2 * mr + br) - (tl + 2 * ml + bl);
+                            var gy = (bl + 2 * bc + br) - (tl + 2 * tc + tr);
+                            var mag = Math.min(1, Math.sqrt(gx * gx + gy * gy) * 2.2);
+                            v = 255 * (1 - mag);
+                        }
+                        p[q] = p[q + 1] = p[q + 2] = v; p[q + 3] = 255;
+                    }
+                }
+                WCX.putImageData(img, 0, 0);
+                CX.fillStyle = '#ffffff';
+                CX.fillRect(0, 0, W, H);
+                CX.drawImage(work, 0, 0, w, h, 0, 0, W, H);
+            }
+
+            /* ---- 3. 3D POINT CLOUD (grayscale points) ------------------- */
+            var R3 = null, SCENE = null, CAM3 = null, CLOUD = null, GRID = null, has3d = true;
+            var orb = { rx: 0.1, ry: 0, tx: 0.1, ty: 0, dist: 46, tdist: 46, drag: false, px: 0, py: 0, pinch: 0 };
+
+            function init3D() {
+                if (R3) return true;
+                if (!has3d) return false;
+                if (!window.THREE) { has3d = false; return false; }
+                try {
+                    R3 = new THREE.WebGLRenderer({ canvas: GL, antialias: true });
+                } catch (e) { has3d = false; return false; }
+
+                var r = frameEl.getBoundingClientRect();
+                R3.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+                R3.setSize(r.width, r.height, false);
+
+                SCENE = new THREE.Scene();
+                SCENE.background = new THREE.Color(0x000000);
+                CAM3 = new THREE.PerspectiveCamera(52, (r.width || 4) / (r.height || 3), 0.1, 400);
+                CAM3.position.z = orb.dist;
+
+                GRID = { gx: 128, gy: 96 };
+                var n = GRID.gx * GRID.gy;
+                var geo = new THREE.BufferGeometry();
+                geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+                geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+                CLOUD = new THREE.Points(geo, new THREE.PointsMaterial({
+                    size: 0.32, vertexColors: true, sizeAttenuation: true
+                }));
+                SCENE.add(CLOUD);
+                bindOrbit();
+                return true;
+            }
+
+            function drawCloud() {
+                if (!init3D()) { pick('ascii'); showErr('WebGL is not available here, so the 3D view is off.'); return; }
+                var d = grab(GRID.gx, GRID.gy);
+                var pos = CLOUD.geometry.attributes.position.array;
+                var col = CLOUD.geometry.attributes.color.array;
+                var span = 54, cw = span / GRID.gx, i = 0;
+                for (var y = 0; y < GRID.gy; y++) {
+                    for (var x = 0; x < GRID.gx; x++, i++) {
+                        var q = i * 4;
+                        var l = (d[q] * 0.299 + d[q + 1] * 0.587 + d[q + 2] * 0.114) / 255;
+                        pos[i * 3] = (x - GRID.gx / 2 + 0.5) * cw;
+                        pos[i * 3 + 1] = (GRID.gy / 2 - y - 0.5) * cw;
+                        pos[i * 3 + 2] = (Math.pow(l, 1.6) - 0.25) * 34;   /* brightness -> depth */
+                        col[i * 3] = col[i * 3 + 1] = col[i * 3 + 2] = 0.25 + l * 0.75;
+                    }
+                }
+                CLOUD.geometry.attributes.position.needsUpdate = true;
+                CLOUD.geometry.attributes.color.needsUpdate = true;
+
+                orb.rx += (orb.tx - orb.rx) * 0.1;
+                orb.ry += (orb.ty - orb.ry) * 0.1;
+                orb.dist += (orb.tdist - orb.dist) * 0.1;
+                CLOUD.rotation.x = orb.rx;
+                CLOUD.rotation.y = orb.ry;
+                CAM3.position.z = orb.dist;
+                CAM3.lookAt(0, 0, 0);
+                R3.render(SCENE, CAM3);
+            }
+
+            function bindOrbit() {
+                function pinchDist(e) {
+                    var a = e.touches[0], b = e.touches[1];
+                    return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+                }
+                function down(e) {
+                    var p = e.touches ? e.touches[0] : e;
+                    orb.drag = true; orb.px = p.clientX; orb.py = p.clientY;
+                    if (e.touches && e.touches.length === 2) orb.pinch = pinchDist(e);
+                }
+                function move(e) {
+                    if (e.touches && e.touches.length === 2) {
+                        var dn = pinchDist(e);
+                        if (orb.pinch) orb.tdist = clamp(orb.tdist * (orb.pinch / dn), 16, 120);
+                        orb.pinch = dn;
+                        e.preventDefault();
+                        return;
+                    }
+                    if (!orb.drag) return;
+                    var p = e.touches ? e.touches[0] : e;
+                    orb.ty += (p.clientX - orb.px) * 0.006;
+                    orb.tx += (p.clientY - orb.py) * 0.005;
+                    orb.tx = clamp(orb.tx, -1.1, 1.1);
+                    orb.px = p.clientX; orb.py = p.clientY;
+                    if (e.touches) e.preventDefault();
+                }
+                function up() { orb.drag = false; orb.pinch = 0; }
+                GL.addEventListener('mousedown', down);
+                window.addEventListener('mousemove', move);
+                window.addEventListener('mouseup', up);
+                GL.addEventListener('touchstart', down, { passive: true });
+                GL.addEventListener('touchmove', move, { passive: false });
+                window.addEventListener('touchend', up);
+                GL.addEventListener('wheel', function (e) {
+                    orb.tdist = clamp(orb.tdist + e.deltaY * 0.05, 16, 120);
+                    e.preventDefault();
+                }, { passive: false });
+            }
+
+            /* ---- main loop --------------------------------------------- */
+            function loop() {
+                requestAnimationFrame(loop);
+                if (!S.live || V.readyState < 2 || !W) return;
+                var is3d = (S.filter === 'cloud');
+                FX.style.display = is3d ? 'none' : 'block';
+                GL.style.display = is3d ? 'block' : 'none';
+                try {
+                    if (is3d) drawCloud();
+                    else if (S.filter === 'edges') drawEdges();
+                    else drawAscii();
+                } catch (e) { /* one dropped frame shouldn't kill the loop */ }
+            }
+            requestAnimationFrame(loop);
+
+            /* ---- camera ------------------------------------------------ */
+            function showErr(msg) { errBox.textContent = msg || ''; }
+
+            function openCamera(facing) {
+                return navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: false
+                }).then(function (st) {
+                    if (stream) stream.getTracks().forEach(function (tr) { tr.stop(); });
+                    stream = st;
+                    V.srcObject = st;
+                    return V.play();
+                });
+            }
+
+            function start() {
+                showErr('');
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showErr('This browser has no camera API.' +
+                        (location.protocol === 'http:' && location.hostname !== 'localhost'
+                            ? ' Camera access also needs https.' : ''));
+                    return;
+                }
+                bStart.disabled = true;
+                bStart.textContent = 'Starting...';
+                openCamera(S.facing).then(function () {
+                    S.live = true;
+                    placeholder.style.display = 'none';
+                    bStart.textContent = 'Start camera';
+                    bStop.disabled = false;
+                    bFlip.disabled = false;
+                    resize();
+                }).catch(function (e) {
+                    bStart.disabled = false;
+                    bStart.textContent = 'Start camera';
+                    var msg = 'Could not open the camera.';
+                    if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) {
+                        msg = 'Camera permission was blocked. Allow it in your browser, then try again.';
+                    } else if (e && e.name === 'NotFoundError') {
+                        msg = 'No camera found on this device.';
+                    } else if (e && e.name === 'NotReadableError') {
+                        msg = 'The camera is busy. Close other apps or tabs using it and try again.';
+                    } else if (e && e.name) { msg += ' (' + e.name + ')'; }
+                    showErr(msg);
+                });
+            }
+
+            function stop() {
+                S.live = false;
+                if (stream) { stream.getTracks().forEach(function (tr) { tr.stop(); }); stream = null; }
+                V.srcObject = null;
+                CX.clearRect(0, 0, W, H);
+                placeholder.textContent = 'The camera is off. Press "Start camera" below.';
+                placeholder.style.display = 'flex';
+                bStart.disabled = false;
+                bStop.disabled = true;
+                bFlip.disabled = true;
+            }
+
+            function flip() {
+                if (!S.live) return;
+                var next = (S.facing === 'user') ? 'environment' : 'user';
+                openCamera({ ideal: next }).then(function () {
+                    S.facing = next;
+                    S.mirror = (next === 'user');
+                }).catch(function () { showErr('Only one camera is available here.'); });
+            }
+
+            /* ---- wiring ------------------------------------------------ */
+            function pick(id) {
+                S.filter = id;
+                var r = document.querySelector('input[name="filter"][value="' + id + '"]');
+                if (r) r.checked = true;
+                hint.style.visibility = (id === 'cloud') ? 'visible' : 'hidden';
+            }
+
+            [].forEach.call(document.querySelectorAll('input[name="filter"]'), function (r) {
+                r.addEventListener('change', function () { showErr(''); pick(this.value); });
+            });
+
+            bStart.addEventListener('click', start);
+            bStop.addEventListener('click', stop);
+            bFlip.addEventListener('click', flip);
+
+            /* stop feeding the loop while the tab is hidden */
+            document.addEventListener('visibilitychange', function () {
+                if (document.hidden) { S.live = false; }
+                else if (stream && stream.active) { S.live = true; V.play().catch(function () { }); }
+            });
+
+            if (!window.THREE) {
+                document.getElementById('rCloud').disabled = true;
+            }
+            pick('ascii');
+            resize();
+            if (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+                showErr('Heads up: browsers only hand out the camera over https.');
+            }
+        })();
+    </script>
+
 </body>
+
 </html>
