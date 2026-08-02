@@ -6,86 +6,43 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
     <style>
-        /* ---- 1998-style animated CTA button (no GIFs, all CSS) ---- */
+        /* ---- plain call-to-action button: no animation, just visible ---- */
         .cta-zone {
-            margin: 26px auto 10px;
+            margin: 24px auto 10px;
             text-align: center;
         }
 
-        .cta-blink {
-            font-family: "Comic Sans MS", "Trebuchet MS", Verdana, sans-serif;
-            font-size: 13px;
+        .cta-new {
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 12px;
             font-weight: bold;
-            color: #ff0000;
-            letter-spacing: 2px;
+            color: #000080;
             margin-bottom: 8px;
-            animation: cta-blink 1.2s steps(1) infinite;
         }
 
-        /* animated rainbow frame */
-        .retro-btn {
+        .cta-btn {
             display: inline-block;
-            padding: 4px;
+            padding: 11px 24px;
             border: 2px outset #c0c0c0;
-            background: linear-gradient(90deg,
-                    #ff0000, #ff8a00, #ffee00, #00cc44,
-                    #00c3ff, #7a3cff, #ff00c8, #ff0000);
-            background-size: 400% 100%;
-            animation: cta-rainbow 3s linear infinite;
-            text-decoration: none;
-            box-shadow: 4px 4px 0 #808080;
-        }
-
-        .retro-btn:active {
-            border-style: inset;
-            box-shadow: 1px 1px 0 #808080;
-            transform: translate(3px, 3px);
-        }
-
-        /* the beveled "3D" plate */
-        .retro-btn-in {
-            display: block;
-            position: relative;
-            overflow: hidden;
-            padding: 14px 28px;
-            border-top: 3px solid #ffffff;
-            border-left: 3px solid #ffffff;
-            border-right: 3px solid #4a4a4a;
-            border-bottom: 3px solid #4a4a4a;
             background: #000080;
-            font-family: "Comic Sans MS", "Trebuchet MS", Verdana, sans-serif;
-            font-size: 19px;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 15px;
             font-weight: bold;
-            color: #ffff00;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            white-space: nowrap;
-            text-shadow: 1px 1px 0 #000000;
+            color: #ffffff;
+            text-decoration: none;
         }
 
-        .retro-btn:hover .retro-btn-in {
-            background: #0000c0;
+        .cta-btn:link,
+        .cta-btn:visited {
             color: #ffffff;
         }
 
-        /* sweeping glare, like the old shiny web-button GIFs */
-        .retro-btn-in::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -60%;
-            width: 45%;
-            height: 100%;
-            background: linear-gradient(100deg,
-                    rgba(255, 255, 255, 0) 0%,
-                    rgba(255, 255, 255, 0.55) 50%,
-                    rgba(255, 255, 255, 0) 100%);
-            animation: cta-shine 2.6s linear infinite;
+        .cta-btn:hover {
+            background: #0000b3;
         }
 
-        .retro-btn-in .cta-arrow {
-            color: #00ff00;
-            animation: cta-blink 1.2s steps(1) infinite;
+        .cta-btn:active {
+            border-style: inset;
         }
 
         .cta-sub {
@@ -95,36 +52,10 @@
             margin-top: 10px;
         }
 
-        @keyframes cta-rainbow {
-            from { background-position: 0 0; }
-            to   { background-position: 400% 0; }
-        }
-
-        @keyframes cta-blink {
-            0%, 64%   { opacity: 1; }
-            65%, 100% { opacity: 0; }
-        }
-
-        @keyframes cta-shine {
-            0%   { left: -60%; }
-            60%  { left: 130%; }
-            100% { left: 130%; }
-        }
-
         @media (max-width: 480px) {
-            .retro-btn-in {
+            .cta-btn {
                 font-size: 13px;
-                padding: 10px 12px;
-                white-space: normal;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .cta-blink,
-            .retro-btn,
-            .retro-btn-in::after,
-            .retro-btn-in .cta-arrow {
-                animation: none;
+                padding: 10px 14px;
             }
         }
     </style>
@@ -189,15 +120,9 @@
     <hr>
 
     <div class="cta-zone">
-        <div class="cta-blink">*** NEW! ***</div>
+        <div class="cta-new">New:</div>
 
-        <a class="retro-btn" href="rover.html">
-            <span class="retro-btn-in">
-                <span class="cta-arrow">&#9658;&#9658;</span>
-                &nbsp;Drive my portfolio&nbsp;
-                <span class="cta-arrow">&#9668;&#9668;</span>
-            </span>
-        </a>
+        <a class="cta-btn" href="rover.html">&#9658; Drive my portfolio</a>
 
         <div class="cta-sub">
             <b>ROVER RUN</b> &#183; the playable 3D version of this page &#183;
