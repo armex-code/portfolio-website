@@ -5,9 +5,33 @@
     <title>Abdel Elarfaoui Homepage</title>
 
     <style>
+        /* the whole page is meant to fit one screen, so the spacing is tight
+           and the rules do the separating instead of blank lines */
+        body {
+            margin: 8px 10px;
+        }
+
+        hr {
+            margin: 7px 0;
+        }
+
+        ul,
+        ol {
+            margin: 3px 0 3px 22px;
+            padding: 0;
+        }
+
+        li {
+            margin: 1px 0;
+        }
+
+        p {
+            margin: 3px 0;
+        }
+
         /* ---- plain call-to-action button: no animation, just visible ---- */
         .cta-zone {
-            margin: 24px auto 10px;
+            margin: 10px auto 6px;
             text-align: center;
         }
 
@@ -16,12 +40,12 @@
             font-size: 12px;
             font-weight: bold;
             color: #000080;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .cta-btn {
             display: inline-block;
-            padding: 11px 24px;
+            padding: 9px 22px;
             border: 2px outset #c0c0c0;
             background: #000080;
             font-family: Verdana, Arial, sans-serif;
@@ -48,17 +72,18 @@
             font-family: Verdana, Arial, sans-serif;
             font-size: 11px;
             color: #333333;
-            margin-top: 10px;
+            margin-top: 7px;
         }
 
         /* ---- plain profile links ---- */
         .links-zone {
             text-align: center;
+            margin-top: 6px;
         }
 
         .link-btn {
             display: inline-block;
-            padding: 7px 18px;
+            padding: 5px 16px;
             margin: 0 4px;
             border: 2px outset #c0c0c0;
             background: #e8e8e8;
@@ -81,10 +106,90 @@
             border-style: inset;
         }
 
-        @media (max-width: 480px) {
+        /* two columns on anything wide enough, which halves the page height */
+        .cols {
+            display: flex;
+            gap: 26px;
+            align-items: flex-start;
+        }
+
+        .cols>div {
+            flex: 1;
+            min-width: 0;
+        }
+
+        @media (max-width: 700px) {
+            .cols {
+                display: block;
+            }
+
+            .cols>div+div {
+                margin-top: 6px;
+            }
+        }
+
+        /* short or small screens: shave a little off everything */
+        @media (max-width: 480px), (max-height: 700px) {
+            body {
+                font-size: 14px;
+            }
+
             .cta-btn {
                 font-size: 13px;
-                padding: 10px 14px;
+                padding: 8px 16px;
+            }
+
+            .cta-sub {
+                font-size: 10px;
+            }
+        }
+
+        /* very small phones need one more notch to stay on one screen */
+        @media (max-width: 380px) {
+            body {
+                font-size: 12.5px;
+                margin: 5px 7px;
+            }
+
+            hr {
+                margin: 4px 0;
+            }
+
+            p {
+                margin: 2px 0;
+            }
+
+            ul,
+            ol {
+                margin-left: 18px;
+            }
+
+            .cta-zone {
+                margin: 6px auto 3px;
+            }
+
+            .cta-new {
+                font-size: 11px;
+                margin-bottom: 4px;
+            }
+
+            .cta-btn {
+                font-size: 12px;
+                padding: 7px 14px;
+            }
+
+            .cta-sub {
+                font-size: 9.5px;
+                margin-top: 5px;
+            }
+
+            .links-zone {
+                margin-top: 4px;
+            }
+
+            .link-btn {
+                font-size: 12px;
+                padding: 4px 12px;
             }
         }
     </style>
@@ -99,60 +204,61 @@
     <hr>
 
     <b>Hello, my name is Abderrahman (Abdel) Elarfaoui.</b>
-    <br><br>
-    I am a Computer Science student at Al Akhawayn University.
-    Basically, I like building and coding robots.
-    <br>
-    I'm looking for an internship in robotics starting from January 2027. Ping me if you are interested!
-    <br><br>
-    <hr>
-
-    <u>My current interests:</u>
-    <ul>
-        <li>Digital twins & Robot Simulations</li>
-        <li>Mixed Reality with Meta Quest</li>
-        <li>Reinforcement Learning applied to Robotics</li>
-        <li>Autonomous Vehicles (SLAM)</li>
-    </ul>
+    <p>
+        I am a Computer Science student at Al Akhawayn University.
+        Basically, I like building and coding robots.
+    </p>
+    <p>
+        I'm looking for an internship in robotics starting from January 2027. Ping me if you are
+        interested!
+    </p>
 
     <hr>
 
-    <u>Projects:</u>
-    <ol>
-        <li><a href="https://github.com/armex-code/quest-v5-teleop">Meta Quest to VEX V5 Teleoperation with Digital Twin</a></li>
-        <li>More coming soon...</li>
-    </ol>
+    <div class="cols">
+        <div>
+            <u>My current interests:</u>
+            <ul>
+                <li>Digital twins &amp; Robot Simulations</li>
+                <li>Mixed Reality with Meta Quest</li>
+                <li>Reinforcement Learning applied to Robotics</li>
+                <li>Autonomous Vehicles (SLAM)</li>
+            </ul>
+        </div>
+
+        <div>
+            <u>Projects:</u>
+            <ol>
+                <li><a href="https://github.com/armex-code/quest-v5-teleop">Meta Quest to VEX V5 Teleoperation with Digital Twin</a></li>
+                <li>More coming soon...</li>
+            </ol>
+        </div>
+    </div>
 
     <hr>
 
     <u>Experiments:</u>
     <ul>
         <li>
-            <a href="camera-fx.html">CamFX</a> : Your camera feed turned into live ASCII art,
-            edge detection or a real&#45;time 3D point cloud. Nothing is recorded, it all runs in
-            your browser. Works on the telephone too!
+            <a href="camera-fx.html">CamFX</a> : your camera as live ASCII art, edge detection or a
+            3D point cloud. Runs in your browser, nothing is recorded. Works on the telephone too!
         </li>
         <li>
-            <a href="retro-os.html">AbdelOS&trade;</a> : A replica of an old Windows desktop
-            running right in your browser! Working start menu, draggable windows, Notepad, Paint,
-            Minesweeper and more.
+            <a href="retro-os.html">AbdelOS&trade;</a> : a replica of an old Windows desktop in your
+            browser &#8212; start menu, draggable windows, Notepad, Paint, Minesweeper and more.
         </li>
-        
     </ul>
 
     <hr>
 
-    <i>If you want to contact me, you can send an electronic mail to:</i> <a
-        href="mailto:a.elarfaoui@aui.ma">a.elarfaoui@aui.ma</a>
-
-    <br><br>
+    <i>If you want to contact me, you can send an electronic mail to:</i>
+    <a href="mailto:a.elarfaoui@aui.ma">a.elarfaoui@aui.ma</a>
 
     <div class="links-zone">
         <a class="link-btn" href="https://github.com/armex-code">GitHub</a>
         <a class="link-btn" href="https://www.linkedin.com/in/ar-elarfaoui/">LinkedIn</a>
     </div>
 
-    <br>
     <hr>
 
     <div class="cta-zone">
@@ -161,14 +267,11 @@
         <a class="cta-btn" href="rover.html">&#9658; Drive my portfolio</a>
 
         <div class="cta-sub">
-            <b>ROVER RUN</b> &#183; the playable 3D version of this page &#183;
-            pilot a LiDAR rover, smash crates, unlock my r&eacute;sum&eacute;.
-            <br>
-            Keyboard or touch &#183; no install &#183; ~2 minutes.
+            <b>ROVER RUN</b> &#183; the playable 3D version of this page &#183; pilot a LiDAR rover,
+            smash crates, unlock my r&eacute;sum&eacute; &#183; keyboard or touch &#183; ~2 minutes.
         </div>
     </div>
 
-    <br>
     <p align="right"><small>Last updated: July 2026</small></p>
 
 </body>
