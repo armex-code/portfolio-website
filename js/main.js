@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next"
 /* ============================================================
    3D HERO — morphing iridescent blob + particle field
    Three.js (r128). Vertices displaced by layered trig "noise"
