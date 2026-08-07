@@ -1,5 +1,6 @@
 {
+  "private": true,
   "dependencies": {
-    "@vercel/analytics": "^2.0.1"
+    "@vercel/functions": "^2.0.0"
   }
 }
