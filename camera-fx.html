@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CamFX</title>
+    <meta name="description" content="CamFX: turn your camera into live ASCII art, edge detection or a 3D point cloud. Everything runs in your browser, nothing is recorded.">
+
+    <style>
+        /* keep this page as plain as the homepage: a few boxes, no theming.
+           everything is sized to fit one screen, so the "nothing is recorded"
+           note is always visible without scrolling. */
+        body {
+            margin: 8px;
+        }
+
+        hr {
+            margin: 8px 0;
+        }
+
+        /* the frame gives up whatever height the rest of the page needs:
+           270px covers the header, controls, note and links. */
+        .frame {
+            width: min(100%, 640px, (100dvh - 290px) * 4 / 3);
+            aspect-ratio: 4 / 3;
+            margin: 0 auto;
+            border: 2px inset #c0c0c0;
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .frame canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        #gl {
+            display: none;
+            touch-action: none;
+        }
+
+        #cam {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 16px;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 15px;
+            font-weight: bold;
+            color: #000000;
+        }
+
+        #placeholder span {
+            font-weight: normal;
+            font-size: 12px;
+            color: #555555;
+            margin-top: 6px;
+        }
+
+        .controls {
+            text-align: center;
+            margin: 8px auto 0;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 13px;
+        }
+
+        .controls label {
+            margin: 0 8px;
+            white-space: nowrap;
+        }
+
+        .controls button {
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 13px;
+            padding: 5px 12px;
+            margin: 6px 3px 0;
+        }
+
+        /* the one button people need to press first */
+        #bStart {
+            font-weight: bold;
+            padding: 7px 20px;
+        }
+
+        .note {
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 11px;
+            color: #555555;
+            text-align: center;
+            margin-top: 6px;
+        }
+
+        #err {
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 12px;
+            color: #aa0000;
+            text-align: center;
+            margin-top: 6px;
+        }
+
+        .link-btn {
+            display: inline-block;
+            padding: 5px 14px;
+            margin: 0 4px;
+            border: 2px outset #c0c0c0;
+            background: #e8e8e8;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 13px;
+            color: #000080;
+            text-decoration: none;
+        }
+
+        .link-btn:link,
+        .link-btn:visited {
+            color: #000080;
+        }
+
+        .link-btn:hover {
+            background: #d8d8d8;
+        }
+
+        .link-btn:active {
+            border-style: inset;
+        }
+
+        .disclaimer {
+            border: 1px solid #808080;
+            background: #f4f4f4;
+            padding: 7px 10px;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 12px;
+            text-align: center;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 8px;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+
+    <b>CamFX</b> &#8212; your camera as ASCII characters, edge detection or a 3D point cloud.
+
+    <hr>
+
+    <div class="frame">
+        <video id="cam" playsinline autoplay muted></video>
+        <canvas id="fx"></canvas>
+        <canvas id="gl"></canvas>
+        <div id="placeholder">
+            Click &#8220;Start camera&#8221; below to begin.
+            <span>Your browser will ask for camera permission.</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div>
+            <button id="bStart" type="button">&#9654; Start camera</button>
+            <button id="bStop" type="button" disabled>Stop camera</button>
+            <button id="bFlip" type="button" disabled>Switch camera</button>
+        </div>
+        <div style="margin-top:8px">
+            <label><input type="radio" name="filter" value="ascii" checked> ASCII</label>
+            <label><input type="radio" name="filter" value="edges"> Edges</label>
+            <label><input type="radio" name="filter" value="cloud" id="rCloud"> 3D point cloud</label>
+        </div>
+        <div class="note" id="hint">Drag inside the frame to rotate the point cloud.</div>
+        <div id="err"></div>
+    </div>
+
+    <hr>
+
+    <div class="disclaimer">
+        <b>Nothing is recorded.</b> Every frame is processed inside your own browser and thrown away
+        immediately &#8212; no upload, no server, no saving. Press &#8220;Stop camera&#8221; or close
+        the page to end it.
+    </div>
+
+    <div class="footer">
+        <a href="index.html">&#8592; back to the homepage</a>
+        &nbsp;
+        <a class="link-btn" href="https://github.com/armex-code">GitHub</a>
+        <a class="link-btn" href="https://www.linkedin.com/in/ar-elarfaoui/">LinkedIn</a>
+    </div>
+
+    <noscript>
+        <hr>
+        <b>CamFX needs JavaScript.</b>
+    </noscript>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        (function () {
+            var V = document.getElementById('cam');
+            var FX = document.getElementById('fx');
+            var GL = document.getElementById('gl');
+            var CX = FX.getContext('2d');
+            var frameEl = document.querySelector('.frame');
+            var placeholder = document.getElementById('placeholder');
+            var errBox = document.getElementById('err');
+            var hint = document.getElementById('hint');
+            var bStart = document.getElementById('bStart');
+            var bStop = document.getElementById('bStop');
+            var bFlip = document.getElementById('bFlip');
+
+            var S = { filter: 'ascii', facing: 'user', mirror: true, live: false };
+            var W = 0, H = 0, DPR = 1, stream = null;
+
+            function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+
+            /* ---- sizing ------------------------------------------------ */
+            function resize() {
+                var r = frameEl.getBoundingClientRect();
+                if (!r.width || !r.height) return;
+                DPR = Math.min(window.devicePixelRatio || 1, 2);
+                W = Math.max(2, Math.round(r.width * DPR));
+                H = Math.max(2, Math.round(r.height * DPR));
+                FX.width = W; FX.height = H;
+                if (R3) {
+                    R3.setSize(r.width, r.height, false);
+                    CAM3.aspect = r.width / r.height;
+                    CAM3.updateProjectionMatrix();
+                }
+            }
+            window.addEventListener('resize', resize);
+            window.addEventListener('orientationchange', function () { setTimeout(resize, 250); });
+
+            /* ---- sampling ---------------------------------------------- */
+            var samp = document.createElement('canvas');
+            var SCX = samp.getContext('2d', { willReadFrequently: true });
+
+            /* source rect that "cover"-fits the video into a dw x dh target */
+            function cover(dw, dh) {
+                var vw = V.videoWidth || 640, vh = V.videoHeight || 480;
+                var k = Math.max(dw / vw, dh / vh);
+                var sw = dw / k, sh = dh / k;
+                return { sx: (vw - sw) / 2, sy: (vh - sh) / 2, sw: sw, sh: sh };
+            }
+
+            function paintVideo(ctx, dw, dh) {
+                var r = cover(dw, dh);
+                ctx.save();
+                if (S.mirror) { ctx.translate(dw, 0); ctx.scale(-1, 1); }
+                ctx.drawImage(V, r.sx, r.sy, r.sw, r.sh, 0, 0, dw, dh);
+                ctx.restore();
+            }
+
+            /* downsample the camera to a w x h grid and hand back the bytes */
+            function grab(w, h) {
+                if (samp.width !== w || samp.height !== h) { samp.width = w; samp.height = h; }
+                paintVideo(SCX, w, h);
+                return SCX.getImageData(0, 0, w, h).data;
+            }
+
+            var work = document.createElement('canvas');
+            var WCX = work.getContext('2d', { willReadFrequently: true });
+
+            /* ---- 1. ASCII (black characters on white) ------------------- */
+            var RAMP = '@%#*+=-:. ';   /* dark pixel -> heavy glyph, light -> space */
+
+            function drawAscii() {
+                var fs = Math.max(6, Math.round(9 * DPR));
+                CX.font = '700 ' + fs + 'px "SFMono-Regular", Menlo, Consolas, monospace';
+                var cw = CX.measureText('M').width || fs * 0.6;
+                var cols = Math.max(1, Math.floor(W / cw));
+                var rows = Math.max(1, Math.floor(H / fs));
+                var d = grab(cols, rows), last = RAMP.length - 1;
+
+                CX.fillStyle = '#ffffff';
+                CX.fillRect(0, 0, W, H);
+                CX.fillStyle = '#000000';
+                CX.textBaseline = 'top';
+
+                for (var y = 0; y < rows; y++) {
+                    var line = '';
+                    for (var x = 0; x < cols; x++) {
+                        var i = (y * cols + x) * 4;
+                        var l = (d[i] * 0.299 + d[i + 1] * 0.587 + d[i + 2] * 0.114) / 255;
+                        line += RAMP[Math.round(l * last)];
+                    }
+                    CX.fillText(line, 0, y * fs);
+                }
+            }
+
+            /* ---- 2. EDGES (Sobel, black lines on white) ----------------- */
+            function drawEdges() {
+                var k = Math.min(1, 520 / W);
+                var w = Math.max(3, Math.round(W * k)), h = Math.max(3, Math.round(H * k));
+                if (work.width !== w || work.height !== h) { work.width = w; work.height = h; }
+                paintVideo(WCX, w, h);
+
+                var img = WCX.getImageData(0, 0, w, h), p = img.data;
+                var n = w * h, gray = new Float32Array(n);
+                for (var i = 0; i < n; i++) {
+                    gray[i] = (p[i * 4] * 0.299 + p[i * 4 + 1] * 0.587 + p[i * 4 + 2] * 0.114) / 255;
+                }
+
+                for (var y = 0; y < h; y++) {
+                    for (var x = 0; x < w; x++) {
+                        var o = y * w + x, q = o * 4, v;
+                        if (x === 0 || y === 0 || x === w - 1 || y === h - 1) {
+                            v = 255;
+                        } else {
+                            var tl = gray[o - w - 1], tc = gray[o - w], tr = gray[o - w + 1];
+                            var ml = gray[o - 1], mr = gray[o + 1];
+                            var bl = gray[o + w - 1], bc = gray[o + w], br = gray[o + w + 1];
+                            var gx = (tr + 2 * mr + br) - (tl + 2 * ml + bl);
+                            var gy = (bl + 2 * bc + br) - (tl + 2 * tc + tr);
+                            var mag = Math.min(1, Math.sqrt(gx * gx + gy * gy) * 2.2);
+                            v = 255 * (1 - mag);
+                        }
+                        p[q] = p[q + 1] = p[q + 2] = v; p[q + 3] = 255;
+                    }
+                }
+                WCX.putImageData(img, 0, 0);
+                CX.fillStyle = '#ffffff';
+                CX.fillRect(0, 0, W, H);
+                CX.drawImage(work, 0, 0, w, h, 0, 0, W, H);
+            }
+
+            /* ---- 3. 3D POINT CLOUD (grayscale points) ------------------- */
+            var R3 = null, SCENE = null, CAM3 = null, CLOUD = null, GRID = null, has3d = true;
+            var orb = { rx: 0.1, ry: 0, tx: 0.1, ty: 0, dist: 46, tdist: 46, drag: false, px: 0, py: 0, pinch: 0 };
+
+            function init3D() {
+                if (R3) return true;
+                if (!has3d) return false;
+                if (!window.THREE) { has3d = false; return false; }
+                try {
+                    R3 = new THREE.WebGLRenderer({ canvas: GL, antialias: true });
+                } catch (e) { has3d = false; return false; }
+
+                var r = frameEl.getBoundingClientRect();
+                R3.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+                R3.setSize(r.width, r.height, false);
+
+                SCENE = new THREE.Scene();
+                SCENE.background = new THREE.Color(0x000000);
+                CAM3 = new THREE.PerspectiveCamera(52, (r.width || 4) / (r.height || 3), 0.1, 400);
+                CAM3.position.z = orb.dist;
+
+                GRID = { gx: 128, gy: 96 };
+                var n = GRID.gx * GRID.gy;
+                var geo = new THREE.BufferGeometry();
+                geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+                geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
+                CLOUD = new THREE.Points(geo, new THREE.PointsMaterial({
+                    size: 0.32, vertexColors: true, sizeAttenuation: true
+                }));
+                SCENE.add(CLOUD);
+                bindOrbit();
+                return true;
+            }
+
+            function drawCloud() {
+                if (!init3D()) { pick('ascii'); showErr('WebGL is not available here, so the 3D view is off.'); return; }
+                var d = grab(GRID.gx, GRID.gy);
+                var pos = CLOUD.geometry.attributes.position.array;
+                var col = CLOUD.geometry.attributes.color.array;
+                var span = 54, cw = span / GRID.gx, i = 0;
+                for (var y = 0; y < GRID.gy; y++) {
+                    for (var x = 0; x < GRID.gx; x++, i++) {
+                        var q = i * 4;
+                        var l = (d[q] * 0.299 + d[q + 1] * 0.587 + d[q + 2] * 0.114) / 255;
+                        pos[i * 3] = (x - GRID.gx / 2 + 0.5) * cw;
+                        pos[i * 3 + 1] = (GRID.gy / 2 - y - 0.5) * cw;
+                        pos[i * 3 + 2] = (Math.pow(l, 1.6) - 0.25) * 34;   /* brightness -> depth */
+                        col[i * 3] = col[i * 3 + 1] = col[i * 3 + 2] = 0.25 + l * 0.75;
+                    }
+                }
+                CLOUD.geometry.attributes.position.needsUpdate = true;
+                CLOUD.geometry.attributes.color.needsUpdate = true;
+
+                orb.rx += (orb.tx - orb.rx) * 0.1;
+                orb.ry += (orb.ty - orb.ry) * 0.1;
+                orb.dist += (orb.tdist - orb.dist) * 0.1;
+                CLOUD.rotation.x = orb.rx;
+                CLOUD.rotation.y = orb.ry;
+                CAM3.position.z = orb.dist;
+                CAM3.lookAt(0, 0, 0);
+                R3.render(SCENE, CAM3);
+            }
+
+            function bindOrbit() {
+                function pinchDist(e) {
+                    var a = e.touches[0], b = e.touches[1];
+                    return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+                }
+                function down(e) {
+                    var p = e.touches ? e.touches[0] : e;
+                    orb.drag = true; orb.px = p.clientX; orb.py = p.clientY;
+                    if (e.touches && e.touches.length === 2) orb.pinch = pinchDist(e);
+                }
+                function move(e) {
+                    if (e.touches && e.touches.length === 2) {
+                        var dn = pinchDist(e);
+                        if (orb.pinch) orb.tdist = clamp(orb.tdist * (orb.pinch / dn), 16, 120);
+                        orb.pinch = dn;
+                        e.preventDefault();
+                        return;
+                    }
+                    if (!orb.drag) return;
+                    var p = e.touches ? e.touches[0] : e;
+                    orb.ty += (p.clientX - orb.px) * 0.006;
+                    orb.tx += (p.clientY - orb.py) * 0.005;
+                    orb.tx = clamp(orb.tx, -1.1, 1.1);
+                    orb.px = p.clientX; orb.py = p.clientY;
+                    if (e.touches) e.preventDefault();
+                }
+                function up() { orb.drag = false; orb.pinch = 0; }
+                GL.addEventListener('mousedown', down);
+                window.addEventListener('mousemove', move);
+                window.addEventListener('mouseup', up);
+                GL.addEventListener('touchstart', down, { passive: true });
+                GL.addEventListener('touchmove', move, { passive: false });
+                window.addEventListener('touchend', up);
+                GL.addEventListener('wheel', function (e) {
+                    orb.tdist = clamp(orb.tdist + e.deltaY * 0.05, 16, 120);
+                    e.preventDefault();
+                }, { passive: false });
+            }
+
+            /* ---- main loop --------------------------------------------- */
+            function loop() {
+                requestAnimationFrame(loop);
+                if (!S.live || V.readyState < 2 || !W) return;
+                var is3d = (S.filter === 'cloud');
+                FX.style.display = is3d ? 'none' : 'block';
+                GL.style.display = is3d ? 'block' : 'none';
+                try {
+                    if (is3d) drawCloud();
+                    else if (S.filter === 'edges') drawEdges();
+                    else drawAscii();
+                } catch (e) { /* one dropped frame shouldn't kill the loop */ }
+            }
+            requestAnimationFrame(loop);
+
+            /* ---- camera ------------------------------------------------ */
+            function showErr(msg) { errBox.textContent = msg || ''; }
+
+            function openCamera(facing) {
+                return navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: facing, width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: false
+                }).then(function (st) {
+                    if (stream) stream.getTracks().forEach(function (tr) { tr.stop(); });
+                    stream = st;
+                    V.srcObject = st;
+                    return V.play();
+                });
+            }
+
+            function start() {
+                showErr('');
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    showErr('This browser has no camera API.' +
+                        (location.protocol === 'http:' && location.hostname !== 'localhost'
+                            ? ' Camera access also needs https.' : ''));
+                    return;
+                }
+                bStart.disabled = true;
+                bStart.textContent = 'Starting...';
+                openCamera(S.facing).then(function () {
+                    S.live = true;
+                    placeholder.style.display = 'none';
+                    bStart.textContent = 'Start camera';
+                    bStop.disabled = false;
+                    bFlip.disabled = false;
+                    resize();
+                }).catch(function (e) {
+                    bStart.disabled = false;
+                    bStart.textContent = 'Start camera';
+                    var msg = 'Could not open the camera.';
+                    if (e && (e.name === 'NotAllowedError' || e.name === 'SecurityError')) {
+                        msg = 'Camera permission was blocked. Allow it in your browser, then try again.';
+                    } else if (e && e.name === 'NotFoundError') {
+                        msg = 'No camera found on this device.';
+                    } else if (e && e.name === 'NotReadableError') {
+                        msg = 'The camera is busy. Close other apps or tabs using it and try again.';
+                    } else if (e && e.name) { msg += ' (' + e.name + ')'; }
+                    showErr(msg);
+                });
+            }
+
+            function stop() {
+                S.live = false;
+                if (stream) { stream.getTracks().forEach(function (tr) { tr.stop(); }); stream = null; }
+                V.srcObject = null;
+                CX.clearRect(0, 0, W, H);
+                placeholder.innerHTML = 'The camera is off. Click “Start camera” to begin again.';
+                placeholder.style.display = 'flex';
+                bStart.disabled = false;
+                bStop.disabled = true;
+                bFlip.disabled = true;
+            }
+
+            function flip() {
+                if (!S.live) return;
+                var next = (S.facing === 'user') ? 'environment' : 'user';
+                openCamera({ ideal: next }).then(function () {
+                    S.facing = next;
+                    S.mirror = (next === 'user');
+                }).catch(function () { showErr('Only one camera is available here.'); });
+            }
+
+            /* ---- wiring ------------------------------------------------ */
+            function pick(id) {
+                S.filter = id;
+                var r = document.querySelector('input[name="filter"][value="' + id + '"]');
+                if (r) r.checked = true;
+                hint.style.visibility = (id === 'cloud') ? 'visible' : 'hidden';
+            }
+
+            [].forEach.call(document.querySelectorAll('input[name="filter"]'), function (r) {
+                r.addEventListener('change', function () { showErr(''); pick(this.value); });
+            });
+
+            bStart.addEventListener('click', start);
+            bStop.addEventListener('click', stop);
+            bFlip.addEventListener('click', flip);
+
+            /* stop feeding the loop while the tab is hidden */
+            document.addEventListener('visibilitychange', function () {
+                if (document.hidden) { S.live = false; }
+                else if (stream && stream.active) { S.live = true; V.play().catch(function () { }); }
+            });
+
+            if (!window.THREE) {
+                document.getElementById('rCloud').disabled = true;
+            }
+            pick('ascii');
+            resize();
+            if (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+                showErr('Heads up: browsers only hand out the camera over https.');
+            }
+        })();
+    </script>
+
+
+  <!-- Vercel Web Analytics -->
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+
+</html>

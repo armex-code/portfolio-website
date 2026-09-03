@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Abdel Elarfaoui — Robotics &amp; Computer Science</title>
-  <meta name="description" content="Final-year CS student specialising in AI and mechatronics. Field robots, LiDAR SLAM and VR interfaces. Seeking a robotics engineering internship in Switzerland from January 2027.">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta name="description" content="Senior CS student specialising in AI and mechatronics. Field robots, LiDAR SLAM and VR teleoperation. Seeking a robotics engineering internship in Switzerland from January 2027.">
   <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
@@ -34,9 +33,7 @@
     <div class="contactline">
       <a href="mailto:a.elarfaoui@aui.ma">a.elarfaoui@aui.ma</a>
       <a href="https://github.com/armex-code">github.com/armex-code</a>
-      <!-- TODO: paste your LinkedIn URL here and uncomment.
-      <a href="https://www.linkedin.com/in/YOUR-HANDLE">LinkedIn</a>
-      -->
+      <a href="https://www.linkedin.com/in/ar-elarfaoui/">LinkedIn</a>
       <!-- TODO: drop your CV in the repo root as abdel-elarfaoui-cv.pdf, then uncomment.
       <a href="abdel-elarfaoui-cv.pdf">CV (PDF)</a>
       -->
@@ -54,7 +51,7 @@
 
   <section class="intro">
     <p>
-      I'm a final-year Computer Science student at <b>Al Akhawayn University</b>, specialising in
+      I'm a senior Computer Science student at <b>Al Akhawayn University</b>, specialising in
       AI and mechatronics on an Excellence Scholarship. I spent autumn 2024 at
       <b>Kyungpook National University</b> in South Korea working on outdoor LiDAR SLAM for mobile
       field robots, and before that led a <b>22-person robotics team</b> that represented Morocco in
@@ -96,18 +93,20 @@
       </a>
 
       <a class="work-item" href="projects/vr-interfaces.html">
-        <h3>VR interfaces for robots and learning</h3>
+        <h3>VR teleoperation &amp; digital twins</h3>
         <div class="wmeta">In progress</div>
         <p>
-          Putting people inside the robot's view instead of behind a dashboard. Live telemetry
-          streamed into a headset, and a Unity learning app built on the same stack.
+          The other half of the same problem: once a robot knows where it is, how does a person
+          see what it sees? Driving a VEX V5 robot from a Meta Quest headset against a live digital
+          twin, plus a Unity learning app built on the same stack.
         </p>
         <div class="subs">
-          <b>Telemetry robot + VR</b> (improving) · <b>VR learning app</b> (in progress)
+          <b>Quest → VEX V5 teleoperation</b> (public repo) · <b>VR learning app</b> (in progress)
         </div>
         <div class="tags">
-          <span class="tag">Unity</span><span class="tag">WebXR</span><span class="tag">Meta Quest</span>
-          <span class="tag">Telemetry</span><span class="tag">C#</span>
+          <span class="tag">Unity</span><span class="tag">C#</span><span class="tag">WebXR</span>
+          <span class="tag">Meta Quest</span><span class="tag">Digital twin</span>
+          <span class="tag">Teleoperation</span>
         </div>
       </a>
 
@@ -131,7 +130,11 @@
 
     </div>
 
-    <p style="color:var(--mute);font-size:14px;margin-top:20px;">
+    <p style="margin-top:18px;font-size:15px;">
+      Code: <a href="https://github.com/armex-code/quest-v5-teleop">quest-v5-teleop</a> —
+      Meta Quest to VEX V5 teleoperation with a digital twin.
+    </p>
+    <p style="color:var(--mute);font-size:14px;margin-top:14px;">
       Earlier work: a LEGO-based bionic hand (2021), and robotics workshops taught to K-12 students
       from 2019 to 2024.
     </p>
@@ -145,8 +148,8 @@
       <div class="rrow">
         <div class="when">2022 · 2023 · 2024</div>
         <div class="what">National VEX Robotics Champion — 3×
-          <small>Three consecutive national titles, then on to international championships in the
-          USA, Germany and Croatia with the AUI team.</small>
+          <small>Three consecutive national titles, then on to international championships in
+          the USA, Germany and Croatia with the AUI team.</small>
         </div>
       </div>
       <div class="rrow">
@@ -272,12 +275,18 @@
   </section>
 
   <section id="fun">
-    <div class="eyebrow">Fun projects</div>
+    <div class="eyebrow">Experiments</div>
     <h2>Things I built for no good reason</h2>
     <p style="color:var(--ink-soft);font-size:15px;">
       Side projects, built for fun. Not robotics — just what happens on a quiet weekend.
     </p>
     <div class="fun">
+      <a href="camera-fx.html">
+        <span class="ico" aria-hidden="true">📷</span>
+        <h3>CamFX</h3>
+        <p>Your camera feed as live ASCII art, edge detection or a real-time 3D point cloud.
+        Nothing is recorded — it all runs in your browser.</p>
+      </a>
       <a href="experience.html">
         <span class="ico" aria-hidden="true">🕹️</span>
         <h3>Rover Run</h3>
@@ -310,13 +319,17 @@
     <span>© <span id="year">2026</span> Abdel Elarfaoui</span>
     <span>
       <a href="https://github.com/armex-code">GitHub</a> ·
-      <a href="experience.html">Rover Run</a> ·
-      <a href="retro-os.html">AbdelOS</a>
+      <a href="https://www.linkedin.com/in/ar-elarfaoui/">LinkedIn</a> ·
+      <a href="experience.html">Rover Run</a>
     </span>
   </footer>
 
 </div>
 
 <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+
+  <!-- Vercel Web Analytics -->
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>

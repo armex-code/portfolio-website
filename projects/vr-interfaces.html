@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VR interfaces for robots and learning — Abdel Elarfaoui</title>
-  <meta name="description" content="Live robot telemetry streamed into a VR headset, and a Unity-based VR learning application built on the same stack.">
-  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <title>VR teleoperation &amp; digital twins — Abdel Elarfaoui</title>
+  <meta name="description" content="Driving a VEX V5 robot from a Meta Quest headset against a live digital twin, and a Unity-based VR learning application built on the same stack.">
   <link rel="stylesheet" href="../css/site.css">
 </head>
 <body>
@@ -15,7 +14,7 @@
   <a class="backlink" href="../index.html#work">← Abdel Elarfaoui</a>
 
   <header class="case-head">
-    <h1>VR interfaces for robots and learning</h1>
+    <h1>VR teleoperation &amp; digital twins</h1>
     <p class="summary">
       A robot operator normally reads numbers off a flat dashboard and rebuilds the scene in their
       head. Both projects here try the opposite: put the person inside the robot's sensor picture,
@@ -40,19 +39,28 @@
 
     <section>
       <div class="eyebrow">Project 01 · Improving</div>
-      <h2>Telemetry robot with a VR operator view</h2>
+      <h2>Meta Quest → VEX V5 teleoperation with a digital twin</h2>
+      <p style="font-size:15px;">
+        Code: <a href="https://github.com/armex-code/quest-v5-teleop">github.com/armex-code/quest-v5-teleop</a>
+      </p>
 
       <h3>Context</h3>
       <p>
-        <span class="todo">TODO: what robot is this, and what problem made you want a VR view
-        rather than a normal dashboard? If it grew out of the AUI robotics team or a course, say so.</span>
+        Driving a VEX V5 robot from inside a Meta Quest headset, with a digital twin of the robot
+        updating live alongside it. The VEX platform is the one I know best from five years of
+        competition, which made it the right thing to experiment on.
+      </p>
+      <p>
+        <span class="todo">TODO: two sentences on why you started it — what was wrong with driving
+        a robot off a normal controller and screen that a headset fixes?</span>
       </p>
 
       <h3>What I built</h3>
       <p>
-        <span class="todo">TODO: how does telemetry get from robot to headset — what's the
-        transport (ROS bridge? WebSocket? MQTT?), what data is streamed (pose, LiDAR scan, camera,
-        battery, motor current), and what does the operator actually see and control in VR?</span>
+        <span class="todo">TODO: how do commands get from headset to robot and telemetry back —
+        what's the transport (WebSocket? serial bridge? ROS?), what data moves, and what does the
+        operator see and control in VR? Be specific about how the digital twin stays in sync with
+        the real robot, because that sync is the interesting part.</span>
       </p>
 
       <h3>The hard part</h3>
@@ -77,7 +85,11 @@
       </div>
 
       <h3>Links</h3>
-      <p><span class="todo">TODO: repo, build, or demo video.</span></p>
+      <p>
+        <a href="https://github.com/armex-code/quest-v5-teleop">github.com/armex-code/quest-v5-teleop</a>
+        — <span class="todo">TODO: add a demo video. A teleoperation project is almost impossible
+        to judge from a repo alone; 20 seconds of you driving it sells it instantly.</span>
+      </p>
     </section>
 
     <section>
@@ -122,5 +134,9 @@
 </div>
 
 <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+
+  <!-- Vercel Web Analytics -->
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
