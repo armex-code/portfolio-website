@@ -1,0 +1,157 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VR &amp; Telemetry &#8212; Abdel Elarfaoui</title>
+
+    <style>
+        body {
+            margin: 10px 12px 24px;
+        }
+
+        hr {
+            margin: 13px 0;
+        }
+
+        ul {
+            margin: 6px 0;
+            padding-left: 26px;
+        }
+
+        li {
+            margin-bottom: 4px;
+        }
+
+        .backlink {
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 11px;
+        }
+
+        .hero {
+            display: block;
+            max-width: 460px;
+            width: 100%;
+            height: auto;
+            border: 2px inset #c0c0c0;
+            background: #ffffff;
+            margin: 10px 0;
+        }
+
+        .facts {
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 11px;
+            color: #333333;
+            margin: 6px 0;
+        }
+
+        .facts b {
+            color: #000080;
+        }
+
+        .gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 8px 0;
+        }
+
+        .shot {
+            flex: 1 1 190px;
+            min-height: 130px;
+            border: 2px inset #c0c0c0;
+            background: #efefef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 11px;
+            color: #777777;
+            padding: 8px;
+        }
+
+        .gallery img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border: 2px inset #c0c0c0;
+        }
+    </style>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
+
+    <div class="backlink">[ <a href="../index.html">&#171; Back to homepage</a> ]</div>
+
+    <hr>
+
+    <h2>VR &amp; Telemetry</h2>
+
+    <img class="hero" src="../images/vr-telemetry.svg" alt="VR and telemetry projects">
+
+    <div class="facts">
+        <b>Status</b> Ongoing &#183;
+        <b>Stack</b> Unity, C#, WebXR &#183;
+        <b>Hardware</b> Meta Quest, VEX V5
+    </div>
+
+    <hr>
+
+    <u>Meta Quest to VEX V5 Teleoperation with Digital Twin</u>
+    <br><br>
+
+    The idea is simple to say and awkward to build: instead of driving a robot from a controller
+    while staring at a screen, put the operator <i>inside</i> the robot's world. I drive a VEX V5
+    robot from a Meta Quest headset, with a digital twin of the machine updating live next to the
+    real one, so what you see in the headset and what the robot is actually doing stay in step.
+
+    <br><br>
+
+    I picked the VEX V5 platform because it is the one I know best &#8212; five years of competition
+    robotics means I already know how it behaves, which left me free to work on the interesting part,
+    the link between the headset and the robot.
+
+    <br><br>
+
+    Code is on GitHub:
+    <a href="https://github.com/armex-code/quest-v5-teleop">armex-code/quest-v5-teleop</a>
+
+    <!-- TODO (Abdel): add the technical detail here when you have a minute —
+         how commands travel from headset to robot, what data comes back,
+         how the digital twin stays in sync, and anything you measured (latency, frame rate). -->
+
+    <hr>
+
+    <u>Pictures:</u>
+
+    <div class="gallery">
+        <div class="shot">Photo coming soon<br>&#8212;<br>the robot</div>
+        <div class="shot">Photo coming soon<br>&#8212;<br>view inside the headset</div>
+        <div class="shot">Photo coming soon<br>&#8212;<br>digital twin</div>
+    </div>
+
+    <small>A short screen recording from inside the headset would show this far better than
+        stills.</small>
+
+    <hr>
+
+    <u>Also on this track:</u>
+    <ul>
+        <li><b>Telemetry robot</b> &#8212; the robot-side work that feeds the live data.</li>
+        <li><b>VR learning app</b> &#8212; a Unity application built on the same stack, in progress.</li>
+    </ul>
+
+    <!-- TODO (Abdel): a couple of sentences on each of these two once they are further along. -->
+
+    <hr>
+
+    <div class="backlink">[ <a href="../index.html">&#171; Back to homepage</a> ]
+        &#183; [ <a href="mailto:a.elarfaoui@aui.ma">Email me about this</a> ]</div>
+
+
+  <!-- Vercel Web Analytics -->
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</body>
+
+</html>

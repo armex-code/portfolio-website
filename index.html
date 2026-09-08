@@ -5,9 +5,114 @@
     <title>Abdel Elarfaoui Homepage</title>
 
     <style>
+        /* ---- tighter page rhythm ---- */
+        body {
+            margin: 10px 12px 24px;
+        }
+
+        hr {
+            margin: 13px 0;
+        }
+
+        ul,
+        ol {
+            margin: 6px 0;
+            padding-left: 26px;
+        }
+
+        li {
+            margin-bottom: 3px;
+        }
+
+        /* ---- quick facts strip ---- */
+        .facts {
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 11px;
+            color: #333333;
+            margin-top: 6px;
+        }
+
+        .facts b {
+            color: #000080;
+        }
+
+        /* ---- two columns side by side, stacked on narrow screens ---- */
+        .cols {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0 34px;
+        }
+
+        .cols>div {
+            flex: 1 1 240px;
+        }
+
+        /* ---- project cards ---- */
+        .proj-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 10px 0 4px;
+        }
+
+        .proj-card {
+            flex: 1 1 210px;
+            border: 2px outset #c0c0c0;
+            background: #f4f4f4;
+            padding: 8px;
+            text-decoration: none;
+            color: #000000;
+            display: block;
+        }
+
+        .proj-card:link,
+        .proj-card:visited {
+            color: #000000;
+        }
+
+        .proj-card:hover {
+            background: #e6ecf6;
+            border-color: #000080;
+        }
+
+        .proj-card:active {
+            border-style: inset;
+        }
+
+        .proj-card img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border: 1px solid #999999;
+            background: #ffffff;
+        }
+
+        .proj-title {
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 12px;
+            font-weight: bold;
+            color: #000080;
+            margin: 7px 0 4px;
+        }
+
+        .proj-desc {
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 11px;
+            line-height: 1.45;
+            color: #333333;
+            margin-bottom: 6px;
+        }
+
+        .proj-more {
+            font-family: Verdana, Arial, sans-serif;
+            font-size: 11px;
+            font-weight: bold;
+            color: #0000FF;
+        }
+
         /* ---- plain call-to-action button: no animation, just visible ---- */
         .cta-zone {
-            margin: 24px auto 10px;
+            margin: 16px auto 8px;
             text-align: center;
         }
 
@@ -54,13 +159,13 @@
         /* ---- plain profile links ---- */
         .links-zone {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .link-btn {
             display: inline-block;
             padding: 7px 18px;
-            margin: 0 4px;
+            margin: 0 4px 4px;
             border: 2px outset #c0c0c0;
             background: #e8e8e8;
             font-family: Verdana, Arial, sans-serif;
@@ -100,58 +205,101 @@
     <div class="links-zone">
         <a class="link-btn" href="https://github.com/armex-code">GitHub</a>
         <a class="link-btn" href="https://www.linkedin.com/in/ar-elarfaoui/">LinkedIn</a>
+        <a class="link-btn" href="mailto:a.elarfaoui@aui.ma">Email</a>
     </div>
 
     <hr>
 
     <b>Hello, my name is Abderrahman (Abdel) Elarfaoui.</b>
-    <br><br>
+    <br>
     I am a senior Computer Science student at Al Akhawayn University.
     Basically, I like building and coding robots.
     <br>
     I'm looking for an internship in robotics starting from January 2027. Ping me if you are interested!
-    <br><br>
-    <hr>
 
-    <u>My current interests:</u>
-    <ul>
-        <li>Digital twins & Robot Simulations</li>
-        <li>Mixed Reality with Meta Quest</li>
-        <li>Reinforcement Learning applied to Robotics</li>
-        <li>Autonomous Vehicles (SLAM)</li>
-    </ul>
+    <div class="facts">
+        <b>Based in</b> Ifrane, Morocco &#183;
+        <b>Working with</b> ROS2, C/C++, Python, Unity &#183;
+        <b>Languages</b> French, English, Arabic &#183;
+        <b>Available</b> January 2027
+    </div>
 
     <hr>
 
     <u>Projects:</u>
-    <ol>
-        <li><a href="https://github.com/armex-code/quest-v5-teleop">Meta Quest to VEX V5 Teleoperation with Digital Twin</a></li>
-        <li>More coming soon...</li>
-    </ol>
+
+    <div class="proj-grid">
+
+        <a class="proj-card" href="projects/vr-telemetry.html">
+            <img src="images/vr-telemetry.svg" alt="VR and telemetry projects">
+            <div class="proj-title">VR &amp; Telemetry</div>
+            <div class="proj-desc">
+                Driving a VEX V5 robot from a Meta Quest headset against a live digital twin,
+                plus the telemetry work behind it.
+            </div>
+            <div class="proj-more">Read more &#187;</div>
+        </a>
+
+        <a class="proj-card" href="projects/slam-autonomous.html">
+            <img src="images/slam-autonomous.svg" alt="SLAM and autonomous driving projects">
+            <div class="proj-title">SLAM &amp; Autonomous Driving</div>
+            <div class="proj-desc">
+                Outdoor LiDAR SLAM on mobile field robots at a Korean robotics lab, and my
+                final-year autonomous vehicle capstone.
+            </div>
+            <div class="proj-more">Read more &#187;</div>
+        </a>
+
+        <a class="proj-card" href="projects/competitions.html">
+            <img src="images/competitions.svg" alt="Robotics competitions">
+            <div class="proj-title">Competitions</div>
+            <div class="proj-desc">
+                VEX and WRO: three national titles, two WRO national wins and 11th in the world,
+                plus leading a 22-person team.
+            </div>
+            <div class="proj-more">Read more &#187;</div>
+        </a>
+
+    </div>
+
+    <small>Code: <a href="https://github.com/armex-code/quest-v5-teleop">Meta Quest to VEX V5
+            Teleoperation with Digital Twin</a></small>
 
     <hr>
 
-    <u>Experiments:</u>
-    <ul>
-        <li>
-            <a href="camera-fx.html">CamFX</a> : Your camera feed turned into live ASCII art,
-            edge detection or a real&#45;time 3D point cloud. Nothing is recorded, it all runs in
-            your browser. Works on the telephone too!
-        </li>
-        <li>
-            <a href="retro-os.html">AbdelOS&trade;</a> : A replica of an old Windows desktop
-            running right in your browser! Working start menu, draggable windows, Notepad, Paint,
-            Minesweeper and more.
-        </li>
-        
-    </ul>
+    <div class="cols">
+        <div>
+            <u>My current interests:</u>
+            <ul>
+                <li>Digital twins &amp; Robot Simulations</li>
+                <li>Mixed Reality with Meta Quest</li>
+                <li>Reinforcement Learning applied to Robotics</li>
+                <li>Autonomous Vehicles (SLAM)</li>
+            </ul>
+        </div>
+
+        <div>
+            <u>Experiments:</u>
+            <ul>
+                <li>
+                    <a href="camera-fx.html">CamFX</a> : Your camera feed turned into live ASCII art,
+                    edge detection or a real&#45;time 3D point cloud. Nothing is recorded, it all runs in
+                    your browser. Works on the telephone too!
+                </li>
+                <li>
+                    <a href="retro-os.html">AbdelOS&trade;</a> : A replica of an old Windows desktop
+                    running right in your browser! Working start menu, draggable windows, Notepad, Paint,
+                    Minesweeper and more.
+                </li>
+            </ul>
+        </div>
+    </div>
 
     <hr>
 
     <i>If you want to contact me, you can send an electronic mail to:</i> <a
         href="mailto:a.elarfaoui@aui.ma">a.elarfaoui@aui.ma</a>
 
-    <br><br>
     <hr>
 
     <div class="cta-zone">
@@ -167,8 +315,7 @@
         </div>
     </div>
 
-    <br>
-    <p align="right"><small>Last updated: July 2026</small></p>
+    <p align="right"><small>Last updated: September 2026</small></p>
 
 
   <!-- Vercel Web Analytics -->
