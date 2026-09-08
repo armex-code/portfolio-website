@@ -76,7 +76,19 @@
             height: auto;
             border: 2px inset #c0c0c0;
         }
+
+        /* when shown inside the homepage pop-up, the back links are redundant */
+        .embedded .backlink {
+            display: none;
+        }
+
+        .embedded hr:first-of-type {
+            display: none;
+        }
     </style>
+    <script>
+        if (window.self !== window.top) document.documentElement.className += ' embedded';
+    </script>
 </head>
 
 <body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">

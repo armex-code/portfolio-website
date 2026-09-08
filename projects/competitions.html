@@ -95,7 +95,19 @@
             color: #000080;
             white-space: nowrap;
         }
+
+        /* when shown inside the homepage pop-up, the back links are redundant */
+        .embedded .backlink {
+            display: none;
+        }
+
+        .embedded hr:first-of-type {
+            display: none;
+        }
     </style>
+    <script>
+        if (window.self !== window.top) document.documentElement.className += ' embedded';
+    </script>
 </head>
 
 <body bgcolor="#FFFFFF" text="#000000" link="#0000FF" vlink="#800080" alink="#FF0000">
