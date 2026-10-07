@@ -1,20 +1,18 @@
 # Assets
 
-Files the main page (`index.html`) expects. Paths are referenced as-is.
+Drop files at these paths and they appear on the site automatically: no HTML
+edits needed. Until a file exists, its slot shows a grey placeholder.
 
-| Path | What | Notes |
+Use `.webp` (or rename the paths in `index.html` if you prefer `.jpg`).
+
+| Path | Where it shows | Suggested size |
 | --- | --- | --- |
-| `assets/resume.pdf` | Résumé | Linked from the nav, hero and footer. Missing = 404. |
-| `assets/media/vr-arm.mp4` + `vr-arm-poster.webp` | Card R-01 loop | 720p, muted, < 3 MB |
-| `assets/media/omni-platform.mp4` + poster | Card R-02 loop | |
-| `assets/media/lidar-rig.webp` (or .mp4) | Card R-03 | screenshot or loop |
-| `assets/media/vex-snake.mp4` + poster | Card R-04 loop | |
+| `assets/resume.pdf` | Nav, hero and footer résumé links | |
+| `assets/media/<project>/cover.webp` | Banner panel (grey until hovered) | 1200×1500, portrait |
+| `assets/media/<project>/1.webp` … `4.webp` | Project popup gallery | 1600×900 (16:9) |
+| `assets/media/workshop/1.webp` … `6.webp` | "From the workshop" mosaic (W1 is the large one) | 1600×1000 |
 
-Each card in `index.html` has an `ASSET PLACEHOLDER` comment with a ready-to-paste
-`<video>`/`<img>` snippet. Give videos the `data-autoplay` attribute and
-`preload="none"`: `js/site.js` plays them only while on screen and skips them
-for visitors with reduced motion enabled.
+`<project>` is one of: `vr-arm`, `omni-manipulator`, `lidar-rig`, `competition`.
+Gallery captions are the `data-caption` values on each thumbnail in `index.html`.
 
-Encode loops small, e.g.:
-
-    ffmpeg -i in.mov -vf scale=-2:720 -an -c:v libx264 -crf 28 -preset slow -movflags +faststart out.mp4
+Shrink photos before committing, e.g. `cwebp -q 78 -resize 1600 0 in.jpg -o 1.webp`.

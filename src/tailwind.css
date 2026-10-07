@@ -83,3 +83,36 @@
       linear-gradient(to bottom right, transparent calc(50% - 0.5px), #c9c9c6 calc(50% - 0.5px), #c9c9c6 calc(50% + 0.5px), transparent calc(50% + 0.5px));
   }
 }
+
+@layer components {
+  /* Robotics banner: the hovered/focused panel widens, the others give way */
+  @media (min-width: 768px) {
+    .panel {
+      transition: flex-grow 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .panel:hover,
+    .panel:focus-within {
+      flex-grow: 2.2;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .panel { transition: none; }
+  }
+
+  /* Project popup */
+  .project-dialog {
+    @apply m-auto max-h-[92vh] w-[min(96vw,1240px)] max-w-none overflow-y-auto overscroll-contain border-2 border-ink bg-paper p-0 text-ink;
+  }
+  .project-dialog::backdrop {
+    background: rgb(255 255 255 / 0.82);
+    backdrop-filter: blur(4px);
+  }
+  @media (max-width: 639px) {
+    .project-dialog {
+      @apply m-0 h-full max-h-none w-full border-0;
+    }
+  }
+  .thumb[aria-pressed='true'] {
+    @apply outline outline-2 outline-offset-2 outline-ink;
+  }
+}
