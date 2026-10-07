@@ -4,11 +4,20 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+        // Self-hosted from /fonts (see src/tailwind.css)
+        sans: ['Archivo', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        mono: ['"Fragment Mono"', 'ui-monospace', 'Menlo', 'monospace'],
       },
       colors: {
-        signal: '#e5322d', // Swiss red, used sparingly
+        paper: '#ffffff',
+        ink: '#0b0b0b',
+        graphite: '#5f5f5f',
+        rule: '#d6d6d4',
+        fog: '#f1f1ef',
+        signal: '#e10600', // Swiss red, the only accent
+      },
+      letterSpacing: {
+        display: '-0.045em',
       },
     },
   },

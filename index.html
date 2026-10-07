@@ -3,61 +3,58 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Abdelrahman Elarfaoui · Robotics Systems Integrator</title>
+  <title>Abdelrahman Elarfaoui — Hardware &amp; Software Systems Integrator</title>
   <meta name="description" content="Abdelrahman Elarfaoui: hardware & software systems integrator for robotics. Final-year BSc Computer Science (AI & Mechatronics), Al Akhawayn University. Available for a 4–6 month robotics internship in Switzerland from January 2027. FR/MA dual citizen, no EU/CH visa sponsorship needed.">
-  <meta name="theme-color" content="#0a0a0a">
+  <meta name="theme-color" content="#ffffff">
   <link rel="canonical" href="https://heyabdel.com/">
 
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://heyabdel.com/">
-  <meta property="og:title" content="Abdelrahman Elarfaoui · Robotics Systems Integrator">
+  <meta property="og:title" content="Abdelrahman Elarfaoui — Hardware & Software Systems Integrator">
   <meta property="og:description" content="Embedded platforms, sensor integration and data pipelines for physical systems. Available Jan 2027 · CH/EU eligible.">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="preload" href="fonts/archivo-var-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/fragment-mono-latin.woff2" as="font" type="font/woff2" crossorigin>
   <!-- Compiled Tailwind (src/tailwind.css -> css/site.css via `npm run build:css`) -->
   <link rel="stylesheet" href="css/site.css">
 </head>
 
-<body class="min-h-screen">
-  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:bg-neutral-100 focus:px-3 focus:py-2 focus:text-neutral-950">Skip to content</a>
+<body>
+  <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:bg-ink focus:px-3 focus:py-2 focus:text-paper">Skip to content</a>
 
   <!-- =========================================================
        1. NAVIGATION
        ========================================================= -->
-  <header class="sticky top-0 z-50 border-b border-neutral-800/80 bg-neutral-950/75 backdrop-blur-md supports-[backdrop-filter]:bg-neutral-950/60">
-    <nav class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6" aria-label="Primary">
-      <a href="#top" class="flex min-w-0 items-center gap-3">
-        <span class="truncate text-sm font-semibold tracking-[0.14em] text-neutral-100">ABDELRAHMAN ELARFAOUI</span>
-        <span class="hidden items-center gap-1.5 rounded-full border border-neutral-800 px-2.5 py-0.5 font-mono text-[11px] text-neutral-400 lg:inline-flex">
-          <span class="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden="true"></span>
+  <header class="sticky top-0 z-50 border-b border-ink bg-paper/90 backdrop-blur-md">
+    <nav class="wrap flex h-14 items-center justify-between gap-4" aria-label="Primary">
+      <a href="#top" class="flex min-w-0 items-center gap-5">
+        <span class="truncate text-[13px] font-bold uppercase tracking-[0.04em]">Abdelrahman Elarfaoui</span>
+        <span class="label hidden items-center gap-2 text-graphite lg:inline-flex">
+          <span class="h-2 w-2 bg-signal" aria-hidden="true"></span>
           Available Jan 2027 · CH/EU Eligible
         </span>
       </a>
 
-      <div class="hidden items-center gap-6 md:flex">
-        <ul class="flex items-center gap-6 text-sm text-neutral-400">
-          <li><a class="transition-colors hover:text-neutral-100" href="#robotics">Robotics</a></li>
-          <li><a class="transition-colors hover:text-neutral-100" href="#software">Software</a></li>
-          <li><a class="transition-colors hover:text-neutral-100" href="#experience">Experience</a></li>
-          <li><a class="transition-colors hover:text-neutral-100" href="#awards">Awards</a></li>
+      <div class="hidden items-center gap-8 md:flex">
+        <ul class="flex items-center gap-7 text-[13px] font-medium">
+          <li><a class="hover:text-signal" href="#robotics">Robotics</a></li>
+          <li><a class="hover:text-signal" href="#software">Software</a></li>
+          <li><a class="hover:text-signal" href="#experience">Experience</a></li>
+          <li><a class="hover:text-signal" href="#awards">Awards</a></li>
         </ul>
-        <a href="assets/resume.pdf" class="btn-primary py-2" download>Resume (PDF)</a>
+        <a href="assets/resume.pdf" class="btn py-2 text-[13px]" download>Resume (PDF) <span aria-hidden="true">↓</span></a>
       </div>
 
-      <button type="button" id="nav-toggle" class="btn-ghost px-3 py-2 font-mono text-xs uppercase md:hidden" aria-expanded="false" aria-controls="mobile-nav">
-        Menu
-      </button>
+      <button type="button" id="nav-toggle" class="label border border-ink px-3 py-2 md:hidden" aria-expanded="false" aria-controls="mobile-nav">Menu</button>
     </nav>
 
-    <div id="mobile-nav" class="hidden border-t border-neutral-800 md:hidden">
-      <ul class="mx-auto flex max-w-6xl flex-col px-4 py-2 text-sm sm:px-6">
-        <li><a class="block py-2.5 text-neutral-300" href="#robotics">Robotics</a></li>
-        <li><a class="block py-2.5 text-neutral-300" href="#software">Software</a></li>
-        <li><a class="block py-2.5 text-neutral-300" href="#experience">Experience</a></li>
-        <li><a class="block py-2.5 text-neutral-300" href="#awards">Awards</a></li>
-        <li class="pb-3 pt-2"><a href="assets/resume.pdf" class="btn-primary w-full" download>Resume (PDF)</a></li>
+    <div id="mobile-nav" class="hidden border-t border-ink md:hidden">
+      <ul class="wrap flex flex-col py-2 text-lg font-semibold tracking-tight">
+        <li><a class="flex justify-between border-b border-rule py-3" href="#robotics">Robotics <span class="label self-center text-signal">01</span></a></li>
+        <li><a class="flex justify-between border-b border-rule py-3" href="#software">Software <span class="label self-center text-signal">02</span></a></li>
+        <li><a class="flex justify-between border-b border-rule py-3" href="#experience">Experience <span class="label self-center text-signal">03</span></a></li>
+        <li><a class="flex justify-between py-3" href="#awards">Awards <span class="label self-center text-signal">04</span></a></li>
+        <li class="pb-3 pt-1"><a href="assets/resume.pdf" class="btn w-full" download>Resume (PDF) <span aria-hidden="true">↓</span></a></li>
       </ul>
     </div>
   </header>
@@ -67,364 +64,362 @@
     <!-- =========================================================
          2. HERO
          ========================================================= -->
-    <section id="top" class="border-b border-neutral-800">
-      <div class="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 sm:py-24 lg:grid-cols-12 lg:gap-10">
-        <div class="lg:col-span-7">
-          <p class="section-label">Robotics Engineering · Internship 2027</p>
-          <h1 class="mt-5 text-4xl font-semibold leading-[1.05] tracking-tight text-neutral-50 sm:text-5xl lg:text-6xl">
-            Hardware &amp; Software Systems Integrator
-          </h1>
-          <p class="mt-6 max-w-2xl text-base leading-relaxed text-neutral-400 sm:text-lg">
+    <section id="top" class="wrap pb-16 pt-8 sm:pb-24 lg:pt-10">
+      <!-- Poster metadata row -->
+      <dl class="grid-12 gap-y-5 border-b border-rule pb-6">
+        <div class="col-span-2 lg:col-span-3">
+          <dt class="label text-graphite">Role sought</dt>
+          <dd class="mt-2 text-sm font-medium">Robotics Engineering Intern</dd>
+        </div>
+        <div class="col-span-2 lg:col-span-3">
+          <dt class="label text-graphite">Where / When</dt>
+          <dd class="mt-2 text-sm font-medium">Switzerland · Jan 2027, 4–6 mo.</dd>
+        </div>
+        <div class="col-span-2 lg:col-span-3">
+          <dt class="label text-graphite">Studies</dt>
+          <dd class="mt-2 text-sm font-medium">BSc CS · AI &amp; Mechatronics</dd>
+        </div>
+        <div class="col-span-2 lg:col-span-3">
+          <dt class="label text-graphite">Contact</dt>
+          <dd class="mt-2 text-sm font-medium"><a class="hover:text-signal" href="mailto:a.elarfaoui@aui.ma">a.elarfaoui@aui.ma</a></dd>
+        </div>
+      </dl>
+
+      <h1 class="display mt-10 text-[clamp(3.1rem,10.6vw,10.25rem)] leading-[0.86] sm:mt-14">
+        Hardware &amp; Software<br class="hidden sm:block">
+        Systems Integrator<span class="text-signal">.</span>
+      </h1>
+
+      <div class="grid-12 mt-12 gap-y-10 sm:mt-16">
+        <div class="col-span-4 lg:col-span-6">
+          <p class="max-w-[38rem] text-lg leading-snug sm:text-[1.35rem]">
             Final-year BSc Computer Science (AI &amp; Mechatronics Specialization) at Al Akhawayn University.
-            Specializing in autonomous mechatronics, embedded sensor integration, and data pipelines for physical systems.
+            <span class="text-graphite">Specializing in autonomous mechatronics, embedded sensor integration, and data pipelines for physical systems.</span>
           </p>
 
-          <p class="mt-6 inline-flex flex-wrap items-center gap-x-2 gap-y-1 border border-neutral-800 bg-neutral-900/60 px-3 py-2 font-mono text-xs text-neutral-300">
-            <span aria-hidden="true">📍</span>
-            <span>Available Jan 2027</span>
-            <span class="text-neutral-600" aria-hidden="true">·</span>
-            <span>Dual Citizen (FR / MA — No EU/CH Visa Sponsorship Needed)</span>
+          <p class="mt-8 flex items-start gap-3 text-sm font-medium">
+            <!-- Swiss cross marker -->
+            <svg class="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" fill="#e10600"/><path fill="#fff" d="M13 6h6v7h7v6h-7v7h-6v-7H6v-6h7z"/></svg>
+            <span>Available Jan 2027 · Dual Citizen (FR / MA — No EU/CH Visa Sponsorship Needed)</span>
           </p>
-
-          <div class="mt-8 flex flex-wrap gap-3">
-            <a href="assets/resume.pdf" class="btn-primary" download>Download Resume (PDF)</a>
-            <a href="https://github.com/armex-code" class="btn-ghost" target="_blank" rel="noopener">GitHub Profile</a>
-            <a href="https://www.linkedin.com/in/ar-elarfaoui/" class="btn-ghost" target="_blank" rel="noopener">LinkedIn Profile</a>
-            <a href="mailto:a.elarfaoui@aui.ma" class="btn-ghost">Get in Touch</a>
-          </div>
         </div>
 
-        <!-- Spec sheet: the facts a recruiter scans for -->
-        <aside class="lg:col-span-5 lg:pt-10" aria-label="Candidate summary">
-          <dl class="divide-y divide-neutral-800 border border-neutral-800 font-mono text-xs">
-            <div class="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-3">
-              <dt class="uppercase tracking-wider text-neutral-500">Target</dt>
-              <dd class="text-neutral-200">Robotics Engineering Internship · Switzerland</dd>
-            </div>
-            <div class="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-3">
-              <dt class="uppercase tracking-wider text-neutral-500">Duration</dt>
-              <dd class="text-neutral-200">4–6 months · from January 2027</dd>
-            </div>
-            <div class="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-3">
-              <dt class="uppercase tracking-wider text-neutral-500">Work Auth.</dt>
-              <dd class="text-neutral-200">FR / MA citizen · no sponsorship</dd>
-            </div>
-            <div class="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-3">
-              <dt class="uppercase tracking-wider text-neutral-500">Degree</dt>
-              <dd class="text-neutral-200">BSc CS · AI &amp; Mechatronics</dd>
-            </div>
-            <div class="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-3">
-              <dt class="uppercase tracking-wider text-neutral-500">Core Stack</dt>
-              <dd class="text-neutral-200">Python · C++ · ROS 2 · Linux · OpenCV · CAD</dd>
-            </div>
-            <div class="grid grid-cols-[7.5rem_1fr] gap-3 px-4 py-3">
-              <dt class="uppercase tracking-wider text-neutral-500">Contact</dt>
-              <dd><a class="text-neutral-200 underline-offset-4 hover:underline" href="mailto:a.elarfaoui@aui.ma">a.elarfaoui@aui.ma</a></dd>
-            </div>
-          </dl>
-        </aside>
+        <nav class="col-span-4 lg:col-span-4 lg:col-start-9" aria-label="Profile links">
+          <a href="assets/resume.pdf" class="btn w-full py-4 text-base" download>Download Resume (PDF) <span aria-hidden="true">↓</span></a>
+          <ul class="mt-2 text-base font-medium">
+            <li><a class="flex items-center justify-between border-b border-ink py-3.5 hover:text-signal" href="https://github.com/armex-code" target="_blank" rel="noopener">GitHub Profile <span aria-hidden="true">↗</span></a></li>
+            <li><a class="flex items-center justify-between border-b border-ink py-3.5 hover:text-signal" href="https://www.linkedin.com/in/ar-elarfaoui/" target="_blank" rel="noopener">LinkedIn Profile <span aria-hidden="true">↗</span></a></li>
+            <li><a class="flex items-center justify-between border-b border-ink py-3.5 hover:text-signal" href="mailto:a.elarfaoui@aui.ma">Get in Touch <span aria-hidden="true">→</span></a></li>
+          </ul>
+        </nav>
       </div>
     </section>
 
     <!-- =========================================================
          3. FEATURED ROBOTICS SYSTEMS
          ========================================================= -->
-    <section id="robotics" class="border-b border-neutral-800" aria-labelledby="robotics-title">
-      <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p class="section-label">01 / Robotics</p>
-            <h2 id="robotics-title" class="mt-3 text-2xl font-semibold tracking-tight text-neutral-50 sm:text-3xl">Featured Robotics Systems</h2>
-          </div>
-          <p class="max-w-md text-sm text-neutral-500">Physical platforms, end to end: mechanics, firmware, sensors and the software that drives them.</p>
+    <section id="robotics" class="wrap pb-16 sm:pb-24" aria-labelledby="robotics-title">
+      <div class="grid-12 border-t-2 border-ink pt-5">
+        <span class="numeral col-span-1 text-[4.5rem] sm:text-[6rem] lg:col-span-3 lg:text-[10rem]" aria-hidden="true">01</span>
+        <div class="col-span-3 lg:col-span-9">
+          <p class="label text-graphite">Robotics</p>
+          <h2 id="robotics-title" class="display mt-3 text-[clamp(2.1rem,5.4vw,5rem)] leading-[0.92]">Featured Robotics Systems</h2>
+          <p class="mt-5 max-w-xl text-graphite">Physical platforms built end to end: mechanics, firmware, sensors and the software that drives them.</p>
         </div>
+      </div>
 
-        <div class="mt-10 grid gap-6 md:grid-cols-2">
+      <div class="mt-12 lg:mt-20">
 
-          <!-- Card 1 ------------------------------------------------ -->
-          <article class="flex flex-col border border-neutral-800 bg-neutral-950">
-            <div class="media-frame aspect-video">
+        <!-- 01.1 --------------------------------------------------- -->
+        <article class="grid-12 gap-y-8 border-t border-ink py-10 lg:py-14">
+          <figure class="col-span-4 lg:col-span-7">
+            <div class="relative aspect-video overflow-hidden">
               <!-- ASSET PLACEHOLDER: VR Arm Split-screen Loop (720p WebP/MP4) -->
               <!-- PLACEHOLDER: Insert webp/video src here. Replace the div below with e.g.
                    <video class="absolute inset-0 h-full w-full object-cover" data-autoplay muted loop playsinline preload="none"
                           poster="assets/media/vr-arm-poster.webp" aria-label="VR headset controlling the robotic arm, split screen">
                      <source src="assets/media/vr-arm.mp4" type="video/mp4">
                    </video> -->
-              <div class="media-placeholder">
-                <span class="font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">Media · 16:9</span>
-                <span class="text-sm text-neutral-400">VR Arm split-screen loop</span>
-              </div>
+              <div class="placeholder" role="img" aria-label="Media placeholder: VR arm split-screen loop"></div>
             </div>
-            <div class="flex flex-1 flex-col gap-5 p-5 sm:p-6">
-              <div>
-                <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">R-01</p>
-                <h3 class="mt-2 text-xl font-semibold tracking-tight text-neutral-50">6-DoF VR-Teleoperated Robotic Arm</h3>
-                <p class="mt-2 inline-block border border-neutral-800 px-2 py-1 text-xs text-neutral-300">Lead Developer · Teleoperation &amp; Kinematics Pipeline</p>
-              </div>
-              <ul class="space-y-2.5 text-sm leading-relaxed text-neutral-400">
-                <li class="flex gap-3"><span class="mt-2 h-px w-3 shrink-0 bg-neutral-600" aria-hidden="true"></span><span>Architected a real-time, low-latency teleoperation pipeline mapping 6-DoF spatial controller telemetry to physical robotic arm joints.</span></li>
-                <li class="flex gap-3"><span class="mt-2 h-px w-3 shrink-0 bg-neutral-600" aria-hidden="true"></span><span>Implemented serial communication protocols and motor synchronization bridging a Meta Quest headset and Raspberry Pi controller.</span></li>
-                <li class="flex gap-3"><span class="mt-2 h-px w-3 shrink-0 bg-neutral-600" aria-hidden="true"></span><span>Designed kinematic routines and modular firmware to support ongoing research into physical imitation learning.</span></li>
-              </ul>
-              <ul class="flex flex-wrap gap-1.5" aria-label="Tech stack">
-                <li class="tag">Raspberry Pi</li><li class="tag">Python</li><li class="tag">WebXR</li><li class="tag">Microcontrollers</li><li class="tag">VEX V5</li><li class="tag">Serial Protocols</li>
-              </ul>
-              <div class="mt-auto border-t border-neutral-800 pt-4">
-                <a class="card-link" href="https://github.com/armex-code/quest-v5-teleop" target="_blank" rel="noopener">View Architecture / GitHub <span aria-hidden="true">→</span></a>
-              </div>
+            <figcaption class="label mt-3 flex justify-between text-graphite"><span>Fig. 01.1 — VR arm, split-screen loop</span><span>16:9</span></figcaption>
+          </figure>
+          <div class="col-span-4 flex flex-col lg:col-span-5">
+            <p class="label text-signal">01.1</p>
+            <h3 class="display mt-3 text-[2rem] leading-[0.95] lg:text-[2.6rem]">6-DoF VR-Teleoperated Robotic Arm</h3>
+            <p class="mt-4 text-sm font-semibold">Lead Developer · Teleoperation &amp; Kinematics Pipeline</p>
+            <ul class="mt-6 space-y-3 text-[15px] leading-snug text-graphite">
+              <li class="flex gap-3"><span class="text-ink" aria-hidden="true">–</span><span>Architected a real-time, low-latency teleoperation pipeline mapping 6-DoF spatial controller telemetry to physical robotic arm joints.</span></li>
+              <li class="flex gap-3"><span class="text-ink" aria-hidden="true">–</span><span>Implemented serial communication protocols and motor synchronization bridging a Meta Quest headset and Raspberry Pi controller.</span></li>
+              <li class="flex gap-3"><span class="text-ink" aria-hidden="true">–</span><span>Designed kinematic routines and modular firmware to support ongoing research into physical imitation learning.</span></li>
+            </ul>
+            <ul class="mt-6 flex flex-wrap gap-x-2 gap-y-1 font-mono text-xs" aria-label="Tech stack">
+              <li>Raspberry Pi</li><li aria-hidden="true" class="text-rule">/</li><li>Python</li><li aria-hidden="true" class="text-rule">/</li><li>WebXR</li><li aria-hidden="true" class="text-rule">/</li><li>Microcontrollers</li><li aria-hidden="true" class="text-rule">/</li><li>VEX V5</li><li aria-hidden="true" class="text-rule">/</li><li>Serial Protocols</li>
+            </ul>
+            <div class="mt-8 lg:mt-auto lg:pt-8">
+              <a class="text-link" href="https://github.com/armex-code/quest-v5-teleop" target="_blank" rel="noopener">View Architecture / GitHub <span aria-hidden="true">↗</span></a>
             </div>
-          </article>
+          </div>
+        </article>
 
-          <!-- Card 2 ------------------------------------------------ -->
-          <article class="flex flex-col border border-neutral-800 bg-neutral-950">
-            <div class="media-frame aspect-video">
+        <!-- 01.2 --------------------------------------------------- -->
+        <article class="grid-12 gap-y-8 border-t border-ink py-10 lg:py-14">
+          <figure class="col-span-4 lg:col-span-7">
+            <div class="relative aspect-video overflow-hidden">
               <!-- ASSET PLACEHOLDER: Omni Platform & Hand Tracking Clip (WebP/MP4) -->
-              <!-- PLACEHOLDER: Insert webp/video src here (see Card 1 for the <video> snippet), e.g. assets/media/omni-platform.mp4 -->
-              <div class="media-placeholder">
-                <span class="font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">Media · 16:9</span>
-                <span class="text-sm text-neutral-400">Omni platform &amp; hand-tracking clip</span>
-              </div>
+              <!-- PLACEHOLDER: Insert webp/video src here (see 01.1 for the <video> snippet), e.g. assets/media/omni-platform.mp4 -->
+              <div class="placeholder" role="img" aria-label="Media placeholder: omni platform and hand-tracking clip"></div>
             </div>
-            <div class="flex flex-1 flex-col gap-5 p-5 sm:p-6">
-              <div>
-                <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">R-02</p>
-                <h3 class="mt-2 text-xl font-semibold tracking-tight text-neutral-50">Vision-Guided Omni-Wheel Mobile Manipulator</h3>
-                <p class="mt-2 inline-block border border-neutral-800 px-2 py-1 text-xs text-neutral-300">Systems &amp; Computer Vision Integrator (1-Week Sprint)</p>
-              </div>
-              <ul class="space-y-2.5 text-sm leading-relaxed text-neutral-400">
-                <li class="flex gap-3"><span class="mt-2 h-px w-3 shrink-0 bg-neutral-600" aria-hidden="true"></span><span>Prototyped a complete mobile manipulator in a 1-week rapid-engineering sprint, pairing an omni-directional base with an articulated gripper.</span></li>
-                <li class="flex gap-3"><span class="mt-2 h-px w-3 shrink-0 bg-neutral-600" aria-hidden="true"></span><span>Deployed a real-time computer vision gesture-tracking pipeline translating camera feed into multi-axis robotic hand articulation.</span></li>
-                <li class="flex gap-3"><span class="mt-2 h-px w-3 shrink-0 bg-neutral-600" aria-hidden="true"></span><span>Integrated motor drivers, onboard microcontroller logic, and low-latency serial communication on custom chassis.</span></li>
-              </ul>
-              <ul class="flex flex-wrap gap-1.5" aria-label="Tech stack">
-                <li class="tag">Computer Vision</li><li class="tag">OpenCV / MediaPipe</li><li class="tag">Python</li><li class="tag">Mecanum Drivetrain</li><li class="tag">CAD Prototyping</li>
-              </ul>
-              <div class="mt-auto border-t border-neutral-800 pt-4">
-                <!-- TODO: add the project URL and remove aria-disabled -->
-                <a class="card-link" href="#" aria-disabled="true" title="Write-up coming soon">Project Overview <span aria-hidden="true">→</span></a>
-              </div>
+            <figcaption class="label mt-3 flex justify-between text-graphite"><span>Fig. 01.2 — Omni platform &amp; hand tracking</span><span>16:9</span></figcaption>
+          </figure>
+          <div class="col-span-4 flex flex-col lg:col-span-5">
+            <p class="label text-signal">01.2</p>
+            <h3 class="display mt-3 text-[2rem] leading-[0.95] lg:text-[2.6rem]">Vision-Guided Omni-Wheel Mobile Manipulator</h3>
+            <p class="mt-4 text-sm font-semibold">Systems &amp; Computer Vision Integrator (1-Week Sprint)</p>
+            <ul class="mt-6 space-y-3 text-[15px] leading-snug text-graphite">
+              <li class="flex gap-3"><span class="text-ink" aria-hidden="true">–</span><span>Prototyped a complete mobile manipulator in a 1-week rapid-engineering sprint, pairing an omni-directional base with an articulated gripper.</span></li>
+              <li class="flex gap-3"><span class="text-ink" aria-hidden="true">–</span><span>Deployed a real-time computer vision gesture-tracking pipeline translating camera feed into multi-axis robotic hand articulation.</span></li>
+              <li class="flex gap-3"><span class="text-ink" aria-hidden="true">–</span><span>Integrated motor drivers, onboard microcontroller logic, and low-latency serial communication on custom chassis.</span></li>
+            </ul>
+            <ul class="mt-6 flex flex-wrap gap-x-2 gap-y-1 font-mono text-xs" aria-label="Tech stack">
+              <li>Computer Vision</li><li aria-hidden="true" class="text-rule">/</li><li>OpenCV / MediaPipe</li><li aria-hidden="true" class="text-rule">/</li><li>Python</li><li aria-hidden="true" class="text-rule">/</li><li>Mecanum Drivetrain</li><li aria-hidden="true" class="text-rule">/</li><li>CAD Prototyping</li>
+            </ul>
+            <div class="mt-8 lg:mt-auto lg:pt-8">
+              <!-- TODO: add the project URL and remove aria-disabled -->
+              <a class="text-link" href="#" aria-disabled="true" title="Write-up coming soon">Project Overview <span aria-hidden="true">→</span></a>
             </div>
-          </article>
+          </div>
+        </article>
 
-          <!-- Card 3 ------------------------------------------------ -->
-          <article class="flex flex-col border border-neutral-800 bg-neutral-950">
-            <div class="media-frame aspect-video">
+        <!-- 01.3 --------------------------------------------------- -->
+        <article class="grid-12 gap-y-8 border-t border-ink py-10 lg:py-14">
+          <figure class="col-span-4 lg:col-span-7">
+            <div class="relative aspect-video overflow-hidden">
               <!-- ASSET PLACEHOLDER: 3D LiDAR Mount & RViz Point Cloud Screenshot/Loop -->
               <!-- PLACEHOLDER: Insert webp/video src here, e.g.
                    <img class="absolute inset-0 h-full w-full object-cover" src="assets/media/lidar-rig.webp" alt="Livox LiDAR on a 3D-printed mount next to its RViz point cloud" loading="lazy" decoding="async"> -->
-              <div class="media-placeholder">
-                <span class="font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">Media · 16:9</span>
-                <span class="text-sm text-neutral-400">LiDAR mount &amp; RViz point cloud</span>
-              </div>
+              <div class="placeholder" role="img" aria-label="Media placeholder: LiDAR mount and RViz point cloud"></div>
             </div>
-            <div class="flex flex-1 flex-col gap-5 p-5 sm:p-6">
-              <div>
-                <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">R-03</p>
-                <h3 class="mt-2 text-xl font-semibold tracking-tight text-neutral-50">3D LiDAR Sensor Rig &amp; Field Data Pipeline</h3>
-                <p class="mt-2 inline-block border border-neutral-800 px-2 py-1 text-xs text-neutral-300">Field &amp; Underwater Robotics Lab @ KNU · Hardware &amp; Systems Integrator</p>
-              </div>
-              <ul class="space-y-2.5 text-sm leading-relaxed text-neutral-400">
-                <li class="flex gap-3"><span class="mt-2 h-px w-3 shrink-0 bg-neutral-600" aria-hidden="true"></span><span>Engineered custom 3D-printed vibration-resistant brackets and hardware mounts for Livox 3D LiDAR on field robotics platforms.</span></li>
-                <li class="flex gap-3"><span class="mt-2 h-px w-3 shrink-0 bg-neutral-600" aria-hidden="true"></span><span>Managed real-time Linux (Ubuntu) sensor data collection routines and hardware-in-the-loop field testing for SLAM researchers.</span></li>
-                <li class="flex gap-3"><span class="mt-2 h-px w-3 shrink-0 bg-neutral-600" aria-hidden="true"></span><span>Configured ROS 2 sensor communication channels and validated point-cloud data capture fidelity across outdoor terrains.</span></li>
-              </ul>
-              <ul class="flex flex-wrap gap-1.5" aria-label="Tech stack">
-                <li class="tag">3D LiDAR (Livox)</li><li class="tag">Linux / Ubuntu</li><li class="tag">ROS 2 Environment</li><li class="tag">3D Printing / CAD</li><li class="tag">Hardware-in-the-Loop</li>
-              </ul>
-              <div class="mt-auto border-t border-neutral-800 pt-4">
-                <!-- TODO: add the lab URL and remove aria-disabled -->
-                <a class="card-link" href="#" aria-disabled="true" title="Link coming soon">Lab Overview <span aria-hidden="true">→</span></a>
-              </div>
+            <figcaption class="label mt-3 flex justify-between text-graphite"><span>Fig. 01.3 — LiDAR mount &amp; RViz point cloud</span><span>16:9</span></figcaption>
+          </figure>
+          <div class="col-span-4 flex flex-col lg:col-span-5">
+            <p class="label text-signal">01.3</p>
+            <h3 class="display mt-3 text-[2rem] leading-[0.95] lg:text-[2.6rem]">3D LiDAR Sensor Rig &amp; Field Data Pipeline</h3>
+            <p class="mt-4 text-sm font-semibold">Field &amp; Underwater Robotics Lab @ KNU · Hardware &amp; Systems Integrator</p>
+            <ul class="mt-6 space-y-3 text-[15px] leading-snug text-graphite">
+              <li class="flex gap-3"><span class="text-ink" aria-hidden="true">–</span><span>Engineered custom 3D-printed vibration-resistant brackets and hardware mounts for Livox 3D LiDAR on field robotics platforms.</span></li>
+              <li class="flex gap-3"><span class="text-ink" aria-hidden="true">–</span><span>Managed real-time Linux (Ubuntu) sensor data collection routines and hardware-in-the-loop field testing for SLAM researchers.</span></li>
+              <li class="flex gap-3"><span class="text-ink" aria-hidden="true">–</span><span>Configured ROS 2 sensor communication channels and validated point-cloud data capture fidelity across outdoor terrains.</span></li>
+            </ul>
+            <ul class="mt-6 flex flex-wrap gap-x-2 gap-y-1 font-mono text-xs" aria-label="Tech stack">
+              <li>3D LiDAR (Livox)</li><li aria-hidden="true" class="text-rule">/</li><li>Linux / Ubuntu</li><li aria-hidden="true" class="text-rule">/</li><li>ROS 2 Environment</li><li aria-hidden="true" class="text-rule">/</li><li>3D Printing / CAD</li><li aria-hidden="true" class="text-rule">/</li><li>Hardware-in-the-Loop</li>
+            </ul>
+            <div class="mt-8 lg:mt-auto lg:pt-8">
+              <!-- TODO: add the lab URL and remove aria-disabled -->
+              <a class="text-link" href="#" aria-disabled="true" title="Link coming soon">Lab Overview <span aria-hidden="true">→</span></a>
             </div>
-          </article>
+          </div>
+        </article>
 
-          <!-- Card 4 ------------------------------------------------ -->
-          <article class="flex flex-col border border-neutral-800 bg-neutral-950">
-            <div class="media-frame aspect-video">
+        <!-- 01.4 --------------------------------------------------- -->
+        <article class="grid-12 gap-y-8 border-y border-ink py-10 lg:py-14">
+          <figure class="col-span-4 lg:col-span-7">
+            <div class="relative aspect-video overflow-hidden">
               <!-- ASSET PLACEHOLDER: VEX U Match Action & Snake Robot Video Loop -->
-              <!-- PLACEHOLDER: Insert webp/video src here (see Card 1 for the <video> snippet), e.g. assets/media/vex-snake.mp4 -->
-              <div class="media-placeholder">
-                <span class="font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">Media · 16:9</span>
-                <span class="text-sm text-neutral-400">VEX U match &amp; snake robot loop</span>
-              </div>
+              <!-- PLACEHOLDER: Insert webp/video src here (see 01.1 for the <video> snippet), e.g. assets/media/vex-snake.mp4 -->
+              <div class="placeholder" role="img" aria-label="Media placeholder: VEX U match and snake robot loop"></div>
             </div>
-            <div class="flex flex-1 flex-col gap-5 p-5 sm:p-6">
-              <div>
-                <p class="font-mono text-[11px] uppercase tracking-[0.2em] text-neutral-500">R-04</p>
-                <h3 class="mt-2 text-xl font-semibold tracking-tight text-neutral-50">Autonomous &amp; Competitive Robotics Platforms</h3>
-                <p class="mt-2 inline-block border border-neutral-800 px-2 py-1 text-xs text-neutral-300">Team Captain &amp; Lead Mechanical/Code Integrator</p>
-              </div>
-              <ul class="space-y-2.5 text-sm leading-relaxed text-neutral-400">
-                <li class="flex gap-3"><span class="mt-2 h-px w-3 shrink-0 bg-neutral-600" aria-hidden="true"></span><span>3x National VEX U Champion &amp; World Championship Qualifier; engineered custom gear trains, high-torque intake linkages, and autonomous control routines in C++.</span></li>
-                <li class="flex gap-3"><span class="mt-2 h-px w-3 shrink-0 bg-neutral-600" aria-hidden="true"></span><span>Built a bio-inspired multi-segment rescue snake robot for WRO, achieving 1st Place Nationally and 11th Worldwide.</span></li>
-                <li class="flex gap-3"><span class="mt-2 h-px w-3 shrink-0 bg-neutral-600" aria-hidden="true"></span><span>Supervised team rapid prototyping, Fusion 360 assemblies, and mechatronics lab equipment.</span></li>
-              </ul>
-              <ul class="flex flex-wrap gap-1.5" aria-label="Tech stack">
-                <li class="tag">C++</li><li class="tag">VEX V5</li><li class="tag">Kinematic Linkages</li><li class="tag">Rapid Prototyping</li><li class="tag">Fusion 360</li>
-              </ul>
-              <div class="mt-auto border-t border-neutral-800 pt-4">
-                <!-- TODO: add the competition archive URL and remove aria-disabled -->
-                <a class="card-link" href="#" aria-disabled="true" title="Archive coming soon">Competition Archive <span aria-hidden="true">→</span></a>
-              </div>
+            <figcaption class="label mt-3 flex justify-between text-graphite"><span>Fig. 01.4 — VEX U match &amp; snake robot</span><span>16:9</span></figcaption>
+          </figure>
+          <div class="col-span-4 flex flex-col lg:col-span-5">
+            <p class="label text-signal">01.4</p>
+            <h3 class="display mt-3 text-[2rem] leading-[0.95] lg:text-[2.6rem]">Autonomous &amp; Competitive Robotics Platforms</h3>
+            <p class="mt-4 text-sm font-semibold">Team Captain &amp; Lead Mechanical/Code Integrator</p>
+            <ul class="mt-6 space-y-3 text-[15px] leading-snug text-graphite">
+              <li class="flex gap-3"><span class="text-ink" aria-hidden="true">–</span><span>3x National VEX U Champion &amp; World Championship Qualifier; engineered custom gear trains, high-torque intake linkages, and autonomous control routines in C++.</span></li>
+              <li class="flex gap-3"><span class="text-ink" aria-hidden="true">–</span><span>Built a bio-inspired multi-segment rescue snake robot for WRO, achieving 1st Place Nationally and 11th Worldwide.</span></li>
+              <li class="flex gap-3"><span class="text-ink" aria-hidden="true">–</span><span>Supervised team rapid prototyping, Fusion 360 assemblies, and mechatronics lab equipment.</span></li>
+            </ul>
+            <ul class="mt-6 flex flex-wrap gap-x-2 gap-y-1 font-mono text-xs" aria-label="Tech stack">
+              <li>C++</li><li aria-hidden="true" class="text-rule">/</li><li>VEX V5</li><li aria-hidden="true" class="text-rule">/</li><li>Kinematic Linkages</li><li aria-hidden="true" class="text-rule">/</li><li>Rapid Prototyping</li><li aria-hidden="true" class="text-rule">/</li><li>Fusion 360</li>
+            </ul>
+            <div class="mt-8 lg:mt-auto lg:pt-8">
+              <!-- TODO: add the competition archive URL and remove aria-disabled -->
+              <a class="text-link" href="#" aria-disabled="true" title="Archive coming soon">Competition Archive <span aria-hidden="true">→</span></a>
             </div>
-          </article>
+          </div>
+        </article>
 
-        </div>
       </div>
     </section>
 
     <!-- =========================================================
          4. SOFTWARE EXPERIMENTS & CREATIVE LAB
          ========================================================= -->
-    <section id="software" class="border-b border-neutral-800" aria-labelledby="software-title">
-      <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-        <p class="section-label">02 / Software</p>
-        <h2 id="software-title" class="mt-3 text-2xl font-semibold tracking-tight text-neutral-50 sm:text-3xl">Software Experiments &amp; Creative Lab</h2>
-
-        <div class="mt-10 grid gap-px border border-neutral-800 bg-neutral-800 sm:grid-cols-2 lg:grid-cols-3">
-
-          <article class="flex flex-col gap-4 bg-neutral-950 p-5 sm:p-6">
-            <div class="flex items-baseline justify-between gap-4">
-              <h3 class="font-semibold text-neutral-100">AbdelOS</h3>
-              <span class="font-mono text-[11px] text-neutral-600">S-01</span>
-            </div>
-            <p class="text-sm leading-relaxed text-neutral-400">Browser-based vintage operating system replica: start menu, draggable windows, Notepad, Paint, Minesweeper.</p>
-            <ul class="flex flex-wrap gap-1.5" aria-label="Tech stack"><li class="tag">JavaScript</li><li class="tag">UI Systems</li></ul>
-            <a class="card-link mt-auto pt-2" href="retro-os.html">Open AbdelOS <span aria-hidden="true">→</span></a>
-          </article>
-
-          <article class="flex flex-col gap-4 bg-neutral-950 p-5 sm:p-6">
-            <div class="flex items-baseline justify-between gap-4">
-              <h3 class="font-semibold text-neutral-100">CamFX</h3>
-              <span class="font-mono text-[11px] text-neutral-600">S-02</span>
-            </div>
-            <p class="text-sm leading-relaxed text-neutral-400">Real-time ASCII and canvas-based camera processing experiment. Runs fully in the browser; nothing is recorded.</p>
-            <ul class="flex flex-wrap gap-1.5" aria-label="Tech stack"><li class="tag">WebGL / Canvas</li><li class="tag">Creative Coding</li></ul>
-            <a class="card-link mt-auto pt-2" href="camera-fx.html">Open CamFX <span aria-hidden="true">→</span></a>
-          </article>
-
-          <article class="flex flex-col gap-4 bg-neutral-950 p-5 sm:col-span-2 sm:p-6 lg:col-span-1">
-            <div class="flex items-baseline justify-between gap-4">
-              <h3 class="font-semibold text-neutral-100">ROVER RUN · Interactive Sandbox</h3>
-              <span class="font-mono text-[11px] text-neutral-600">S-03</span>
-            </div>
-            <p class="text-sm leading-relaxed text-neutral-400">3D browser rover simulation with per-second driving dynamics and rigid-body obstacles. Optional; loads only on request.</p>
-            <ul class="flex flex-wrap gap-1.5" aria-label="Tech stack"><li class="tag">Three.js</li><li class="tag">Physics</li></ul>
-            <div class="mt-auto flex flex-wrap items-center gap-4 pt-2">
-              <button type="button" class="btn-ghost px-3 py-2 font-mono text-xs uppercase tracking-wider" data-open-sandbox>Launch 3D Sandbox</button>
-              <a class="font-mono text-[11px] uppercase tracking-wider text-neutral-500 hover:text-neutral-300" href="rover.html">Full screen ↗</a>
-            </div>
-          </article>
-
-          <article class="flex flex-col gap-4 bg-neutral-950 p-5 sm:col-span-2 sm:p-6 lg:col-span-3">
-            <div class="flex items-baseline justify-between gap-4">
-              <h3 class="font-semibold text-neutral-100">Enterprise Data Pipeline</h3>
-              <span class="font-mono text-[11px] text-neutral-600">S-04</span>
-            </div>
-            <p class="max-w-3xl text-sm leading-relaxed text-neutral-400">Automated PDF parsing and SAP dashboard integration tool for Stallergenes Greer. Production internal tool; source is confidential.</p>
-            <ul class="flex flex-wrap gap-1.5" aria-label="Tech stack"><li class="tag">Python</li><li class="tag">Tkinter</li><li class="tag">APIs</li><li class="tag">SAP Integration</li></ul>
-          </article>
-
+    <section id="software" class="wrap pb-16 sm:pb-24" aria-labelledby="software-title">
+      <div class="grid-12 border-t-2 border-ink pt-5">
+        <span class="numeral col-span-1 text-[4.5rem] sm:text-[6rem] lg:col-span-3 lg:text-[10rem]" aria-hidden="true">02</span>
+        <div class="col-span-3 lg:col-span-9">
+          <p class="label text-graphite">Software</p>
+          <h2 id="software-title" class="display mt-3 text-[clamp(2.1rem,5.4vw,5rem)] leading-[0.92]">Software Experiments &amp; Creative Lab</h2>
         </div>
+      </div>
+
+      <div class="mt-12 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4">
+        <article class="flex flex-col border-t border-ink pt-4">
+          <p class="label text-signal">02.1</p>
+          <h3 class="display mt-4 text-2xl leading-none">AbdelOS</h3>
+          <p class="mt-3 text-[15px] leading-snug text-graphite">Browser-based vintage operating system replica: start menu, draggable windows, Notepad, Paint, Minesweeper.</p>
+          <p class="mt-4 font-mono text-xs">JavaScript <span class="text-rule">/</span> UI Systems</p>
+          <div class="mt-6 sm:mt-auto sm:pt-6"><a class="text-link" href="retro-os.html">Open AbdelOS <span aria-hidden="true">→</span></a></div>
+        </article>
+
+        <article class="flex flex-col border-t border-ink pt-4">
+          <p class="label text-signal">02.2</p>
+          <h3 class="display mt-4 text-2xl leading-none">CamFX</h3>
+          <p class="mt-3 text-[15px] leading-snug text-graphite">Real-time ASCII and canvas-based camera processing experiment. Runs fully in the browser; nothing is recorded.</p>
+          <p class="mt-4 font-mono text-xs">WebGL / Canvas <span class="text-rule">/</span> Creative Coding</p>
+          <div class="mt-6 sm:mt-auto sm:pt-6"><a class="text-link" href="camera-fx.html">Open CamFX <span aria-hidden="true">→</span></a></div>
+        </article>
+
+        <article class="flex flex-col border-t border-ink pt-4">
+          <p class="label text-signal">02.3</p>
+          <h3 class="display mt-4 text-2xl leading-none">Rover Run</h3>
+          <p class="mt-3 text-[15px] leading-snug text-graphite">Interactive 3D browser rover simulation with rigid-body obstacles. Optional; loads only when launched.</p>
+          <p class="mt-4 font-mono text-xs">Three.js <span class="text-rule">/</span> Physics</p>
+          <div class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 sm:mt-auto sm:pt-6">
+            <button type="button" class="btn py-2 text-[13px]" data-open-sandbox>Launch 3D Sandbox <span aria-hidden="true">▸</span></button>
+            <a class="label text-graphite hover:text-signal" href="rover.html">Full screen ↗</a>
+          </div>
+        </article>
+
+        <article class="flex flex-col border-t border-ink pt-4">
+          <p class="label text-signal">02.4</p>
+          <h3 class="display mt-4 text-2xl leading-none">Enterprise Data Pipeline</h3>
+          <p class="mt-3 text-[15px] leading-snug text-graphite">Automated PDF parsing and SAP dashboard integration tool for Stallergenes Greer. Internal production tool; source confidential.</p>
+          <p class="mt-4 font-mono text-xs">Python <span class="text-rule">/</span> Tkinter <span class="text-rule">/</span> APIs <span class="text-rule">/</span> SAP Integration</p>
+        </article>
       </div>
     </section>
 
     <!-- =========================================================
          5. EXPERIENCE & LEADERSHIP
          ========================================================= -->
-    <section id="experience" class="border-b border-neutral-800" aria-labelledby="experience-title">
-      <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-        <p class="section-label">03 / Experience</p>
-        <h2 id="experience-title" class="mt-3 text-2xl font-semibold tracking-tight text-neutral-50 sm:text-3xl">Professional Experience &amp; Leadership</h2>
-
-        <ol class="mt-10 border-t border-neutral-800">
-          <li class="grid gap-1 border-b border-neutral-800 py-5 md:grid-cols-12 md:gap-6">
-            <p class="font-mono text-xs text-neutral-500 md:col-span-3 md:pt-1">Jun 2025 – Present</p>
-            <div class="md:col-span-6">
-              <h3 class="font-medium text-neutral-100">IT &amp; AI Consultant</h3>
-              <p class="text-sm text-neutral-400">Stallergenes Greer</p>
-            </div>
-            <p class="font-mono text-xs text-neutral-500 md:col-span-3 md:pt-1 md:text-right">Hybrid / France</p>
-          </li>
-          <li class="grid gap-1 border-b border-neutral-800 py-5 md:grid-cols-12 md:gap-6">
-            <p class="font-mono text-xs text-neutral-500 md:col-span-3 md:pt-1">2022 – Present</p>
-            <div class="md:col-span-6">
-              <h3 class="font-medium text-neutral-100">Technical Team Lead &amp; President</h3>
-              <p class="text-sm text-neutral-400">AUI Robotics Team</p>
-            </div>
-            <p class="font-mono text-xs text-neutral-500 md:col-span-3 md:pt-1 md:text-right">Morocco</p>
-          </li>
-          <li class="grid gap-1 border-b border-neutral-800 py-5 md:grid-cols-12 md:gap-6">
-            <p class="font-mono text-xs text-neutral-500 md:col-span-3 md:pt-1">Oct 2024 – Dec 2024</p>
-            <div class="md:col-span-6">
-              <h3 class="font-medium text-neutral-100">Undergraduate Research Intern</h3>
-              <p class="text-sm text-neutral-400">Field &amp; Underwater Robotics Lab @ KNU</p>
-            </div>
-            <p class="font-mono text-xs text-neutral-500 md:col-span-3 md:pt-1 md:text-right">South Korea</p>
-          </li>
-          <li class="grid gap-1 border-b border-neutral-800 py-5 md:grid-cols-12 md:gap-6">
-            <p class="font-mono text-xs text-neutral-500 md:col-span-3 md:pt-1">Nov 2023 – Jan 2024</p>
-            <div class="md:col-span-6">
-              <h3 class="font-medium text-neutral-100">R&amp;D Engineering Intern</h3>
-              <p class="text-sm text-neutral-400">Capgemini</p>
-            </div>
-            <p class="font-mono text-xs text-neutral-500 md:col-span-3 md:pt-1 md:text-right">Morocco</p>
-          </li>
-        </ol>
+    <section id="experience" class="wrap pb-16 sm:pb-24" aria-labelledby="experience-title">
+      <div class="grid-12 border-t-2 border-ink pt-5">
+        <span class="numeral col-span-1 text-[4.5rem] sm:text-[6rem] lg:col-span-3 lg:text-[10rem]" aria-hidden="true">03</span>
+        <div class="col-span-3 lg:col-span-9">
+          <p class="label text-graphite">Experience</p>
+          <h2 id="experience-title" class="display mt-3 text-[clamp(2.1rem,5.4vw,5rem)] leading-[0.92]">Professional Experience &amp; Leadership</h2>
+        </div>
       </div>
+
+      <ol class="mt-12 border-b border-ink lg:mt-20">
+        <li class="grid-12 gap-y-2 border-t border-ink py-6">
+          <p class="col-span-4 font-mono text-xs lg:col-span-3 lg:pt-2">Jun 2025 – Present</p>
+          <div class="col-span-4 lg:col-span-6">
+            <h3 class="display text-2xl leading-tight sm:text-3xl">IT &amp; AI Consultant</h3>
+            <p class="mt-1 text-graphite">Stallergenes Greer</p>
+          </div>
+          <p class="col-span-4 font-mono text-xs text-graphite lg:col-span-3 lg:pt-2 lg:text-right">Hybrid / France</p>
+        </li>
+        <li class="grid-12 gap-y-2 border-t border-ink py-6">
+          <p class="col-span-4 font-mono text-xs lg:col-span-3 lg:pt-2">2022 – Present</p>
+          <div class="col-span-4 lg:col-span-6">
+            <h3 class="display text-2xl leading-tight sm:text-3xl">Technical Team Lead &amp; President</h3>
+            <p class="mt-1 text-graphite">AUI Robotics Team</p>
+          </div>
+          <p class="col-span-4 font-mono text-xs text-graphite lg:col-span-3 lg:pt-2 lg:text-right">Morocco</p>
+        </li>
+        <li class="grid-12 gap-y-2 border-t border-ink py-6">
+          <p class="col-span-4 font-mono text-xs lg:col-span-3 lg:pt-2">Oct 2024 – Dec 2024</p>
+          <div class="col-span-4 lg:col-span-6">
+            <h3 class="display text-2xl leading-tight sm:text-3xl">Undergraduate Research Intern</h3>
+            <p class="mt-1 text-graphite">Field &amp; Underwater Robotics Lab @ KNU</p>
+          </div>
+          <p class="col-span-4 font-mono text-xs text-graphite lg:col-span-3 lg:pt-2 lg:text-right">South Korea</p>
+        </li>
+        <li class="grid-12 gap-y-2 border-t border-ink py-6">
+          <p class="col-span-4 font-mono text-xs lg:col-span-3 lg:pt-2">Nov 2023 – Jan 2024</p>
+          <div class="col-span-4 lg:col-span-6">
+            <h3 class="display text-2xl leading-tight sm:text-3xl">R&amp;D Engineering Intern</h3>
+            <p class="mt-1 text-graphite">Capgemini</p>
+          </div>
+          <p class="col-span-4 font-mono text-xs text-graphite lg:col-span-3 lg:pt-2 lg:text-right">Morocco</p>
+        </li>
+      </ol>
     </section>
 
     <!-- =========================================================
          6. HONORS, AWARDS & ACADEMIC HIGHLIGHTS
          ========================================================= -->
-    <section id="awards" aria-labelledby="awards-title">
-      <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-        <p class="section-label">04 / Awards</p>
-        <h2 id="awards-title" class="mt-3 text-2xl font-semibold tracking-tight text-neutral-50 sm:text-3xl">Honors, Awards &amp; Academic Highlights</h2>
-
-        <ul class="mt-10 grid gap-px border border-neutral-800 bg-neutral-800 md:grid-cols-2">
-          <li class="flex flex-col gap-1 bg-neutral-950 p-5">
-            <span class="font-mono text-xs text-neutral-500">2022 · 2023 · 2024</span>
-            <span class="text-neutral-100">3x National VEX Robotics Champion &amp; Direct VEX U World Qualifier</span>
-          </li>
-          <li class="flex flex-col gap-1 bg-neutral-950 p-5">
-            <span class="font-mono text-xs text-neutral-500">2019 · 2022</span>
-            <span class="text-neutral-100">2x National World Robot Olympiad (WRO) Champion &amp; 11th Worldwide</span>
-          </li>
-          <li class="flex flex-col gap-1 bg-neutral-950 p-5">
-            <span class="font-mono text-xs text-neutral-500">2021</span>
-            <span class="text-neutral-100">5th Best FLL Innovation Project Worldwide</span>
-          </li>
-          <li class="flex flex-col gap-1 bg-neutral-950 p-5">
-            <span class="font-mono text-xs text-neutral-500">2024 · 2022</span>
-            <span class="text-neutral-100">1st Place: IEEE WIE Hackathon (2024) &amp; neoHack (2022)</span>
-          </li>
-          <li class="flex flex-col gap-1 bg-neutral-950 p-5 md:col-span-2">
-            <span class="font-mono text-xs text-neutral-500">Al Akhawayn University</span>
-            <span class="text-neutral-100">Excellence Scholarship Award Recipient</span>
-          </li>
-        </ul>
+    <section id="awards" class="wrap pb-16 sm:pb-24" aria-labelledby="awards-title">
+      <div class="grid-12 border-t-2 border-ink pt-5">
+        <span class="numeral col-span-1 text-[4.5rem] sm:text-[6rem] lg:col-span-3 lg:text-[10rem]" aria-hidden="true">04</span>
+        <div class="col-span-3 lg:col-span-9">
+          <p class="label text-graphite">Awards</p>
+          <h2 id="awards-title" class="display mt-3 text-[clamp(2.1rem,5.4vw,5rem)] leading-[0.92]">Honors, Awards &amp; Academic Highlights</h2>
+        </div>
       </div>
+
+      <ul class="mt-12 grid gap-x-6 sm:grid-cols-2 lg:mt-20">
+        <li class="flex gap-5 border-t border-ink py-6">
+          <span class="numeral w-24 shrink-0 text-[3.5rem] text-ink sm:w-28 sm:text-[4.5rem]">3×</span>
+          <div>
+            <p class="text-lg font-semibold leading-snug">National VEX Robotics Champion &amp; Direct VEX U World Qualifier</p>
+            <p class="mt-2 font-mono text-xs text-graphite">2022 · 2023 · 2024</p>
+          </div>
+        </li>
+        <li class="flex gap-5 border-t border-ink py-6">
+          <span class="numeral w-24 shrink-0 text-[3.5rem] text-ink sm:w-28 sm:text-[4.5rem]">2×</span>
+          <div>
+            <p class="text-lg font-semibold leading-snug">National World Robot Olympiad (WRO) Champion &amp; 11th Worldwide</p>
+            <p class="mt-2 font-mono text-xs text-graphite">2019 · 2022</p>
+          </div>
+        </li>
+        <li class="flex gap-5 border-t border-ink py-6">
+          <span class="numeral w-24 shrink-0 text-[3.5rem] text-ink sm:w-28 sm:text-[4.5rem]">5th</span>
+          <div>
+            <p class="text-lg font-semibold leading-snug">Best FLL Innovation Project Worldwide</p>
+            <p class="mt-2 font-mono text-xs text-graphite">2021</p>
+          </div>
+        </li>
+        <li class="flex gap-5 border-t border-ink py-6">
+          <span class="numeral w-24 shrink-0 text-[3.5rem] text-ink sm:w-28 sm:text-[4.5rem]">1st</span>
+          <div>
+            <p class="text-lg font-semibold leading-snug">IEEE WIE Hackathon &amp; neoHack</p>
+            <p class="mt-2 font-mono text-xs text-graphite">2024 · 2022</p>
+          </div>
+        </li>
+        <li class="flex gap-5 border-y border-ink py-6 sm:col-span-2">
+          <span class="numeral w-24 shrink-0 text-[3.5rem] text-ink sm:w-28 sm:text-[4.5rem]">AUI</span>
+          <div>
+            <p class="text-lg font-semibold leading-snug">Excellence Scholarship Award Recipient</p>
+            <p class="mt-2 font-mono text-xs text-graphite">Al Akhawayn University</p>
+          </div>
+        </li>
+      </ul>
     </section>
   </main>
 
   <!-- =========================================================
        7. FOOTER
        ========================================================= -->
-  <footer class="border-t border-neutral-800">
-    <div class="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-12 sm:px-6 md:flex-row md:items-end md:justify-between">
-      <div>
-        <p class="section-label">Contact</p>
-        <a href="mailto:a.elarfaoui@aui.ma" class="mt-3 block text-2xl font-semibold tracking-tight text-neutral-50 underline-offset-8 hover:underline sm:text-3xl">a.elarfaoui@aui.ma</a>
-        <ul class="mt-5 flex flex-wrap gap-x-6 gap-y-2 font-mono text-xs uppercase tracking-wider text-neutral-400">
-          <li><a class="hover:text-neutral-100" href="https://www.linkedin.com/in/ar-elarfaoui/" target="_blank" rel="noopener">LinkedIn</a></li>
-          <li><a class="hover:text-neutral-100" href="https://github.com/armex-code" target="_blank" rel="noopener">GitHub</a></li>
-          <li><a class="hover:text-neutral-100" href="assets/resume.pdf" download>Resume PDF</a></li>
+  <footer class="bg-ink text-paper">
+    <div class="wrap pb-8 pt-14 sm:pt-20">
+      <p class="label text-[#9a9a9a]">Contact</p>
+      <a href="mailto:a.elarfaoui@aui.ma" class="display mt-4 block break-words text-[clamp(2.2rem,8.4vw,8.5rem)] leading-[0.9] hover:text-signal">a.elarfaoui@aui.ma</a>
+
+      <div class="grid-12 mt-14 gap-y-8 border-t border-[#333] pt-6 sm:mt-20">
+        <ul class="col-span-4 flex flex-wrap gap-x-8 gap-y-3 text-sm font-medium lg:col-span-6">
+          <li><a class="hover:text-signal" href="https://www.linkedin.com/in/ar-elarfaoui/" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+          <li><a class="hover:text-signal" href="https://github.com/armex-code" target="_blank" rel="noopener">GitHub ↗</a></li>
+          <li><a class="hover:text-signal" href="assets/resume.pdf" download>Resume PDF ↓</a></li>
         </ul>
-      </div>
-      <div class="font-mono text-[11px] leading-relaxed text-neutral-500 md:text-right">
-        <p>© <span data-year>2026</span> Abdelrahman Elarfaoui · heyabdel.com</p>
-        <p>Built with precision for robotics engineering.</p>
+        <div class="label col-span-4 space-y-2 leading-normal text-[#9a9a9a] lg:col-span-6 lg:text-right">
+          <p>© <span data-year>2026</span> Abdelrahman Elarfaoui · heyabdel.com</p>
+          <p>Built with precision for robotics engineering.</p>
+        </div>
       </div>
     </div>
   </footer>
@@ -433,16 +428,16 @@
        Optional 3D sandbox (Rover Run). The iframe is only created
        when the visitor asks for it, so the main page stays light.
        ========================================================= -->
-  <dialog id="sandbox" class="m-auto h-[min(85vh,760px)] w-[min(96vw,1200px)] max-w-none border border-neutral-800 bg-neutral-950 p-0 text-neutral-300 backdrop:bg-black/80 backdrop:backdrop-blur-sm" aria-labelledby="sandbox-title">
+  <dialog id="sandbox" class="m-auto h-[min(85vh,760px)] w-[min(96vw,1200px)] max-w-none border-2 border-ink bg-paper p-0 text-ink backdrop:bg-white/80 backdrop:backdrop-blur-sm" aria-labelledby="sandbox-title">
     <div class="flex h-full flex-col">
-      <div class="flex items-center justify-between gap-4 border-b border-neutral-800 px-4 py-2.5">
-        <p id="sandbox-title" class="font-mono text-xs uppercase tracking-wider text-neutral-400">Rover Run · 3D Sandbox <span class="hidden text-neutral-600 sm:inline">· WASD / arrows · Shift boost</span></p>
-        <div class="flex items-center gap-3">
-          <a href="rover.html" class="font-mono text-[11px] uppercase tracking-wider text-neutral-500 hover:text-neutral-200">Full screen ↗</a>
-          <button type="button" class="btn-ghost px-3 py-1.5 font-mono text-xs uppercase" data-close-sandbox>Close</button>
+      <div class="flex items-center justify-between gap-4 border-b-2 border-ink px-4 py-2.5">
+        <p id="sandbox-title" class="label">Rover Run — 3D Sandbox <span class="hidden text-graphite sm:inline">· WASD / arrows · Shift boost</span></p>
+        <div class="flex items-center gap-4">
+          <a href="rover.html" class="label text-graphite hover:text-signal">Full screen ↗</a>
+          <button type="button" class="btn py-1.5 text-[13px]" data-close-sandbox>Close ✕</button>
         </div>
       </div>
-      <div class="relative flex-1 bg-black" data-sandbox-slot></div>
+      <div class="relative flex-1 bg-ink" data-sandbox-slot></div>
     </div>
   </dialog>
 
